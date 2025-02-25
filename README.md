@@ -61,7 +61,7 @@ Nodemon automatically restarts the server whenever changes are made to the code,
 It is especially useful during backend development to avoid manually stopping and restarting the server.
 
 
-## Next step for le database with PostgreSQL and Tailwind CSS for the styles
+## Next step for le database with PostgreSQL, Tailwind CSS for the styles and Zustand for state management library for Admin
 
 This section will guide you through setting up the PostgreSQL database for the project. 
 

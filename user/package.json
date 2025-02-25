@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "userdev": "next dev --turbopack",
+    "userdev": "next dev",
     "builduser": "next build",
     "start": "next start",
     "lint": "next lint"

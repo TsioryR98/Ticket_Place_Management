@@ -51,7 +51,7 @@ It is built with Next.js for server-side rendering and better performance.
    ```bash
    npm run devstart
    ```
-    Sans nodemon
+    without nodemon
 
     ```bash
    node app.js

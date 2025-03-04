@@ -1,0 +1,23 @@
+import express, { json } from "express";
+import cors from "cors";
+import bcrypt from "bcryptjs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import cookieParser from "cookie-parser";
+import { usersRouter } from "./routes/usersRoute.js";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename); //static files
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+const corsOptions = { credentials: true, origin: process.env.URL || "*" };
+
+app.use(cors(corsOptions));
+app.use(json());
+app.use(cookieParser());
+
+app.use("/auth/users", usersRouter);
+
+app.listen(PORT, () => {
+  console.log(`appServer is running on http://localhost:${PORT}`);
+});

@@ -15,4 +15,15 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  try {
+    //hash password
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const newUser = await pool.query(
+      "INSERT INTO users (user_name, user_email, user_passwords, created_at) VALUES($1,$2,$3,$4) RETURNING *",
+      [req.name, req.email, req.hashedPassword, req.date]
+    );
+  } catch (error) {}
+});
+
 export { router as usersRouter };

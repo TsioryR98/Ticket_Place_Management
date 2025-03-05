@@ -2,3 +2,4 @@ index.ejs
 login.ejs
 register.ejs
 dashboard.ejs
+.env

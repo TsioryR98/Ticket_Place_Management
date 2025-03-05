@@ -16,6 +16,7 @@ app.use(cors(corsOptions));
 app.use(json());
 app.use(cookieParser());
 
+//route for user test only
 app.use("/auth/users", usersRouter);
 
 app.listen(PORT, () => {

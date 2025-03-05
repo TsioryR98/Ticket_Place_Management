@@ -3,7 +3,7 @@ CREATE DATABASE ticket_management;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
 
 CREATE TABLE users(
-    users_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    users_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), /*dafault generate*/
     user_name VARCHAR(255) UNIQUE NOT NULL,
     user_email VARCHAR(255) UNIQUE NOT NULL,
     user_passwords TEXT NOT NULL,
@@ -19,3 +19,6 @@ INSERT INTO users (user_name, user_email, user_passwords, "role", created_at) VA
 
 INSERT INTO users (user_name, user_email, user_passwords, created_at) 
 VALUES ('regular_user', 'user@example.com', 'hashedpassword2', NOW());
+
+INSERT INTO users (user_name, user_email, user_passwords) 
+VALUES ('regular_user', 'user@example.com', 'hashedpassword2');

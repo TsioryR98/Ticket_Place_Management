@@ -3,3 +3,4 @@ login.ejs
 register.ejs
 dashboard.ejs
 .env
+test

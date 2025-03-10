@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 
 const router = express.Router();
+
 const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
@@ -17,7 +18,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     //body request
     const { username, email } = req.body;

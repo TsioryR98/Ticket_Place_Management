@@ -2,5 +2,6 @@ index.ejs
 login.ejs
 register.ejs
 dashboard.ejs
+views
 .env
 request.rest

@@ -3,7 +3,7 @@ CREATE DATABASE ticket_management;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
 
 CREATE TABLE users(
-    users_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), /*dafault generate*/
+    user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), /*dafault generate*/
     user_name VARCHAR(255) UNIQUE NOT NULL,
     user_email VARCHAR(255) UNIQUE NOT NULL,
     user_passwords TEXT NOT NULL,

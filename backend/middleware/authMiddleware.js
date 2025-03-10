@@ -1,20 +1,19 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { error } from "console";
 
-dotenv.config();
-function authenticationToken(res, req, next) {
-  const auhtHeader = req.headers["authorization"]; //not null in const token
-  const token = auhtHeader && auhtHeader.split(" ")[1];
+function authenticationToken(req, res, next) {
+  const authHeader = req.headers["authorization"]; //not null in const token
+  const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) return res.status(401).json({ message: "Acces not allower" });
-  if (token === null) return res.status(401).json({ message: "token is null" });
+  if (!token) return res.status(401).json({ message: "Access not allowed" });
 
   try {
-    const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decodedUser;
+    const decodedUser = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    req.user = decodedUser; //user from JWT
     next();
   } catch (error) {
-    res.status(403).json({ message: "invalid token" });
+    return res.status(403).json({ error: error.message });
   }
 }
 

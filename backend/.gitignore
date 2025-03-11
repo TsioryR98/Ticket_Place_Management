@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 index.ejs
 login.ejs
 register.ejs
@@ -8,7 +7,4 @@ views
 request.rest
 node_modules/
 views/
-=======
 node_modules
-.env
->>>>>>> origin/dev

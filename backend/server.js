@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
-import { usersRouter } from "./routes/usersRoute.js";
+import { usersRouter } from "../backend/routes/usersRoute.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename); //static files
 
@@ -17,7 +17,7 @@ app.use(json());
 app.use(cookieParser());
 
 //route for user test only
-app.use("/auth/users", usersRouter);
+app.use("/api/users", usersRouter);
 
 app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

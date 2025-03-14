@@ -3,7 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --lightBrown: #D9A577;
+  --lightBrown: #d9a577;
   --darkVariant: #121217;
 }
 
@@ -25,7 +25,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
 .landing_page {
   background-image: url("../Images/land.jpg");
   background-position: center;
@@ -34,37 +33,43 @@ body {
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-Regular.ttf")
+    format("truetype");
   font-weight: 400;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-SemiBold.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-SemiBold.ttf")
+    format("truetype");
   font-weight: 600;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Medium.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-Medium.ttf")
+    format("truetype");
   font-weight: 500;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-ExtraBold.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-ExtraBold.ttf")
+    format("truetype");
   font-weight: 800;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-Bold.ttf")
+    format("truetype");
   font-weight: 700;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Black.ttf") format("truetype");
+  src: url("../Fonts_Family/Montserrat/static/Montserrat-Black.ttf")
+    format("truetype");
   font-weight: 900;
 }
 
@@ -104,10 +109,18 @@ body {
   font-weight: 900;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Montserrat", sans-serif;
 }
 
-p, span, a, li {
+p,
+span,
+a,
+li {
   font-family: "Poppins", sans-serif;
 }

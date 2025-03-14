@@ -49,6 +49,11 @@ export default function EventPage({ params }: { params: { eventId: string } }) {
           ))}
         </tbody>
       </table>
+      <div className="mt-6">
+        <button className="bg-blue-500 text-white py-2 px-4 rounded" disabled>
+          Réserver maintenant
+        </button>
+      </div>
     </div>
   );
 }

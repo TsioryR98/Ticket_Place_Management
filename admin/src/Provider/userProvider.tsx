@@ -41,6 +41,7 @@ export const userDataProvider: DataProvider = {
         page,
         perPage,
       };
+      const offset = (page - 1) * perPage;
 
       // get data with HTTPS and URL
       const url = `${urlAPI}?${queryString.stringify(query)}`;
@@ -55,16 +56,31 @@ export const userDataProvider: DataProvider = {
         method: "GET",
       });
 
+      const pageNumber = Math.ceil(json.length / perPage);
+
       //convert into id required by react admin
+      /*
       const data = json.map((user: User) => ({
         id: user.user_id,
         ...user, // Include all other user fields in User interface
       }));
       const total = json.total;
-      return {
-        data,
-        total,
+      */
+      const result: GetListResult = {
+        data: json
+          .map((user: User) => ({
+            id: user.user_id,
+            ...user, // Include all other user fields in User interface
+          }))
+          .slice(offset, offset + perPage),
+        total: json.length,
+        pageInfo: {
+          hasNextPage: page < pageNumber,
+          hasPreviousPage: page !== 1, //if page 1 no previous
+        },
       };
+
+      return result;
     } catch (error) {
       throw error;
     }

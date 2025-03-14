@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import eventsData from "@/lib/events.json";
-import { Event } from "@/Types/event";
+import { Event } from "@/types/event";
 
 export default function EventPage({ params }: { params: { eventId: string } }) {
   const event: Event | undefined = eventsData.find(

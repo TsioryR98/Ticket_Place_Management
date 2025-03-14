@@ -1,15 +1,17 @@
 import * as React from "react";
 import { useLogin, useNotify } from "react-admin";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
+import {
+  Box,
+  Button,
+  CssBaseline,
+  Divider,
+  FormControl,
+  Link,
+  TextField,
+  Typography,
+  Stack,
+  Card as MuiCard,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../loginPage/ForgotPassword";
 import { GoogleIcon } from "../shared_theme/CustomIcons";

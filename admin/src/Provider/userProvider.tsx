@@ -19,7 +19,7 @@ import { fetchUtils } from "react-admin";
 import queryString from "query-string";
 
 interface User {
-  user_id: string;
+  user_id: Identifier;
   user_name: string;
   user_email: string;
   role: string;

@@ -10,7 +10,11 @@ const __dirname = dirname(__filename); //static files
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const corsOptions = { credentials: true, origin: process.env.URL || "*" };
+const corsOptions = {
+  credentials: true,
+  origin: process.env.URL || "*",
+  exposedHeaders: ["X-Total-Count"], //allow cors to expose X-Total-Count
+};
 
 app.use(cors(corsOptions));
 app.use(json());

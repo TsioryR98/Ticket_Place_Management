@@ -1,21 +1,6 @@
 import { notFound } from "next/navigation";
 import eventsData from "@/lib/events.json";
-
-type Event = {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  organizer: string;
-  tickets: {
-    type: string;
-    price: number;
-    available: number;
-    limitPerPerson: number;
-  }[];
-};
+import { Event } from "@/Types/event";
 
 export default function EventPage({ params }: { params: { eventId: string } }) {
   const event: Event | undefined = eventsData.find(

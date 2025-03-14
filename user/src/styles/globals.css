@@ -26,86 +26,86 @@ body {
 }
 
 .landing_page {
-  background-image: url("../Images/land.jpg");
+  background-image: url("../../public/land.jpg");
   background-position: center;
   background-size: cover;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Regular.ttf")
+  src: url("Montserrat/Montserrat-Regular.ttf")
     format("truetype");
   font-weight: 400;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-SemiBold.ttf")
+  src: url("Montserrat/Montserrat-SemiBold.ttf")
     format("truetype");
   font-weight: 600;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Medium.ttf")
+  src: url("Montserrat/Montserrat-Medium.ttf")
     format("truetype");
   font-weight: 500;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-ExtraBold.ttf")
+  src: url("Montserrat/Montserrat-ExtraBold.ttf")
     format("truetype");
   font-weight: 800;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Bold.ttf")
+  src: url("Montserrat/Montserrat-Bold.ttf")
     format("truetype");
   font-weight: 700;
 }
 
 @font-face {
   font-family: "Montserrat";
-  src: url("../Fonts_Family/Montserrat/static/Montserrat-Black.ttf")
+  src: url("Montserrat/Montserrat-Black.ttf")
     format("truetype");
   font-weight: 900;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-SemiBold.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-SemiBold.ttf") format("truetype");
   font-weight: 600;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-Regular.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-Regular.ttf") format("truetype");
   font-weight: 400;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-Medium.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-Medium.ttf") format("truetype");
   font-weight: 500;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-ExtraBold.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-ExtraBold.ttf") format("truetype");
   font-weight: 800;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-Bold.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-Bold.ttf") format("truetype");
   font-weight: 700;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("../Fonts_Family/Poppins/Poppins-Black.ttf") format("truetype");
+  src: url("../styles/Poppins/Poppins-Black.ttf") format("truetype");
   font-weight: 900;
 }
 

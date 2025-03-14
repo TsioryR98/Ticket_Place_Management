@@ -14,20 +14,13 @@ const handleError = (res, message, error) => {
   /*Get LIST OF USER for admin role only*/
 }
 router.get("/", authenticationToken, async (req, res) => {
-  //Pagination
-  const { page = 1, perPage = 10 } = req.query;
-  const offset = (page - 1) * perPage;
-
   if (req.user.role !== "user") {
     //test only for user
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     //Get Paged Users List
-    const userQuery = await pool.query(
-      "SELECT * FROM users ORDER BY user_id LIMIT $1 OFFSET $2",
-      [perPage, offset]
-    );
+    const userQuery = await pool.query("SELECT * FROM users");
 
     //Get Total of all Users
     const totalResult = await pool.query("SELECT COUNT(*) FROM users");

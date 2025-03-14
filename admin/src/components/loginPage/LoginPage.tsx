@@ -6,14 +6,13 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import Link from "@mui/material/Link";
-import { Link as RouterLink } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../loginPage/ForgotPassword";
-import { GoogleIcon, SitemarkIcon } from "../shared_theme/CustomIcons";
+import { GoogleIcon } from "../shared_theme/CustomIcons";
 
 // for sign card connection
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -96,7 +95,7 @@ const LoginPage: React.FC = () => {
       setEmailErrorMessage("");
     }
 
-    if (!password || password.length < 6) {
+    if (!password) {
       setPasswordError(true);
       setPasswordErrorMessage("Password must be at least 6 characters long.");
       isValid = false;
@@ -113,7 +112,6 @@ const LoginPage: React.FC = () => {
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
-          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
@@ -197,16 +195,6 @@ const LoginPage: React.FC = () => {
             >
               Sign in with Google
             </Button>
-            <Typography sx={{ textAlign: "center" }}>
-              Don&apos;t have an account?{" "}
-              <Link
-                component={RouterLink}
-                to="/register"
-                style={{ textDecoration: "none", color: "primary" }}
-              >
-                Sign up
-              </Link>
-            </Typography>
           </Box>
         </Card>
       </SignInContainer>

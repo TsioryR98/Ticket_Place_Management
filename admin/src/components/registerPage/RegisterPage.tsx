@@ -12,7 +12,7 @@ import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../loginPage/ForgotPassword";
-import { GoogleIcon, SitemarkIcon } from "../shared_theme/CustomIcons";
+import { GoogleIcon } from "../shared_theme/CustomIcons";
 import { Link as RouterLink } from "react-router-dom";
 
 // for sign card connection
@@ -128,13 +128,12 @@ const RegisterPage: React.FC = () => {
       <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
-          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign in
+            Register
           </Typography>
           <Box
             component="form"
@@ -234,7 +233,7 @@ const RegisterPage: React.FC = () => {
               Already have an account?{" "}
               <Link
                 component={RouterLink}
-                to="/signin"
+                to="/login"
                 style={{ textDecoration: "none", color: "primary" }}
                 sx={{ alignSelf: "center" }}
               >

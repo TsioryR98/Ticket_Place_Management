@@ -18,20 +18,20 @@ import {
 import { fetchUtils } from "react-admin";
 import queryString from "query-string";
 
-type UserRecord = {
-  id: Identifier;
-  username: string;
-  email: string;
+interface User {
+  user_id: string;
+  user_name: string;
+  user_email: string;
   role: string;
-  created: string;
-};
+  created_at: string;
+}
 
 const urlAPI = "http://localhost:4000/api/users";
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
-  getList: async function <RecordType extends RaRecord = UserRecord>(
+  getList: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetListParams & QueryFunctionContext,
   ): Promise<GetListResult<RecordType>> {
@@ -48,10 +48,18 @@ export const userDataProvider: DataProvider = {
       if (!token) {
         throw new Error("No token found in localStorage");
       }
+
+      //build headers
       const { json, headers } = await httpClient(url, {
         headers: new Headers({ Authorization: `Bearer ${token}` }),
+        method: "GET",
       });
-      const data = json.data as RecordType[];
+
+      //convert into id required by react admin
+      const data = json.map((user: User) => ({
+        id: user.user_id,
+        ...user, // Include all other user fields in User interface
+      }));
       const total = json.total;
       return {
         data,
@@ -65,7 +73,7 @@ export const userDataProvider: DataProvider = {
   /*
     
     */
-  delete: async function <RecordType extends RaRecord = UserRecord>(
+  delete: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteParams<RecordType>,
   ): Promise<DeleteResult<RecordType>> {
@@ -86,20 +94,20 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  getOne: function <RecordType extends RaRecord = UserRecord>(
+  getOne: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetOneParams<RecordType> & QueryFunctionContext,
   ): Promise<GetOneResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
-  update: function <RecordType extends RaRecord = UserRecord>(
+  update: function <RecordType extends RaRecord = any>(
     resource: string,
     params: UpdateParams,
   ): Promise<UpdateResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
   create: function <
-    RecordType extends Omit<RaRecord, "id"> = UserRecord,
+    RecordType extends Omit<RaRecord, "id"> = any,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier },
   >(
     resource: string,

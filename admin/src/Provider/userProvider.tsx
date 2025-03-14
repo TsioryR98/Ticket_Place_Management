@@ -46,26 +46,21 @@ export const userDataProvider: DataProvider = {
       // get data with HTTPS and URL
       const url = `${urlAPI}?${queryString.stringify(query)}`;
       const token = localStorage.getItem("token");
+
       if (!token) {
         throw new Error("No token found in localStorage");
       }
 
-      //build headers
       const { json, headers } = await httpClient(url, {
         headers: new Headers({ Authorization: `Bearer ${token}` }),
         method: "GET",
       });
 
-      const pageNumber = Math.ceil(json.length / perPage);
+      //get X total count from header and cast Number
+      const total = Number(headers.get("X-Total-Count"));
+      const pageNumber = Math.ceil(total / perPage);
 
       //convert into id required by react admin
-      /*
-      const data = json.map((user: User) => ({
-        id: user.user_id,
-        ...user, // Include all other user fields in User interface
-      }));
-      const total = json.total;
-      */
       const result: GetListResult = {
         data: json
           .map((user: User) => ({
@@ -73,7 +68,7 @@ export const userDataProvider: DataProvider = {
             ...user, // Include all other user fields in User interface
           }))
           .slice(offset, offset + perPage),
-        total: json.length,
+        total: total,
         pageInfo: {
           hasNextPage: page < pageNumber,
           hasPreviousPage: page !== 1, //if page 1 no previous

@@ -1,4 +1,5 @@
 import type { AuthProvider } from "react-admin";
+import { redirect } from "react-router";
 
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
@@ -24,6 +25,10 @@ export const authProvider: AuthProvider = {
     return Promise.resolve();
   },
   checkAuth: () => {
-    return localStorage.getItem("token") ? Promise.resolve() : Promise.reject();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return Promise.reject();
+    }
+    return Promise.resolve();
   },
 };

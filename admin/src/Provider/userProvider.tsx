@@ -17,6 +17,7 @@ import {
 
 import { fetchUtils } from "react-admin";
 import queryString from "query-string";
+import { authProvider } from "./authProvider";
 
 interface User {
   user_id: Identifier;

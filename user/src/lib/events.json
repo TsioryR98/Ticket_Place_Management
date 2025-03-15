@@ -1,0 +1,83 @@
+[
+  {
+    "id": "event-1",
+    "title": "Conférence Tech 2025",
+    "description": "Un événement réunissant les experts du monde de la technologie.",
+    "date": "2025-06-10",
+    "time": "09:00",
+    "location": "Palais des Congrès, Paris",
+    "organizer": "TechWorld",
+    "tickets": [
+      { "type": "VIP", "price": 150, "available": 20, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 80, "available": 50, "limitPerPerson": 5 },
+      {
+        "type": "Early Bird",
+        "price": 50,
+        "available": 10,
+        "limitPerPerson": 1
+      }
+    ]
+  },
+  {
+    "id": "event-2",
+    "title": "Festival de Musique 2025",
+    "description": "Venez découvrir des artistes internationaux sur scène.",
+    "date": "2025-07-20",
+    "time": "18:00",
+    "location": "Stade Olympique, Lyon",
+    "organizer": "MusicFest",
+    "tickets": [
+      { "type": "VIP", "price": 200, "available": 30, "limitPerPerson": 2 },
+      {
+        "type": "Standard",
+        "price": 100,
+        "available": 100,
+        "limitPerPerson": 5
+      },
+      {
+        "type": "Early Bird",
+        "price": 70,
+        "available": 20,
+        "limitPerPerson": 1
+      }
+    ]
+  },
+  {
+    "id": "event-3",
+    "title": "Salon du Livre",
+    "description": "Rencontrez vos auteurs préférés et découvrez les dernières parutions.",
+    "date": "2025-09-15",
+    "time": "10:00",
+    "location": "Centre Expo, Marseille",
+    "organizer": "Livres & Culture",
+    "tickets": [
+      { "type": "VIP", "price": 50, "available": 15, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 25, "available": 60, "limitPerPerson": 5 },
+      {
+        "type": "Early Bird",
+        "price": 15,
+        "available": 10,
+        "limitPerPerson": 1
+      }
+    ]
+  },
+  {
+    "id": "event-4",
+    "title": "Compétition d'eSport",
+    "description": "Regardez les meilleures équipes s'affronter en direct.",
+    "date": "2025-11-05",
+    "time": "14:00",
+    "location": "Arena Gaming, Bordeaux",
+    "organizer": "eSport League",
+    "tickets": [
+      { "type": "VIP", "price": 120, "available": 25, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 60, "available": 80, "limitPerPerson": 5 },
+      {
+        "type": "Early Bird",
+        "price": 40,
+        "available": 15,
+        "limitPerPerson": 1
+      }
+    ]
+  }
+]

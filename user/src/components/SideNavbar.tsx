@@ -2,14 +2,14 @@
 
 import {useState} from "react";
 import Link from "next/link";
-import NavbarElementType from '@/Types/NavbarElements';
+import NavbarElementType from '@/types/NavbarElements';
 import {IoHomeOutline, IoPersonAddOutline} from "react-icons/io5";
 import {CiBookmarkCheck, CiCalendarDate} from "react-icons/ci";
 import {FiLogOut} from "react-icons/fi";
 import {AiOutlineLogin} from "react-icons/ai";
 
 const SideNavbar = () => {
-    const isUserLoggedIn = true;
+    const isUserLoggedIn = false;
     const [isExpanded, setIsExpanded] = useState<boolean>(true)
 
     const toggleExpanded = (): void => {
@@ -56,11 +56,16 @@ const SideNavbar = () => {
                 <Link href="/user/reservation" className="flex items-center gap-x-8 text-orange-400 font-semibold">
                     <CiBookmarkCheck className="text-3xl" /> My Bookings
                 </Link>
-                <button className="flex items-center gap-x-8 text-orange-400 font-semibold">
-                    <FiLogOut className="text-3xl"/> Log out
+                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                    <FiLogOut className="text-3xl"/> Sign out
                 </button>
-            </div> : <div>
-
+            </div> : <div className="flex flex-col gap-y-8 mt-8 ps-8">
+                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                    <AiOutlineLogin className="text-3xl"/>   Sign In
+                </button>
+                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                    <IoPersonAddOutline className="text-3xl"/> Sign Up
+                </button>
             </div>}
         </div>
     );

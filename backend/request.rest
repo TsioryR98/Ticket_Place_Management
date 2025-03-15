@@ -1,0 +1,28 @@
+POST http://localhost:4000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password" : "test"
+}
+
+###
+POST http://localhost:4000/api/users/register
+Content-Type: application/json
+
+{
+    "username": "regular_user3",
+    "email": "user3@example.com",
+    "password" : "test2"
+}
+
+
+
+###
+GET http://localhost:4000/api/users
+Authorization: Bearer 
+
+
+###
+DELETE http://localhost:4000/api/users/
+Authorization: Bearer 

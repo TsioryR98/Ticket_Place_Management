@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react";
+import { useState } from "react";
 import Link from "next/link";
 import NavbarElementType from '@/types/NavbarElements';
 import {IoHomeOutline, IoPersonAddOutline} from "react-icons/io5";
@@ -9,28 +9,25 @@ import {FiLogOut} from "react-icons/fi";
 import {AiOutlineLogin} from "react-icons/ai";
 
 const SideNavbar = () => {
-    const isUserLoggedIn = false;
-    const [isExpanded, setIsExpanded] = useState<boolean>(true)
+  const isUserLoggedIn = true;
+  const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-    const toggleExpanded = (): void => {
-        setIsExpanded(!isExpanded)
-    }
+  const toggleExpanded = (): void => {
+    setIsExpanded(!isExpanded);
+  };
 
-    const NavbarElements: NavbarElementType[] = [
-        {
-            name : "Home",
-            icon : IoHomeOutline,
-            link: "/"
-        },
-        {
-            name : "Events",
-            icon : CiCalendarDate,
-            link: "#events"
-        }]
-
-
-
-
+  const NavbarElements: NavbarElementType[] = [
+    {
+      name: "Home",
+      icon: IoHomeOutline,
+      link: "/",
+    },
+    {
+      name: "Events",
+      icon: CiCalendarDate,
+      link: "#events",
+    },
+  ];
 
     return (
         <div className={`fixed top-0 left-0 h-screen  bg-[var(--darkVariant)] z-40 ${isExpanded ? "w-64" : "w-0"} duration-300`}>
@@ -38,19 +35,27 @@ const SideNavbar = () => {
                 <h1 className="text-white text-2xl font-bold">Tickify</h1>
             </Link>
 
-            <ul className="">
-                {NavbarElements.map((element, index) => {
-                    return (
-                        <li key={index} className="mt-8">
-                            <Link href={element.link} className="flex items-center gap-x-8 ps-8 ">
-                                <element.icon className={`text-orange-400 text-3xl ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}/>
-                                <h2 className="text-orange-400 text-center font-semibold">{element.name}</h2>
-                            </Link>
-                        </li>
-                    )
-                })}
-            </ul>
-
+      <ul className="">
+        {NavbarElements.map((element, index) => {
+          return (
+            <li key={index} className="mt-8">
+              <Link
+                href={element.link}
+                className="flex items-center gap-x-8 ps-8 "
+              >
+                <element.icon
+                  className={`text-orange-400 text-3xl ${
+                    isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                  }`}
+                />
+                <h2 className="text-orange-400 text-center font-semibold">
+                  {element.name}
+                </h2>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
 
             {isUserLoggedIn ? <div className="flex flex-col gap-y-8 mt-8 ps-8">
                 <Link href="/user/reservation" className="flex items-center gap-x-8 text-orange-400 font-semibold">
@@ -67,8 +72,8 @@ const SideNavbar = () => {
                     <IoPersonAddOutline className="text-3xl"/> Sign Up
                 </button>
             </div>}
-        </div>
-    );
+    </div>
+  );
 };
 
 export default SideNavbar;

@@ -20,7 +20,6 @@
 }
 
 .landing_page {
-  background-image: url("../../public/land.jpg");
   background-position: center;
   background-size: cover;
 }
@@ -110,6 +109,6 @@ p,
 span,
 a,
 li,
-button{
+button {
   font-family: "Poppins", sans-serif;
 }

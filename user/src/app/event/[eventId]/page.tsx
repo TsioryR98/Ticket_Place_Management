@@ -2,10 +2,14 @@ import { notFound } from "next/navigation";
 import eventsData from "@/lib/events.json";
 import { Event } from "@/types/event";
 
-export default function EventPage({ params }: { params: { eventId: string } }) {
-  const event: Event | undefined = eventsData.find(
-    (e) => e.id === params.eventId
-  );
+export default async function EventPage({
+  params,
+}: {
+  params: { eventId: string };
+}) {
+  const { eventId } = await params;
+
+  const event: Event | undefined = eventsData.find((e) => e.id === eventId);
 
   if (!event) {
     return notFound();

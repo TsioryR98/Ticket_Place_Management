@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`antialiased !bg-white`}
+        className={`antialiased bg-white`}
       >
       <SideNavbar />
         {children}

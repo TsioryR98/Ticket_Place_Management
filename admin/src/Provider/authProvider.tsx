@@ -10,8 +10,8 @@ export const authProvider: AuthProvider = {
     try {
       const response = await fetch(request);
       if (response.ok) {
-        const { accessToken } = await response.json();
-        localStorage.setItem("token", accessToken); // save token
+        const { tokens } = await response.json();
+        localStorage.setItem("token", tokens.accessToken); // save token
         return Promise.resolve();
       }
       return Promise.reject(new Error("Invalid login"));

@@ -51,7 +51,6 @@ export const userDataProvider: DataProvider = {
       if (!token) {
         throw new Error("No token found in localStorage");
       }
-
       const { json, headers } = await httpClient(url, {
         headers: new Headers({ Authorization: `Bearer ${token}` }),
         method: "GET",

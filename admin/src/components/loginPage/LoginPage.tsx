@@ -142,7 +142,7 @@ const LoginPage: React.FC = () => {
                 autoFocus
                 required
                 fullWidth
-                id="outlined-basic"
+                id="input-email"
                 label="Email"
                 variant="outlined"
                 color={emailError ? "error" : "primary"}
@@ -157,7 +157,7 @@ const LoginPage: React.FC = () => {
                 name="password"
                 placeholder="••••••"
                 type="password"
-                id="outlined-basic"
+                id="input-password"
                 label="Password"
                 variant="outlined"
                 autoComplete="current-password"

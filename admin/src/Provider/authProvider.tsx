@@ -1,5 +1,4 @@
 import type { AuthProvider } from "react-admin";
-import { redirect } from "react-router";
 
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
@@ -24,11 +23,14 @@ export const authProvider: AuthProvider = {
     localStorage.removeItem("token");
     return Promise.resolve();
   },
-  checkAuth: () => {
+  checkAuth: function (params: any): Promise<void> {
     const token = localStorage.getItem("token");
     if (!token) {
       return Promise.reject();
     }
     return Promise.resolve();
+  },
+  checkError: function (error: any): Promise<void> {
+    throw new Error("Function not implemented.");
   },
 };

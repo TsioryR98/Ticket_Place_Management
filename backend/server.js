@@ -1,19 +1,19 @@
 import express, { json } from "express";
 import cors from "cors";
-import bcrypt from "bcryptjs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
-import { usersRouter } from "../backend/routes/usersRoute.js";
+//import { usersRouter } from "../backend/routes/userRoutes.js";
+import { usersRouter } from "../backend/routes/userRoute.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename); //static files
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const corsOptions = {
-  origin: "http://localhost:5174", //allow front and backend => ["..",".."]by CORS and replace during deployement
+  origin: "http://localhost:5173", //allow front and backend => ["..",".."]by CORS and replace during deployement
   credentials: true,
-  origin: process.env.URL || "*",
   exposedHeaders: ["X-Total-Count"], //allow cors to expose X-Total-Count
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 };

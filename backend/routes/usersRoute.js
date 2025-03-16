@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
       maxAge: 10 * 60 * 1000, //milliseconds
     });
 
-    res.json(tokens);
+    res.json({ tokens, user: users.rows[0] });
   } catch (error) {
     handleError(res, "Error during connection", error);
   }

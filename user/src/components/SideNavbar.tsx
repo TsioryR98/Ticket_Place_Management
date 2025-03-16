@@ -7,6 +7,7 @@ import {IoHomeOutline, IoPersonAddOutline} from "react-icons/io5";
 import {CiBookmarkCheck, CiCalendarDate} from "react-icons/ci";
 import {FiLogOut} from "react-icons/fi";
 import {AiOutlineLogin} from "react-icons/ai";
+import { FaRegArrowAltCircleRight } from "react-icons/fa";
 
 const SideNavbar = () => {
   const isUserLoggedIn = true;
@@ -31,11 +32,12 @@ const SideNavbar = () => {
 
     return (
         <div className={`fixed top-0 left-0 h-screen  bg-[var(--darkVariant)] z-40 ${isExpanded ? "w-64" : "w-0"} duration-300`}>
+            <button className="z-[1000]" onClick={toggleExpanded}><i className={`text-white text-3xl absolute top-2 -right-10`}><FaRegArrowAltCircleRight className={`text-white cursor-pointer text-3xl ${isExpanded && "rotate-180"}`}/></i></button>
             <Link href="/" className={`cursor-pointer p-8 flex ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                 <h1 className="text-white text-2xl font-bold">Tickify</h1>
             </Link>
 
-      <ul className="">
+      <ul className="whitespace-nowrap">
         {NavbarElements.map((element, index) => {
           return (
             <li key={index} className="mt-8">
@@ -48,7 +50,7 @@ const SideNavbar = () => {
                     isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"
                   }`}
                 />
-                <h2 className="text-orange-400 text-center font-semibold">
+                <h2 className={`text-orange-400 text-center font-semibold ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                   {element.name}
                 </h2>
               </Link>
@@ -58,17 +60,17 @@ const SideNavbar = () => {
       </ul>
 
             {isUserLoggedIn ? <div className="flex flex-col gap-y-8 mt-8 ps-8">
-                <Link href="/user/reservation" className="flex items-center gap-x-8 text-orange-400 font-semibold">
+                <Link href="/user/reservation" className={`flex items-center gap-x-8 text-orange-400 font-semibold text-nowrap ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                     <CiBookmarkCheck className="text-3xl" /> My Bookings
                 </Link>
-                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                <button className={`flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer text-nowrap ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                     <FiLogOut className="text-3xl"/> Sign out
                 </button>
             </div> : <div className="flex flex-col gap-y-8 mt-8 ps-8">
-                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                <button className={`flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer text-nowrap ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                     <AiOutlineLogin className="text-3xl"/>   Sign In
                 </button>
-                <button className="flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer">
+                <button className={`flex items-center gap-x-8 text-orange-400 font-semibold cursor-pointer text-nowrap ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                     <IoPersonAddOutline className="text-3xl"/> Sign Up
                 </button>
             </div>}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import "./styles/globals.css";
-import SideNavbar from "@/app/components/SideNavbar";
+import "../styles/globals.css";
+import SideNavbar from "@/components/SideNavbar";
 
 export const metadata: Metadata = {
   title: "Tickify – Book Your Tickets for Unforgettable Events!",

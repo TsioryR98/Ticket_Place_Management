@@ -7,6 +7,7 @@ import { IoHomeOutline, IoPersonAddOutline } from "react-icons/io5";
 import { CiBookmarkCheck, CiCalendarDate } from "react-icons/ci";
 import { FiLogOut } from "react-icons/fi";
 import { AiOutlineLogin } from "react-icons/ai";
+import {FaRegArrowAltCircleRight} from "react-icons/fa";
 
 const SideNavbar = () => {
   const isUserLoggedIn = true;

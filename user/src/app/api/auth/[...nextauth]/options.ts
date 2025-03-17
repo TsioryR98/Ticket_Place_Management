@@ -80,6 +80,12 @@ const option: NextAuthOptions = {
       return session;
     },
   },
+
+  pages: {
+    signIn: "/auth/login",   // to login page
+    signOut: "/auth/logout", // to logout
+    newUser: "/auth/signup", // to register 
+  },
 };
 
 export default option;

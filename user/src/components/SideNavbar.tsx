@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import NavbarElementType from '@/types/NavbarElements';
-import {IoHomeOutline, IoPersonAddOutline} from "react-icons/io5";
-import {CiBookmarkCheck, CiCalendarDate} from "react-icons/ci";
-import {FiLogOut} from "react-icons/fi";
-import {AiOutlineLogin} from "react-icons/ai";
-import { FaRegArrowAltCircleRight } from "react-icons/fa";
+import NavbarElementType from "@/types/NavbarElements";
+import { IoHomeOutline, IoPersonAddOutline } from "react-icons/io5";
+import { CiBookmarkCheck, CiCalendarDate } from "react-icons/ci";
+import { FiLogOut } from "react-icons/fi";
+import { AiOutlineLogin } from "react-icons/ai";
 
 const SideNavbar = () => {
   const isUserLoggedIn = true;
@@ -32,7 +31,7 @@ const SideNavbar = () => {
 
     return (
         <div className={`fixed top-0 left-0 h-screen  bg-[var(--darkVariant)] z-40 ${isExpanded ? "w-64" : "w-0"} duration-500 transition-all`}>
-            <button className="z-[1000]" onClick={toggleExpanded}><i className={`text-black text-3xl absolute top-2 -right-10`}><FaRegArrowAltCircleRight className={`text-black cursor-pointer text-3xl ${isExpanded && "rotate-180"}`}/></i></button>
+            <button className="z-[1000]" onClick={toggleExpanded}><i className={`text-white text-3xl absolute top-2 -right-10`}><FaRegArrowAltCircleRight className={`text-white cursor-pointer text-3xl ${isExpanded && "rotate-180"}`}/></i></button>
             <Link href="/" className={`cursor-pointer p-8 flex ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>
                 <h1 className={`text-white text-2xl font-bold duration-500 transition-all ${isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}>Tickify</h1>
             </Link>

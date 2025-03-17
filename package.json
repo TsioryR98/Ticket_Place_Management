@@ -8,5 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express-router": "^0.0.1",
+    "uuid": "^11.1.0"
+  }
 }

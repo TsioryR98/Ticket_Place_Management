@@ -1,7 +1,7 @@
 "use server";
 
-import eventsData from "@/lib/events.json";
-import { Event } from "@/types/event";
+import eventsData from "@/app/lib/events.json";
+import { Event } from "@/app/types/event";
 
 export async function reserveTicket(
   eventId: string,

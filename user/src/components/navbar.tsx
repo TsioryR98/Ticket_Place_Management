@@ -1,7 +1,14 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { useLoginModal } from "@/context/ModalContext";
 
 export default function NavBar() {
+  //call modalcontext of login inside nav
+  const { loginOpenModal, openModal } = useLoginModal();
+
+  const handleLoginClick = () => {
+    loginOpenModal();
+  };
   return (
     <nav className="sticky top-0 z-2 border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
       <div className="flex-1"></div>
@@ -46,7 +53,15 @@ export default function NavBar() {
         <button className="btn btn-sm btn-text btn-circle size-[2.125rem] md:hidden">
           <span className="icon-[tabler--search] size-[1.375rem]"></span>
         </button>
-        <button className="bg-sky-950 hover:bg-sky-900 text-white font-bold py-2 px-4 rounded-full">
+        {/*call for loginopenModal to open modal on click */}
+        <button
+          onClick={handleLoginClick}
+          className="bg-sky-950 hover:bg-sky-900 text-white font-bold py-2 px-4 rounded-full"
+          aria-haspopup="dialog"
+          aria-expanded={openModal}
+          aria-controls="scroll-inside-modal"
+          data-overlay="#scroll-inside-modal"
+        >
           Login
         </button>
         <Menu as="div" className="relative inline-block text-left">

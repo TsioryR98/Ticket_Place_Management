@@ -11,7 +11,7 @@ const __dirname = dirname(__filename); //static files
 const app = express();
 const PORT = process.env.PORT || 4000;
 const corsOptions = {
-  origin: "http://localhost:5173", //allow front and backend => ["..",".."]by CORS and replace during deployement
+  origin: ["http://localhost:5173", "http://localhost:3000"], //allow front and backend => ["..",".."]by CORS and replace during deployement
   credentials: true,
   origin: process.env.URL || "*",
   exposedHeaders: ["X-Total-Count"], //allow cors to expose X-Total-Count

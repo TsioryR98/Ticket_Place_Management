@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../loginPage/ForgotPassword";
-import { GoogleIcon } from "../shared_theme/CustomIcons";
 
 // for sign card connection
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -187,17 +186,7 @@ const LoginPage: React.FC = () => {
               Forgot your password?
             </Link>
           </Box>
-          <Divider>or</Divider>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert("Sign in with Google")}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
-          </Box>
+          <Divider></Divider>
         </Card>
       </SignInContainer>
     </React.Fragment>

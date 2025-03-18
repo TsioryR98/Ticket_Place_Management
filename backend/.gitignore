@@ -1,5 +1,7 @@
 node_modules
-.env
+
 database.sql
 /node_modules
 request.request
+
+delete .env for testing only

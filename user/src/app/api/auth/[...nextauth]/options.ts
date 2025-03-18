@@ -39,16 +39,13 @@ const option: NextAuthOptions = {
             }),
           });
           const data = await res.json();
-          if (
-            credentials?.email === data.user.user_email &&
-            credentials?.password === data.user.user_passwords
-          ) {
+          if (data.user) {
             return {
               id: data.user.user_id,
               name: data.user.user_name,
               email: data.user.user_email,
               role: data.user.role,
-              //tokens
+              //token
               accessToken: data.tokens.accessToken,
               refreshToken: data.tokens.refreshToken,
             };
@@ -80,12 +77,7 @@ const option: NextAuthOptions = {
       return session;
     },
   },
-
-  pages: {
-    signIn: "/auth/login",   // to login page
-    signOut: "/auth/logout", // to logout
-    newUser: "/auth/signup", // to register 
-  },
+  // if we need defaut route for login or logout
 };
 
 export default option;

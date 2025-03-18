@@ -1,11 +1,10 @@
 import Events from "../lib/events.json";
 import EventCardHome from "@/components/EventCardHome";
-import NavBar from "@/components/navbar";
 
 export default function Home() {
   return (
     <>
-      <div className="landing_page h-[80vh] bg-red-700"></div>
+      <div className="landing_page h-[25vh] bg-green-400"></div>
       <section id="events" className="flex items-center flex-col">
         <ul className="grid grid-cols-2 gap-8 px-8 mt-8">
           {Events.map((event) => {

@@ -1,6 +1,5 @@
 import Events from "../lib/events.json";
-import EventCardHome from "@/components/EventCardHome";
-import NavBar from "@/components/navbar";
+import EventCardHome from "@/components/event/EventCardHome";
 
 export default function Home() {
   return (

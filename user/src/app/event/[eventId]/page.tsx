@@ -8,7 +8,7 @@ export default async function EventPage({
 }: {
   params: { eventId: string };
 }) {
-  const { eventId } = await params;
+  const { eventId } = params;
 
   // Simuler une récupération asynchrone des données
   const event: Event | undefined = eventsData.find((e) => e.id === eventId);

@@ -1,9 +1,5 @@
 import Events from "../lib/events.json";
-<<<<<<< HEAD
 import EventCardHome from "@/components/event/EventCardHome";
-=======
-import EventCardHome from "@/components/EventCardHome";
->>>>>>> userOnly
 
 export default function Home() {
   return (

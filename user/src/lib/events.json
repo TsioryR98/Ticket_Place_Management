@@ -1,8 +1,8 @@
 [
   {
     "id": "event-1",
-    "title": "Conférence Tech 2025",
-    "description": "Un événement réunissant les experts du monde de la technologie.",
+    "title": "Tech Conference 2025",
+    "description": "An event bringing together technology experts.",
     "date": "2025-06-10",
     "time": "09:00",
     "location": "Palais des Congrès, Paris",
@@ -20,11 +20,11 @@
   },
   {
     "id": "event-2",
-    "title": "Festival de Musique 2025",
-    "description": "Venez découvrir des artistes internationaux sur scène.",
+    "title": "Music Festival 2025",
+    "description": "Come and discover international artists on stage.",
     "date": "2025-07-20",
     "time": "18:00",
-    "location": "Stade Olympique, Lyon",
+    "location": "Olympic Stadium, Lyon",
     "organizer": "MusicFest",
     "tickets": [
       { "type": "VIP", "price": 200, "available": 30, "limitPerPerson": 2 },
@@ -44,12 +44,12 @@
   },
   {
     "id": "event-3",
-    "title": "Salon du Livre",
-    "description": "Rencontrez vos auteurs préférés et découvrez les dernières parutions.",
+    "title": "Book Fair",
+    "description": "Meet your favorite authors and discover the latest releases.",
     "date": "2025-09-15",
     "time": "10:00",
-    "location": "Centre Expo, Marseille",
-    "organizer": "Livres & Culture",
+    "location": "Expo Center, Marseille",
+    "organizer": "Books & Culture",
     "tickets": [
       { "type": "VIP", "price": 50, "available": 15, "limitPerPerson": 2 },
       { "type": "Standard", "price": 25, "available": 60, "limitPerPerson": 5 },
@@ -63,11 +63,11 @@
   },
   {
     "id": "event-4",
-    "title": "Compétition d'eSport",
-    "description": "Regardez les meilleures équipes s'affronter en direct.",
+    "title": "eSport Competition",
+    "description": "Watch the best teams compete live.",
     "date": "2025-11-05",
     "time": "14:00",
-    "location": "Arena Gaming, Bordeaux",
+    "location": "Gaming Arena, Bordeaux",
     "organizer": "eSport League",
     "tickets": [
       { "type": "VIP", "price": 120, "available": 25, "limitPerPerson": 2 },
@@ -78,6 +78,87 @@
         "available": 15,
         "limitPerPerson": 1
       }
+    ]
+  },
+  {
+    "id": "event-5",
+    "title": "Art Exhibition",
+    "description": "Explore breathtaking art from world-renowned artists.",
+    "date": "2025-04-12",
+    "time": "11:00",
+    "location": "Modern Art Museum, Nice",
+    "organizer": "ArtWorld",
+    "tickets": [
+      { "type": "VIP", "price": 100, "available": 10, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 50, "available": 40, "limitPerPerson": 4 }
+    ]
+  },
+  {
+    "id": "event-6",
+    "title": "Cooking Workshop",
+    "description": "Learn to cook gourmet dishes with professional chefs.",
+    "date": "2025-03-18",
+    "time": "10:00",
+    "location": "Culinary Institute, Lille",
+    "organizer": "Chef's Table",
+    "tickets": [
+      { "type": "VIP", "price": 300, "available": 5, "limitPerPerson": 1 },
+      { "type": "Standard", "price": 150, "available": 20, "limitPerPerson": 2 }
+    ]
+  },
+  {
+    "id": "event-7",
+    "title": "Science Fair",
+    "description": "Discover the latest innovations in science and technology.",
+    "date": "2025-05-01",
+    "time": "09:30",
+    "location": "Innovation Center, Toulouse",
+    "organizer": "SciExpo",
+    "tickets": [
+      { "type": "VIP", "price": 120, "available": 15, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 60, "available": 50, "limitPerPerson": 4 }
+    ]
+  },
+  {
+    "id": "event-8",
+    "title": "Marathon for Charity",
+    "description": "Join us for a charity marathon to support local communities.",
+    "date": "2025-09-10",
+    "time": "07:00",
+    "location": "Central Park, Nantes",
+    "organizer": "Charity Runs",
+    "tickets": [
+      {
+        "type": "Participation",
+        "price": 20,
+        "available": 500,
+        "limitPerPerson": 1
+      }
+    ]
+  },
+  {
+    "id": "event-9",
+    "title": "Winter Gala",
+    "description": "An elegant evening of music, dance, and fine dining.",
+    "date": "2025-12-15",
+    "time": "20:00",
+    "location": "Grand Ballroom, Bordeaux",
+    "organizer": "Gala Events",
+    "tickets": [
+      { "type": "VIP", "price": 250, "available": 20, "limitPerPerson": 2 },
+      { "type": "Standard", "price": 120, "available": 50, "limitPerPerson": 3 }
+    ]
+  },
+  {
+    "id": "event-10",
+    "title": "Outdoor Movie Night",
+    "description": "Enjoy a classic film under the stars.",
+    "date": "2025-08-22",
+    "time": "20:30",
+    "location": "Open Air Cinema, Montpellier",
+    "organizer": "Cinema Lovers",
+    "tickets": [
+      { "type": "Standard", "price": 10, "available": 100, "limitPerPerson": 4 }
     ]
   }
 ]

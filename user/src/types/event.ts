@@ -13,5 +13,6 @@ export type Event = {
   time: string;
   location: string;
   organizer: string;
+  category : string;
   tickets: Ticket[];
 };

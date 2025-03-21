@@ -63,7 +63,7 @@ export default function NavBar() {
             {" "}
             <button
               onClick={() => signOut()}
-              className="bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
+              className="cursor-pointer bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
               aria-haspopup="dialog"
               aria-expanded={openModal}
               aria-controls="scroll-inside-modal"
@@ -104,7 +104,7 @@ export default function NavBar() {
                     <MenuItem>
                       <button
                         type="submit"
-                        className="block w-full px-4 py-2 text-left text-sm text-gray-700"
+                        className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700"
                       >
                         Sign out
                       </button>
@@ -118,7 +118,7 @@ export default function NavBar() {
           <>
             <button
               onClick={handleLoginClick}
-              className="bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
+              className="cursor-pointer bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
               aria-haspopup="dialog"
               aria-expanded={openModal}
               aria-controls="scroll-inside-modal"

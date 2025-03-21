@@ -35,7 +35,7 @@ const LoginModal = () => {
 
   if (!openModal) return null;
 
-  const handleSignClick = () => {
+  const handleCloseClick = () => {
     closeModal();
   };
   return (
@@ -45,16 +45,25 @@ const LoginModal = () => {
       role="dialog"
       tabIndex={-1}
     >
-      <div className="bg-gray-100 p-8 rounded-lg shadow-md w-96">
+      <div className="modal-content bg-gray-100 p-8 rounded-lg shadow-md w-96">
         {/* Header */}
-        <div className="flex justify-center border-b pb-3">
+        <div className="modal-header justify-between flex border-b pb-3">
           <h1 className="text-xl text-center font-bold text-gray-900">
             Sign in
           </h1>
+          <button
+            type="button"
+            onClick={handleCloseClick}
+            className="btn btn-text btn-circle btn-sm cursor-pointer"
+            aria-label="Close"
+            data-overlay="#middle-start-modal"
+          >
+            <span className="icon-[tabler--x] size-4">X</span>
+          </button>
         </div>
 
         {/* Body */}
-        <div className="py-6">
+        <div className="py-6 modal-body">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label
@@ -94,7 +103,7 @@ const LoginModal = () => {
 
             <button
               type="submit"
-              className="w-full bg-sky-950 hover:bg-sky-900 text-white font-bold focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
+              className="cursor-pointer w-full bg-sky-950 hover:bg-sky-900 text-white font-bold focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
             >
               Sign in
             </button>
@@ -103,7 +112,7 @@ const LoginModal = () => {
               Don’t have an account yet?{" "}
               <a
                 href="#"
-                className="font-medium text-primary-600 hover:underline"
+                className="cursor-pointer font-medium text-primary-600 hover:underline"
               >
                 Sign up
               </a>
@@ -119,7 +128,7 @@ const LoginModal = () => {
             {/* Google Login Button */}
             <button
               type="button"
-              className="w-full flex justify-center text-center items-center border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500"
+              className="cursor-pointer w-full flex justify-center text-center items-center border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500"
               onClick={() => signIn("google")}
             >
               <svg className="h-6 w-6 mr-2" viewBox="0 0 48 48">

@@ -78,6 +78,7 @@ const option: NextAuthOptions = {
     },
   },
   // if we need defaut route for login or logout
+  session: { strategy: "jwt" },
 };
 
 export default option;

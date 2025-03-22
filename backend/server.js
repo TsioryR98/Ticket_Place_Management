@@ -3,7 +3,8 @@ import cors from "cors";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
-import { usersRouter } from "../backend/routes/userRoutes.js";
+import { usersRouter } from "./routes/userRoutes.js";
+import { eventRouter } from "./routes/eventRoute.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename); //static files
@@ -22,8 +23,10 @@ app.use(cors(corsOptions));
 app.use(json());
 app.use(cookieParser());
 
-//route for user test only
+//route for user
 app.use("/api/users", usersRouter);
+//route for event
+app.use("/api/events", eventRouter);
 
 app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

@@ -11,7 +11,12 @@
     "tickets": [
       { "type": "VIP", "price": 150, "available": 20, "limitPerPerson": 2 },
       { "type": "Standard", "price": 80, "available": 50, "limitPerPerson": 5 },
-      { "type": "Early Bird", "price": 50, "available": 10, "limitPerPerson": 1 }
+      {
+        "type": "Early Bird",
+        "price": 50,
+        "available": 10,
+        "limitPerPerson": 1
+      }
     ]
   },
   {
@@ -25,8 +30,18 @@
     "category": "Music",
     "tickets": [
       { "type": "VIP", "price": 200, "available": 30, "limitPerPerson": 2 },
-      { "type": "Standard", "price": 100, "available": 100, "limitPerPerson": 5 },
-      { "type": "Early Bird", "price": 70, "available": 20, "limitPerPerson": 1 }
+      {
+        "type": "Standard",
+        "price": 100,
+        "available": 100,
+        "limitPerPerson": 5
+      },
+      {
+        "type": "Early Bird",
+        "price": 70,
+        "available": 20,
+        "limitPerPerson": 1
+      }
     ]
   },
   {
@@ -41,7 +56,12 @@
     "tickets": [
       { "type": "VIP", "price": 50, "available": 15, "limitPerPerson": 2 },
       { "type": "Standard", "price": 25, "available": 60, "limitPerPerson": 5 },
-      { "type": "Early Bird", "price": 15, "available": 10, "limitPerPerson": 1 }
+      {
+        "type": "Early Bird",
+        "price": 15,
+        "available": 10,
+        "limitPerPerson": 1
+      }
     ]
   },
   {
@@ -56,7 +76,12 @@
     "tickets": [
       { "type": "VIP", "price": 120, "available": 25, "limitPerPerson": 2 },
       { "type": "Standard", "price": 60, "available": 80, "limitPerPerson": 5 },
-      { "type": "Early Bird", "price": 40, "available": 15, "limitPerPerson": 1 }
+      {
+        "type": "Early Bird",
+        "price": 40,
+        "available": 15,
+        "limitPerPerson": 1
+      }
     ]
   },
   {
@@ -111,7 +136,12 @@
     "organizer": "Charity Runs",
     "category": "Sports",
     "tickets": [
-      { "type": "Participation", "price": 20, "available": 500, "limitPerPerson": 1 }
+      {
+        "type": "Participation",
+        "price": 20,
+        "available": 500,
+        "limitPerPerson": 1
+      }
     ]
   },
   {

@@ -12,6 +12,7 @@ type Inputs = {
 
 const LoginModal = () => {
   const { closeModal, openModal } = useLoginModal();
+  //REACT HOOK FORM
   const {
     register,
     handleSubmit,
@@ -51,6 +52,7 @@ const LoginModal = () => {
           </button>
         </div>
         <div className="py-6 modal-body">
+          {/*REACT HOOK FORM */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label

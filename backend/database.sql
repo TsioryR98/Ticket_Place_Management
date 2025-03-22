@@ -1,3 +1,4 @@
+--These are all inserts with appropriate tables, change.env for local testing 
 CREATE DATABASE ticket_management;
 
 --uuid_generate_v4 () random uuid

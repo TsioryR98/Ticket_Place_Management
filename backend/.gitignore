@@ -3,4 +3,4 @@ node_modules
 /node_modules
 request.request
 
-delete .env for testing only
+delete for testing only

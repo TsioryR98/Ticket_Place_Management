@@ -1,70 +1,57 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import React, { useState } from "react";
+import React from "react";
 import { useLoginModal } from "@/context/ModalContext";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type Inputs = {
+  email: string;
+  password: string;
+};
 
 const LoginModal = () => {
   const { closeModal, openModal } = useLoginModal();
-  //input
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const handleOnChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setEmail(event.target.value);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
 
-  const handleOnChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setPassword(event.target.value);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    //check credentials from option in nextauth
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const result = await signIn("credentials", {
-      redirect: false, //stay in the same page
-      email,
-      password,
+      redirect: false,
+      email: data.email,
+      password: data.password,
     });
 
     if (result?.error) {
       alert("Email ou mot de passe incorrect.");
     } else {
-      alert("connexion ok ");
+      alert("Connexion réussie");
       closeModal();
     }
   };
 
   if (!openModal) return null;
 
-  const handleCloseClick = () => {
-    closeModal();
-  };
   return (
-    <div
-      id="scroll-inside-modal"
-      className="fixed inset-0 bg-gray/10 backdrop-blur-[3px] flex justify-center items-center border border-gray-400"
-      role="dialog"
-      tabIndex={-1}
-    >
+    <div className="fixed inset-0 bg-gray/10 backdrop-blur-[3px] flex justify-center items-center">
       <div className="modal-content bg-gray-100 p-8 rounded-lg shadow-md w-96">
-        {/* Header */}
         <div className="modal-header justify-between flex border-b pb-3">
           <h1 className="text-xl text-center font-bold text-gray-900">
             Sign in
           </h1>
           <button
-            type="button"
-            onClick={handleCloseClick}
-            className="btn btn-text btn-circle btn-sm cursor-pointer"
+            onClick={closeModal}
+            className="btn btn-text btn-circle btn-sm"
             aria-label="Close"
-            data-overlay="#middle-start-modal"
           >
-            <span className="icon-[tabler--x] size-4">X</span>
+            <span>X</span>
           </button>
         </div>
-
-        {/* Body */}
         <div className="py-6 modal-body">
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
@@ -73,16 +60,15 @@ const LoginModal = () => {
                 Your email
               </label>
               <input
-                type="email"
-                value={email}
                 id="email"
-                onChange={handleOnChangeEmail}
-                className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                {...register("email", { required: "Email is required" })}
+                className="w-full border border-gray-300 p-2.5 rounded-lg"
                 placeholder="name@company.com"
-                required
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email.message}</p>
+              )}
             </div>
-
             <div>
               <label
                 htmlFor="password"
@@ -93,38 +79,36 @@ const LoginModal = () => {
               <input
                 type="password"
                 id="password"
-                className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                {...register("password", { required: "Password is required" })}
+                className="w-full border border-gray-300 p-2.5 rounded-lg"
                 placeholder="••••••••"
-                value={password}
-                onChange={handleOnChangePassword}
-                required
               />
+              {errors.password && (
+                <p className="text-red-500 text-xs">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
-
             <button
               type="submit"
-              className="cursor-pointer w-full bg-sky-950 hover:bg-sky-900 text-white font-bold focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
+              className="w-full bg-sky-950 hover:bg-sky-900 text-white font-bold py-2.5 rounded-lg"
             >
               Sign in
             </button>
-
             <p className="text-sm text-gray-500">
               Don’t have an account yet?{" "}
               <a
                 href="#"
-                className="cursor-pointer font-medium text-primary-600 hover:underline"
+                className="font-medium text-primary-600 hover:underline"
               >
                 Sign up
               </a>
             </p>
-
-            {/* Divider */}
             <div className="flex items-center my-4">
               <div className="flex-1 border-t border-gray-300"></div>
               <span className="px-4 text-gray-500">or</span>
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
-
             {/* Google Login Button */}
             <button
               type="button"

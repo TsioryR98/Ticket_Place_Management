@@ -14,11 +14,12 @@ export const getAllUsers = async (req, res) => {
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
-    //Get Paged Users List
-    const userQuery = await pool.query("SELECT * FROM users");
+    //Get Paged Users List  //Get Total of all Users
 
-    //Get Total of all Users
-    const totalResult = await pool.query("SELECT COUNT(*) FROM users");
+    const [userQuery, totalResult] = await Promise.all([
+      pool.query("SELECT * FROM users"),
+      pool.query("SELECT COUNT(*) FROM users"),
+    ]);
     const total = parseInt(totalResult.rows[0].count, 10);
 
     //Add x-total-Count

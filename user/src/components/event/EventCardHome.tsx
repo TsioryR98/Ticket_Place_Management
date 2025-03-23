@@ -17,7 +17,7 @@ const EventCardHome = ({title, description, date, time, location, organizer, lin
             <Card className="w-[400px] shadow-2xl">
                 <CardHeader>
                     <CardTitle className="text-lg">{title}</CardTitle>
-                    <CardDescription>{description}</CardDescription>
+                    <CardDescription className="text-[1.05rem]">{description}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-y-5">
                     <span className="flex items-center gap-8">

@@ -28,7 +28,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-/*--------get all events GET /api/events/:eventId --------- */
+/*--------get 1 event GET /api/events/:eventId --------- */
 
 export const getEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -45,4 +45,12 @@ export const getEvent = async (req, res) => {
   } catch (error) {
     handleError(res, "Error while getting event", error);
   }
+};
+
+/*--------save 1 event POST /api/events/save  ADMIN--------- */
+
+export const saveEvent = async (req, res) => {
+  try {
+    const {} = req.body;
+  } catch (error) {}
 };

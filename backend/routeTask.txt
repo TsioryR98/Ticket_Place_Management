@@ -1,0 +1,30 @@
+vous pouvez l'integrer dans la backend , vous avez le choix soit de diviser en 
+models controller et routes ( convention ou juste sans models mais dans /controller et /routes 
+il faut les separer afin de mieux gerer implementation de middleware notamment pour les
+gestions de panier avec un middleware globale : Par exemple /orders ou /order.../items qui deviendra un store zustand a part)
+
+
+----le requetes sql sont dans database.sql avec des inserts si des modifications a apporter 
+dites le nous a cas ou on ne check pas le commits 
+
+vous pouvez diviser en 8 routes /3 personnes
+
+
+
+vous pouvez meme tester car il suffit juste de changer les .env pour faire le test. Normalement on ne parlera plus de routes demain
+
+-------- Gestion des commandes
+●​ POST /api/orders : Créer une nouvelle commande.
+●​ GET /api/orders : Récupérer toutes les commandes de l'utilisateur connecté.
+●​ GET /api/orders/:orderId : Récupérer une commande spécifique.
+●​ PUT /api/orders/:orderId : Mettre à jour le statut d'une commande (admin
+seulement).
+
+
+--------Gestion des articles de commande (order_items)
+
+●​ POST /api/orders/:orderId/items : Ajouter un article à une commande.
+●​ GET /api/orders/:orderId/items : Récupérer les articles d'une commande.
+●​ PUT /api/orders/:orderId/items/:itemId : Mettre à jour la quantité d'un article.
+●​ DELETE /api/orders/:orderId/items/:itemId : Supprimer un article d'une
+commande.

@@ -60,25 +60,24 @@ CREATE TABLE
     );
 
 ---SQL SCRIPTS---
+---take event with ticket details
 SELECT
-    e.event_id AS id,
-    e.title,
-    e.descriptions AS description,
-    e.event_datetime,
-    e.locations AS location,
-    e.organizer,
-    e.category,
-    t.types AS ticket_type,
-    t.price AS ticket_price,
-    t.available AS ticket_available,
-    t.limit_per_person AS ticket_limitPerPerson
+    *
 FROM
     events e
     LEFT JOIN tickets t ON e.event_id = t.event_id
 WHERE
     e.event_id = '8939ff10-7401-4d29-bbe3-c79f3d7a7ed8';
 
----INSERT EVENT 
+-- UPDATE event just for { description, date, time, location }
+UPDATE events
+SET
+    descriptions = ?,
+    event_datetime = ?,
+    locations = ?
+WHERE
+    event_id = ? RETURNING *
+    ---INSERT EVENT 
 INSERT INTO
     events (
         title,

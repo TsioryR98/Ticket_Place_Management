@@ -1,6 +1,4 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { error } from "console";
 
 function authenticationToken(req, res, next) {
   const authHeader = req.headers["authorization"]; //not null in const token

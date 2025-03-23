@@ -12,7 +12,7 @@ export default function Home() {
     }));
     const categories = [...new Set(Events.map((event) => event.category))];
 
-    const [selectedDateRange, setSelectedDateRange] = useState<{ start: Date | undefined; end: Date | undefined }>({ start: undefined, end: undefined });
+    const [selectedDateRange, setSelectedDateRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null });
     const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
     const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
 
@@ -24,7 +24,7 @@ export default function Home() {
 
         const eventDate = parseISO(event.date);
         const matchDate =
-            selectedDateRange.start !== undefined && selectedDateRange.end !== undefined
+            selectedDateRange.start !== null && selectedDateRange.end !== null
                 ? isWithinInterval(eventDate, { start: selectedDateRange.start, end: selectedDateRange.end })
                 : true;
 

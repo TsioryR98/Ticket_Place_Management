@@ -9,6 +9,7 @@ const handleError = (res, message, error) => {
 /*--------get all user for admin only --------- */
 
 export const getAllUsers = async (req, res) => {
+  //user JWT
   if (req.user.role !== "user") {
     //test only for user
     return res.status(403).json({ error: "Forbidden request" });
@@ -17,7 +18,7 @@ export const getAllUsers = async (req, res) => {
     //Get Paged Users List  //Get Total of all Users
 
     const [userQuery, totalResult] = await Promise.all([
-      pool.query("SELECT * FROM users"),
+      pool.query("SELECT * FROM users*"),
       pool.query("SELECT COUNT(*) FROM users"),
     ]);
     const total = parseInt(totalResult.rows[0].count, 10);
@@ -114,7 +115,9 @@ export const deleteUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    await pool.query("DELETE FROM users WHERE user_id = $1", [userId]);
+    await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [
+      userId,
+    ]);
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {

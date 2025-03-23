@@ -8,41 +8,115 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const [resultEvent, totalResult] = await Promise.all([
+    const [resultEvent, totalResult, resultTicket] = await Promise.all([
       pool.query("SELECT * FROM events"),
       pool.query("SELECT COUNT(*) FROM events"),
+      pool.query("SELECT*FROM tickets"),
     ]);
 
     const total = parseInt(totalResult.rows[0].count, 10);
-    //for pagination     //Add x-total-Count and getting from headers
+    //Add x-total-Count and getting from headers for pagination
 
     res.set("X-Total-Count", total);
 
-    const events = resultEvent.rows.map((ev) => ({
-      ...ev,
-      created_at: new Date(ev.created_at).toISOString(),
-    }));
+    //filter ticket for on event ( ticket.event_id === event.event_id
+    const events = resultEvent.rows.map((event) => {
+      const eventTicket = resultTicket.rows
+        .filter((ticket) => ticket.event_id === event.event_id)
+        .map((ticket) => ({
+          type: ticket.types,
+          price: Number(ticket.price),
+          available: ticket.available,
+          limitPerPerson: ticket.limit_per_person,
+        }));
+
+      return {
+        id: event.event_id,
+        title: event.title,
+        description: event.descriptions,
+        date: new Date(event.event_datetime).toISOString().split("T")[0], // Format YYYY-MM-DD
+        time: new Date(event.event_datetime).toTimeString().split(" ")[0], // Format HH:MM:SS
+        location: event.locations,
+        organizer: event.organizer,
+        category: event.category,
+        tickets: eventTicket,
+      };
+    });
     res.status(200).json(events);
   } catch (error) {
     handleError(res, "Error during fecthing from database", error);
   }
 };
 
-/*--------get all events GET /api/events/:eventId --------- */
+/*--------get 1 event GET /api/events/:eventId --------- */
 
 export const getEvent = async (req, res) => {
   const { eventId } = req.params;
 
   try {
-    const result = await pool.query("SELECT * FROM events WHERE event_id =$1", [
-      eventId,
-    ]);
+    const result = await pool.query(
+      "SELECT\n" +
+        "*\n" +
+        "FROM\n" +
+        "events e\n" +
+        "JOIN tickets t ON e.event_id = t.event_id\n" +
+        "WHERE\n" +
+        "e.event_id =$1",
+      [eventId]
+    );
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "event not found" });
     }
-    const event = result.rows[0];
+    // format rows0 to string
+    const event = {
+      id: result.rows[0].event_id,
+      title: result.rows[0].title,
+      description: result.rows[0].descriptions, ///    "date": "2025-06-10T07:00:00.000Z","time": "09:00:00 GMT+0200
+      date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0], // Format YYYY-MM-DD from T
+      time: new Date(result.rows[0].event_datetime)
+        .toTimeString()
+        .split(" ")[0], // Format HH:MM:SS
+      location: result.rows[0].locations,
+      organizer: result.rows[0].organizer,
+      category: result.rows[0].category,
+      tickets: result.rows.map((row) => ({
+        type: row.types,
+        price: Number(row.price),
+        available: row.available,
+        limitPerPerson: row.limit_per_person,
+      })),
+    };
+
     res.status(200).json(event);
   } catch (error) {
     handleError(res, "Error while getting event", error);
+  }
+};
+
+/*--------UPDATE 1 event POST /api/events/save  ADMIN--------- */
+
+export const updateEvent = async (req, res) => {
+  if (req.user.role !== "user") {
+    // only for user and change role into admin and organizer
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+
+  try {
+    const { eventId } = req.params;
+    const { description, date, time, location } = req.body;
+    const eventDatetime = `${date} ${time}`;
+
+    const saveQuery = await pool.query(
+      "UPDATE events SET descriptions= $1,event_datetime= $2,locations= $3 WHERE event_id=$4 RETURNING *",
+      [description, eventDatetime, location, eventId]
+    );
+
+    if (saveQuery.rows.length === 0) {
+      return res.status(401).json({ error: "this event doesn't exist" });
+    }
+    res.status(200).json(saveQuery.rows[0]);
+  } catch (error) {
+    handleError(res, "Error during update event", error);
   }
 };

@@ -30,12 +30,13 @@ CREATE TABLE
 CREATE TABLE
     tickets (
         ticket_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        event_id uuid REFERENCES events (event_id) ON DELETE CASCADE,
+        event_id uuid,
         types VARCHAR(100) NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
         available INT NOT NULL CHECK (available >= 0),
         limit_per_person INT NOT NULL CHECK (limit_per_person > 0),
-        created_at TIMESTAMP DEFAULT NOW ()
+        created_at TIMESTAMP DEFAULT NOW (),
+        FOREIGN KEY (event_id) REFERENCES events (event_id) ON DELETE CASCADE
     );
 
 CREATE TABLE
@@ -50,14 +51,34 @@ CREATE TABLE
 CREATE TABLE
     order_items (
         order_item_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        order_id uuid REFERENCES orders (order_id) ON DELETE CASCADE,
-        ticket_id uuid REFERENCES tickets (ticket_id) ON DELETE SET NULL,
+        order_id uuid NOT NULL,
+        ticket_id uuid OT NULL,
         quantity INT NOT NULL CHECK (quantity > 0),
         price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
-        created_at TIMESTAMP DEFAULT NOW ()
+        created_at TIMESTAMP DEFAULT NOW (),
+        FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE,
+        FOREIGN KEY (ticket_id) REFERENCES tickets (ticket_id) ON DELETE SET NULL
     );
 
----INSERT EVENT 
+---SQL SCRIPTS---
+---take event with ticket details
+SELECT
+    *
+FROM
+    events e
+    LEFT JOIN tickets t ON e.event_id = t.event_id
+WHERE
+    e.event_id = '8939ff10-7401-4d29-bbe3-c79f3d7a7ed8';
+
+-- UPDATE event just for { description, date, time, location }
+UPDATE events
+SET
+    descriptions = ?,
+    event_datetime = ?,
+    locations = ?
+WHERE
+    event_id = ? RETURNING *
+    ---INSERT EVENT 
 INSERT INTO
     events (
         title,

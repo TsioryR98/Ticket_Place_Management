@@ -153,7 +153,7 @@ export const createEvent = async (req, res) => {
   const eventDatetime = `${date} ${time}`;
 
   if (role !== "user") {
-    // only for user and change role into admin and organizer
+    // only for user and change role into admin and organizer if exist
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {

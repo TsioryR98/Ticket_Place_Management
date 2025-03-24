@@ -28,6 +28,8 @@ app.use(cookieParser());
 app.use("/api/users", usersRouter);
 //route for event
 app.use("/api/events", eventRouter);
+//route for order
+app.use("/api/orders", orderRouter);
 //route for ticket
 app.use("/api/events", ticketRouter);
 

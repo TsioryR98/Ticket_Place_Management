@@ -69,7 +69,7 @@
                             defaultMonth={selectedDateRange?.start ?? new Date()}
                             selected={{ from: selectedDateRange.start ?? undefined, to: selectedDateRange.end ?? undefined }}
                             onSelect={(range) => setSelectedDateRange({ start: range?.from ?? null, end: range?.to ?? null })}
-                            numberOfMonths={2}
+                            numberOfMonths={1}
                         />
                     </PopoverContent>
                 </Popover>

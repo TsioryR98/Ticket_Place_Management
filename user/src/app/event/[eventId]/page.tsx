@@ -1,22 +1,25 @@
 import { notFound } from "next/navigation";
-import eventsData from "@/lib/events.json";
 import { Event } from "@/types/event";
 import EventClientComponent from "./EventClientComponent";
+import { fetchEventById } from "@/lib/api";
 
 export default async function EventPage({
   params,
 }: {
   params: { eventId: string };
 }) {
-  const { eventId } = await params;
+  const { eventId } = params;
 
-  // Simuler une récupération asynchrone des données
-  const event: Event | undefined = eventsData.find((e) => e.id === eventId);
+  try {
+    const event: Event = await fetchEventById(eventId);
 
-  if (!event) {
+    if (!event) {
+      return notFound();
+    }
+
+    return <EventClientComponent event={event} />;
+  } catch (error) {
+    console.error("Error fetching event:", error);
     return notFound();
   }
-
-  // Passer les données au composant client
-  return <EventClientComponent event={event} />;
 }

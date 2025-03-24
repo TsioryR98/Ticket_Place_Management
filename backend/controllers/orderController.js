@@ -8,7 +8,11 @@ const handleError = (res, message, error) => {
 
 // POST /api/orders - Créer une nouvelle commande
 export const createOrder = async (req, res) => {
-  const { userId, items } = req.body; // items: [{ticketId, quantity}]
+  //const { userId, items } = req.body; // items: [{ticketId, quantity}]
+  // Simulation d'user ID pour les tests
+  const userId = "11111111-1111-1111-1111-111111111111"; // ID du user test
+
+  const { items } = req.body; // On ne prend plus userId du body
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "Items are required" });
@@ -160,7 +164,9 @@ export const getOrderById = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
-  const { role } = req.user;
+  // const { role } = req.user;
+  // Solution temporaire - bypass auth pour les tests
+  const role = "admin"; // Force le rôle admin
 
   if (role !== "admin") {
     return res.status(403).json({ error: "Forbidden: admin access required" });

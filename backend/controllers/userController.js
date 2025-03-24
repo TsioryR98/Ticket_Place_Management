@@ -6,7 +6,7 @@ const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
 
-/*--------get all user for admin only --------- */
+/*--------get all user only ADMIN--------- */
 
 export const getAllUsers = async (req, res) => {
   //user JWT
@@ -36,7 +36,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-/*--------register an user POST api/users/register--------- */
+/*--------register an user POST api/users/register USER--------- */
 export const registerUser = async (req, res) => {
   try {
     //body request
@@ -54,7 +54,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-/*--------authenticate an user POST api/users/login--------- */
+/*--------authenticate an user POST api/users/login  USER--------- */
 
 export const loginUser = async (req, res) => {
   try {
@@ -98,11 +98,12 @@ export const loginUser = async (req, res) => {
   }
 };
 
-/*-------delete an user GET /api/users/delete/:id --------- */
+/*-------delete an user GET /api/users/delete/:id  ADMIN--------- */
 
 export const deleteUser = async (req, res) => {
-  const userId = req.user.userId;
-  if (req.user.role !== "user") {
+  const { userId } = req.params;
+  const { role } = req.user;
+  if (role !== "user") {
     return res.status(403).json({ error: "Forbidden request" });
   }
 
@@ -125,7 +126,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-/*-------get one user  GET /api/users/me  --------- */
+/*-------get one user  GET /api/users/me  USER --------- */
 
 export const getUser = async (req, res) => {
   const userId = req.user.userId; //jwt key

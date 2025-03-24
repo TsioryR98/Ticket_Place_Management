@@ -4,7 +4,7 @@ const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
 
-/*--------get all events GET /api/events --------- */
+/*--------get all events GET /api/events USER--------- */
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -48,7 +48,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-/*--------get 1 event GET /api/events/:eventId --------- */
+/*--------get 1 event GET /api/events/:eventId USER--------- */
 
 export const getEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -97,16 +97,15 @@ export const getEvent = async (req, res) => {
 /*--------UPDATE 1 event POST /api/events/save  ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const { description, date, time, location } = req.body;
+  const eventDatetime = `${date} ${time}`;
+
   if (req.user.role !== "user") {
     // only for user and change role into admin and organizer
     return res.status(403).json({ error: "Forbidden request" });
   }
-
   try {
-    const { eventId } = req.params;
-    const { description, date, time, location } = req.body;
-    const eventDatetime = `${date} ${time}`;
-
     const saveQuery = await pool.query(
       "UPDATE events SET descriptions= $1,event_datetime= $2,locations= $3 WHERE event_id=$4 RETURNING *",
       [description, eventDatetime, location, eventId]
@@ -118,5 +117,28 @@ export const updateEvent = async (req, res) => {
     res.status(200).json(saveQuery.rows[0]);
   } catch (error) {
     handleError(res, "Error during update event", error);
+  }
+};
+
+/*----DELETE /api/events/:eventId -----ADMIN*/
+
+export const deleteEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const { role } = req.user;
+  if (role !== "user") {
+    // only for user and change role into admin and organizer
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+  try {
+    const result = await pool.query("DELETE FROM events WHERE event_id=$1", [
+      eventId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "event not found" });
+    }
+    const event = result.rows[0];
+    res.status(200).json(event);
+  } catch (error) {
+    handleError(res, "Error while getting event", error);
   }
 };

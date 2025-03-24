@@ -15,22 +15,28 @@ export const getAllEventsTicket = async (req, res) => {
       [eventId]
     );
     if (result.rows.length === 0) {
-        return res.status(404).json({ error: "event not found" });
-      }
-      res.status(200).json({tickets : result.rows[0].json()});
+      return res.status(404).json({ error: "event not found" });
+    }
+    res.status(200).json({ tickets: result.rows[0].json() });
   } catch (error) {
     handleError(res, "Error during fecthing from database", error);
   }
 };
 
-/*-------- POST /api/events/:eventId/tickets ADMIN--------- */
+/*-------- PUT /api/tickets/:ticketId ADMIN--------- */
 
 export const updateEventTicket = async (req, res) => {
-    const { eventId } = req.params;
-    const {}
-    try {
-        
-    } catch (error) {
-        
+  const { ticketId } = req.params;
+  const { type, price, available, limitPerPerson } = req.body;
+
+  try {
+    const query = await pool.query(
+      "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE ticket_id = $5 RETURNING *",
+      [type, price, available, limitPerPerson]
+    );
+
+    if (query.rows.length === 0) {
+      return res.status(401).json({ error: "this ticket doesn't exist" });
     }
-}
+  } catch (error) {}
+};

@@ -137,6 +137,7 @@ export const deleteEvent = async (req, res) => {
       return res.status(404).json({ error: "event not found" });
     }
     const event = result.rows[0];
+
     res.status(200).json(event);
   } catch (error) {
     handleError(res, "Error while getting event", error);
@@ -160,7 +161,20 @@ export const createEvent = async (req, res) => {
       "INSERT INTO events (title, description, event_datetime , locations ,organizer ,category )VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [title, description, eventDatetime, locations, organizer, category]
     );
+    // Input validation
+    if (
+      !title ||
+      !description ||
+      !date ||
+      !time ||
+      !locations ||
+      !organizer ||
+      !category
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
     const event = result.rows[0];
+
     res.status(201).json(event);
   } catch (error) {
     handleError(res, "Error while crating event", error);

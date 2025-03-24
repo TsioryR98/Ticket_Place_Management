@@ -138,6 +138,7 @@ export const getUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     const user = result.rows[0];
+
     res.status(200).json(user);
   } catch (error) {
     handleError(res, "Error while getting user", error);

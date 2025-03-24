@@ -137,8 +137,46 @@ export const deleteEvent = async (req, res) => {
       return res.status(404).json({ error: "event not found" });
     }
     const event = result.rows[0];
+
     res.status(200).json(event);
   } catch (error) {
     handleError(res, "Error while getting event", error);
+  }
+};
+
+/*----POST /api/events -----ADMIN*/
+
+export const createEvent = async (req, res) => {
+  const { role } = req.user;
+  const { title, description, date, time, locations, organizer, category } =
+    req.body;
+  const eventDatetime = `${date} ${time}`;
+
+  if (role !== "user") {
+    // only for user and change role into admin and organizer if exist
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+  try {
+    const result = await pool.query(
+      "INSERT INTO events (title, description, event_datetime , locations ,organizer ,category )VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [title, description, eventDatetime, locations, organizer, category]
+    );
+    // Input validation
+    if (
+      !title ||
+      !description ||
+      !date ||
+      !time ||
+      !locations ||
+      !organizer ||
+      !category
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    const event = result.rows[0];
+
+    res.status(201).json(event);
+  } catch (error) {
+    handleError(res, "Error while crating event", error);
   }
 };

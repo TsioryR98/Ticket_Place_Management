@@ -37,7 +37,7 @@ const LoginModal = () => {
   if (!openModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray/10 backdrop-blur-[3px] flex justify-center items-center">
+    <div className="fixed inset-0 bg-gray/10 backdrop-blur-[3px] flex justify-center items-center z-50">
       <div className="modal-content bg-gray-100 p-8 rounded-lg shadow-md w-96">
         <div className="modal-header justify-between flex border-b pb-3">
           <h1 className="text-xl text-center font-bold text-gray-900">

@@ -5,6 +5,7 @@ import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
 import { usersRouter } from "./routes/userRoutes.js";
 import { eventRouter } from "./routes/eventRoute.js";
+import { ticketRouter } from "./routes/ticketRoute.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename); //static files
@@ -27,6 +28,9 @@ app.use(cookieParser());
 app.use("/api/users", usersRouter);
 //route for event
 app.use("/api/events", eventRouter);
+//route for ticket
+app.use("/api/events", ticketRouter);
+
 
 app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

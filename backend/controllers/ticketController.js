@@ -1,32 +1,31 @@
 import pool from "../dbConfig.js";
 
-/*-------- update /api/tickets/:ticketId ADMIN--------- */
-
+/*-------- update /api/events/:eventId/tickets/:ticketId ADMIN--------- */
 export const updateEventTicket = async (req, res) => {
-  const { ticketId } = req.params;
-  const { type, price, available, limitPerPerson } = req.body;
-  const { role } = req.user;
+    const { eventId, ticketId } = req.params;
+    const { type, price, available, limitPerPerson } = req.body;
+    const { role } = req.user;
 
-  if (role !== "user") {
-    return res.status(403).json({ error: "Forbidden request" });
-  }
-
-  try {
-    const query = await pool.query(
-      "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE ticket_id = $5 RETURNING *",
-      [type, price, available, limitPerPerson, ticketId]
-    );
-
-    if (query.rows.length === 0) {
-      return res.status(404).json({ error: "Ticket not found" });
+    if (role !== "admin") {
+        return res.status(403).json({ error: "Forbidden request" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Ticket updated successfully", ticket: query.rows[0] });
-  } catch (error) {
-    handleError(res, "Error updating the ticket", error);
-  }
+    try {
+        const query = await pool.query(
+            "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE event_id = $5 AND ticket_id = $6 RETURNING *",
+            [type, price, available, limitPerPerson, eventId, ticketId]
+        );
+
+        if (query.rows.length === 0) {
+            return res.status(404).json({ error: "Ticket not found" });
+        }
+
+        res
+            .status(200)
+            .json({ message: "Ticket updated successfully", ticket: query.rows[0] });
+    } catch (error) {
+        handleError(res, "Error updating the ticket", error);
+    }
 };
 /*-------- DELETE /api/events/:eventId/tickets/:ticketId ADMIN--------- */
 

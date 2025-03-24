@@ -4,16 +4,16 @@ import { getAllEventsTicket,updateEventTicket, createEventTicket ,deleteEventTic
 const router = express.Router();
 
 // Get all tickets for an event
-router.get('/api/events/:eventId/tickets',getAllEventsTicket);
+router.get('/:eventId/tickets',getAllEventsTicket);
 
 // Add a new ticket for an event (admin only) 
-router.post('/api/events/:eventId/tickets', createEventTicket);
+router.post('/:eventId/tickets', createEventTicket);
 
 // Update a ticket by ID (admin only)
-router.put('/api/tickets/:ticketId', updateEventTicket);
+router.put('/:eventId/tickets/:ticketId', updateEventTicket);
 
 // Delete a ticket by ID and (admin only) 
-router.delete('/api/events/:eventId/tickets/:ticketId', deleteEventTicket);
+router.delete('/:eventId/tickets/:ticketId', deleteEventTicket);
 
 
 export { router as ticketRouter };

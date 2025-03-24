@@ -3,59 +3,59 @@ CREATE DATABASE ticket_management;
 
 --uuid_generate_v4 () random uuid
 --ALTER TABLE events ADD COLUMN imagepath VARCHAR(255) DEFAULT NULL;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
-CREATE TABLE
-    users (
-        user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        user_name VARCHAR(255) UNIQUE NOT NULL,
-        user_email VARCHAR(255) UNIQUE NOT NULL,
-        user_passwords TEXT NOT NULL,
-        "role" VARCHAR(50) NOT NULL DEFAULT 'user' CHECK ("role" IN ('admin', 'user')),
-        created_at TIMESTAMP DEFAULT NOW ()
-    );
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" CREATE TABLE users (
+    user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    user_name VARCHAR(255) UNIQUE NOT NULL,
+    user_email VARCHAR(255) UNIQUE NOT NULL,
+    user_passwords TEXT NOT NULL,
+    "role" VARCHAR(50) NOT NULL DEFAULT 'user' CHECK ("role" IN ('admin', 'user')),
+    created_at TIMESTAMP DEFAULT NOW ()
+);
 
-CREATE TABLE
-    events (
-        event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        title VARCHAR(255) NOT NULL,
-        descriptions TEXT,
-        event_datetime TIMESTAMP NOT NULL,
-        locations VARCHAR(255) NOT NULL,
-        organizer VARCHAR(255),
-        category VARCHAR(100) NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW (),
-        imagepath VARCHAR(255) DEFAULT NULL
-    );
+CREATE TABLE events (
+    event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    title VARCHAR(255) NOT NULL,
+    descriptions TEXT,
+    event_datetime TIMESTAMP NOT NULL,
+    locations VARCHAR(255) NOT NULL,
+    organizer VARCHAR(255),
+    category VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW (),
+    imagepath VARCHAR(255) DEFAULT NULL
+);
 
-CREATE TABLE
-    tickets (
-        ticket_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        event_id uuid REFERENCES events (event_id) ON DELETE CASCADE,
-        types VARCHAR(100) NOT NULL,
-        price DECIMAL(10, 2) NOT NULL,
-        available INT NOT NULL CHECK (available >= 0),
-        limit_per_person INT NOT NULL CHECK (limit_per_person > 0),
-        created_at TIMESTAMP DEFAULT NOW ()
-    );
+CREATE TABLE tickets (
+    ticket_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    event_id uuid REFERENCES events (event_id) ON DELETE CASCADE,
+    types VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    available INT NOT NULL CHECK (available >= 0),
+    limit_per_person INT NOT NULL CHECK (limit_per_person > 0),
+    created_at TIMESTAMP DEFAULT NOW ()
+);
 
-CREATE TABLE
-    orders (
-        order_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        user_id uuid REFERENCES users (user_id) ON DELETE SET NULL,
+CREATE TABLE orders (
+    order_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    user_id uuid REFERENCES users (user_id) ON DELETE
+    SET
+        NULL,
         total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),
-        status_order VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
+        status_order VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (
+            status_order IN ('pending', 'completed', 'cancelled')
+        ),
         created_at TIMESTAMP DEFAULT NOW ()
-    );
+);
 
-CREATE TABLE
-    order_items (
-        order_item_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        order_id uuid REFERENCES orders (order_id) ON DELETE CASCADE,
-        ticket_id uuid REFERENCES tickets (ticket_id) ON DELETE SET NULL,
+CREATE TABLE order_items (
+    order_item_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    order_id uuid REFERENCES orders (order_id) ON DELETE CASCADE,
+    ticket_id uuid REFERENCES tickets (ticket_id) ON DELETE
+    SET
+        NULL,
         quantity INT NOT NULL CHECK (quantity > 0),
         price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
         created_at TIMESTAMP DEFAULT NOW ()
-    );
+);
 
 ---INSERT EVENT 
 INSERT INTO
@@ -86,7 +86,8 @@ VALUES
         'MusicFest',
         'Music',
         NOW ()
-    ), --
+    ),
+    --
     (
         'Book Fair',
         'Meet your favorite authors and discover the latest releases.',
@@ -113,7 +114,8 @@ VALUES
         'ArtWorld',
         'Art',
         NOW ()
-    ), ---
+    ),
+    ---
     (
         'Cooking Workshop',
         'Learn to cook gourmet dishes with professional chefs.',

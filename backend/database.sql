@@ -3,26 +3,29 @@ CREATE DATABASE ticket_management;
 
 --uuid_generate_v4 () random uuid
 --ALTER TABLE events ADD COLUMN imagepath VARCHAR(255) DEFAULT NULL;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" CREATE TABLE users (
-    user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-    user_name VARCHAR(255) UNIQUE NOT NULL,
-    user_email VARCHAR(255) UNIQUE NOT NULL,
-    user_passwords TEXT NOT NULL,
-    "role" VARCHAR(50) NOT NULL DEFAULT 'user' CHECK ("role" IN ('admin', 'user')),
-    created_at TIMESTAMP DEFAULT NOW ()
-);
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+CREATE TABLE
+    users (
+        user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        user_name VARCHAR(255) UNIQUE NOT NULL,
+        user_email VARCHAR(255) UNIQUE NOT NULL,
+        user_passwords TEXT NOT NULL,
+        "role" VARCHAR(50) NOT NULL DEFAULT 'user' CHECK ("role" IN ('admin', 'user')),
+        created_at TIMESTAMP DEFAULT NOW ()
+    );
 
-CREATE TABLE events (
-    event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-    title VARCHAR(255) NOT NULL,
-    descriptions TEXT,
-    event_datetime TIMESTAMP NOT NULL,
-    locations VARCHAR(255) NOT NULL,
-    organizer VARCHAR(255),
-    category VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW (),
-    imagepath VARCHAR(255) DEFAULT NULL
-);
+CREATE TABLE
+    events (
+        event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        title VARCHAR(255) NOT NULL,
+        descriptions TEXT,
+        event_datetime TIMESTAMP NOT NULL,
+        locations VARCHAR(255) NOT NULL,
+        organizer VARCHAR(255),
+        category VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW (),
+        imagepath VARCHAR(255) DEFAULT NULL
+    );
 
 CREATE TABLE
     tickets (
@@ -36,17 +39,16 @@ CREATE TABLE
         FOREIGN KEY (event_id) REFERENCES events (event_id) ON DELETE CASCADE
     );
 
-CREATE TABLE orders (
-    order_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-    user_id uuid REFERENCES users (user_id) ON DELETE
-    SET
-        NULL,
+CREATE TABLE
+    orders (
+        order_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        user_id uuid REFERENCES users (user_id) ON DELETE SET NULL,
         total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),
         status_order VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (
             status_order IN ('pending', 'completed', 'cancelled')
         ),
         created_at TIMESTAMP DEFAULT NOW ()
-);
+    );
 
 CREATE TABLE
     order_items (

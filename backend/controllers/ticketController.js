@@ -2,37 +2,37 @@ import pool from "../dbConfig.js";
 
 /*-------- update /api/events/:eventId/tickets/:ticketId ADMIN--------- */
 export const updateEventTicket = async (req, res) => {
-    const { eventId, ticketId } = req.params;
-    const { type, price, available, limitPerPerson } = req.body;
-    const { role } = req.user;
+  const { eventId, ticketId } = req.params;
+  const { type, price, available, limitPerPerson } = req.body;
+  const { role } = req.user;
 
-    if (role !== "admin") {
-        return res.status(403).json({ error: "Forbidden request" });
+  if (role !== "user") {
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+
+  try {
+    const query = await pool.query(
+      "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE event_id = $5 AND ticket_id = $6 RETURNING *",
+      [type, price, available, limitPerPerson, eventId, ticketId]
+    );
+
+    if (query.rows.length === 0) {
+      return res.status(404).json({ error: "Ticket not found" });
     }
 
-    try {
-        const query = await pool.query(
-            "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE event_id = $5 AND ticket_id = $6 RETURNING *",
-            [type, price, available, limitPerPerson, eventId, ticketId]
-        );
-
-        if (query.rows.length === 0) {
-            return res.status(404).json({ error: "Ticket not found" });
-        }
-
-        res
-            .status(200)
-            .json({ message: "Ticket updated successfully", ticket: query.rows[0] });
-    } catch (error) {
-        handleError(res, "Error updating the ticket", error);
-    }
+    res
+      .status(200)
+      .json({ message: "Ticket updated successfully", ticket: query.rows[0] });
+  } catch (error) {
+    handleError(res, "Error updating the ticket", error);
+  }
 };
 /*-------- DELETE /api/events/:eventId/tickets/:ticketId ADMIN--------- */
 
 export const deleteEventTicket = async (req, res) => {
   const { eventId, ticketId } = req.params;
   const { role } = req.user;
-  if (role !== "admin") {
+  if (role !== "user") {
     return res.status(403).json({ error: "Forbidden request" });
   }
 
@@ -69,10 +69,7 @@ export const getAllEventsTicket = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "event not found" });
     }
-    res.status(200).json({
-      message: "Tickets retrieved successfully",
-      tickets: result.rows,
-    });
+    res.status(200).json({ tickets: result.rows });
   } catch (error) {
     handleError(res, "Error during fecthing from database", error);
   }
@@ -86,12 +83,12 @@ export const createEventTicket = async (req, res) => {
   if (role !== "user") {
     return res.status(403).json({ error: "Forbidden request" });
   }
-  const { type, price, available, limitPerPerson } = req.body;
+  const { types, price, available, limitPerPerson } = req.body;
 
   try {
     const result = await pool.query(
-      "INSERT INTO tickets (event_id, types, price, available, limit_per_person) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [eventId, type, price, available, limitPerPerson]
+      "INSERT INTO tickets (event_id,types, price, available, limit_per_person) VALUES ($1,$2, $3, $4, $5) RETURNING *",
+      [eventId, types, price, available, limitPerPerson]
     );
 
     res.status(201).json({ ticket: result.rows[0] });

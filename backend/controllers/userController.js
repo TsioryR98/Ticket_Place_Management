@@ -129,7 +129,7 @@ export const deleteUser = async (req, res) => {
 /*-------get one user  GET /api/users/me  USER --------- */
 
 export const getUser = async (req, res) => {
-  const userId = req.user.userId; //jwt key
+  const userId = req.user?.userId; //jwt key
   try {
     const result = await pool.query("SELECT * FROM users WHERE user_id =$1", [
       userId,

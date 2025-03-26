@@ -2,6 +2,14 @@ import jwt from "jsonwebtoken";
 
 function authenticationToken(req, res, next) {
   const authHeader = req.headers["authorization"]; //not null in const token
+  //add this for check if token is null or not
+  if (!authHeader) {
+    return res.status(401).json({
+      message: "Authorization header missing",
+      code: "MISSING_AUTH_HEADER",
+    });
+  }
+
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) return res.status(401).json({ message: "Access not allowed" });

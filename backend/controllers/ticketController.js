@@ -1,9 +1,12 @@
 import pool from "../dbConfig.js";
+const handleError = (res, message, error) => {
+  res.status(500).json({ message, error: error?.message || error });
+};
 
-/*-------- update /api/events/:eventId/tickets/:ticketId ADMIN--------- */
+/*-------- update /api/events/:eventId/tickets/:ticketId OK ADMIN--------- */
 export const updateEventTicket = async (req, res) => {
   const { eventId, ticketId } = req.params;
-  const { type, price, available, limitPerPerson } = req.body;
+  const { types, price, available, limitPerPerson } = req.body;
   const { role } = req.user;
 
   if (role !== "user") {
@@ -13,7 +16,7 @@ export const updateEventTicket = async (req, res) => {
   try {
     const query = await pool.query(
       "UPDATE tickets SET types = $1, price = $2, available = $3, limit_per_person = $4 WHERE event_id = $5 AND ticket_id = $6 RETURNING *",
-      [type, price, available, limitPerPerson, eventId, ticketId]
+      [types, price, available, limitPerPerson, eventId, ticketId]
     );
 
     if (query.rows.length === 0) {
@@ -27,7 +30,7 @@ export const updateEventTicket = async (req, res) => {
     handleError(res, "Error updating the ticket", error);
   }
 };
-/*-------- DELETE /api/events/:eventId/tickets/:ticketId ADMIN--------- */
+/*-------- DELETE /api/events/:eventId/tickets/:ticketId ADMIN OK--------- */
 
 export const deleteEventTicket = async (req, res) => {
   const { eventId, ticketId } = req.params;
@@ -42,7 +45,7 @@ export const deleteEventTicket = async (req, res) => {
       [eventId, ticketId]
     );
 
-    if (result.rows.length === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: "Ticket not found" });
     }
 
@@ -53,11 +56,8 @@ export const deleteEventTicket = async (req, res) => {
     handleError(res, "Error deleting the ticket", error);
   }
 };
-const handleError = (res, message, error) => {
-  res.status(500).json({ message, error: error?.message || error });
-};
 
-/*-------- GET /api/events/:eventId/tickets--------- */
+/*-------- GET /api/events/:eventId/tickets ok --------- */
 
 export const getAllEventsTicket = async (req, res) => {
   const { eventId } = req.params;
@@ -75,7 +75,7 @@ export const getAllEventsTicket = async (req, res) => {
   }
 };
 
-/*-------- create /api/events/:eventId/tickets ADMIN--------- */
+/*-------- create /api/events/:eventId/tickets ADMIN ok --------- */
 
 export const createEventTicket = async (req, res) => {
   const { eventId } = req.params;

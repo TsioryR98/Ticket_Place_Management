@@ -44,22 +44,17 @@ CREATE TABLE
         order_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
         user_id uuid REFERENCES users (user_id) ON DELETE SET NULL,
         total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),
-        status_order VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (
-            status_order IN ('pending', 'completed', 'cancelled')
-        ),
         created_at TIMESTAMP DEFAULT NOW ()
     );
 
 CREATE TABLE
     order_items (
         order_item_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        order_id uuid NOT NULL,
-        ticket_id uuid OT NULL,
+        order_id uuid NOT NULL REFERENCES orders (order_id) ON DELETE CASCADE,
+        ticket_id uuid REFERENCES tickets (ticket_id) ON DELETE SET NULL,
         quantity INT NOT NULL CHECK (quantity > 0),
         price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
-        created_at TIMESTAMP DEFAULT NOW (),
-        FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE,
-        FOREIGN KEY (ticket_id) REFERENCES tickets (ticket_id) ON DELETE SET NULL
+        created_at TIMESTAMP DEFAULT NOW ()
     );
 
 ---SQL SCRIPTS---
@@ -536,3 +531,29 @@ VALUES
         4,
         NOW ()
     );
+
+
+BEGIN;
+
+-- Vérifier la disponibilité du ticket
+SELECT available, price, limit_per_person 
+FROM tickets 
+WHERE ticket_id = $1 
+FOR UPDATE;
+
+-- Insérer l'article dans la commande
+INSERT INTO order_items (order_id, ticket_id, quantity, price)
+VALUES ($1, $2, $3, (SELECT price FROM tickets WHERE ticket_id = $2))
+RETURNING *;
+
+-- Mettre à jour la disponibilité du ticket
+UPDATE tickets 
+SET available = available - $3 
+WHERE ticket_id = $2;
+
+-- Mettre à jour le montant total de la commande
+UPDATE orders
+SET total_amount = total_amount + ($3 * (SELECT price FROM tickets WHERE ticket_id = $2))
+WHERE order_id = $1;
+
+COMMIT;

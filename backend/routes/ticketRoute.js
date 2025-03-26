@@ -15,9 +15,17 @@ router.get("/:eventId/tickets", getAllEventsTicket);
 router.post("/:eventId/tickets", authenticationToken, createEventTicket);
 
 // Update a ticket by ID (admin only)
-router.put("/:eventId/tickets/:ticketId", updateEventTicket);
+router.put(
+  "/:eventId/tickets/:ticketId",
+  authenticationToken,
+  updateEventTicket
+);
 
 // Delete a ticket by ID and (admin only)
-router.delete("/:eventId/tickets/:ticketId", deleteEventTicket);
+router.delete(
+  "/:eventId/tickets/:ticketId",
+  authenticationToken,
+  deleteEventTicket
+);
 
 export { router as ticketRouter };

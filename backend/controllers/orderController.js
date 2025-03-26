@@ -1,17 +1,15 @@
-// backend/controllers/orderController.js
 import pool from "../dbConfig.js";
 
 const handleError = (res, message, error) => {
-  console.error(message, error);
   res.status(500).json({ message, error: error?.message || error });
 };
 
-// POST /api/orders - Créer une nouvelle commande
+// POST /api/orders - Créer une commande
 export const createOrder = async (req, res) => {
-  const { userId, items } = req.body; // items: [{ticketId, quantity}]
+  const { userId, items } = req.body;
 
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: "Items are required" });
+  if (!items?.length) {
+    return res.status(400).json({ error: "Minimum 1 item requis" });
   }
 
   const client = await pool.connect();
@@ -19,169 +17,138 @@ export const createOrder = async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // 1. Calculer le montant total
-    const ticketPrices = await Promise.all(
-      items.map((item) =>
-        client
-          .query("SELECT price FROM tickets WHERE ticket_id = $1", [
-            item.ticketId,
-          ])
-          .then((result) => {
-            if (result.rows.length === 0) {
-              throw new Error(`Ticket ${item.ticketId} not found`);
-            }
-            return Number(result.rows[0].price) * item.quantity;
-          })
-      )
-    );
-
-    const totalAmount = ticketPrices.reduce((sum, price) => sum + price, 0);
-
-    // 2. Créer la commande
-    const orderResult = await client.query(
-      "INSERT INTO orders (user_id, total_amount, status_order) VALUES ($1, $2, $3) RETURNING *",
-      [userId, totalAmount, "pending"]
-    );
-    const order = orderResult.rows[0];
-
-    // 3. Ajouter les items de la commande
-    const orderItems = await Promise.all(
+    // 1. Calcul du montant total
+    const tickets = await Promise.all(
       items.map((item) =>
         client.query(
-          "INSERT INTO order_items (order_id, ticket_id, quantity, price) " +
-            "VALUES ($1, $2, $3, (SELECT price FROM tickets WHERE ticket_id = $2)) RETURNING *",
-          [order.order_id, item.ticketId, item.quantity]
+          "SELECT price, available FROM tickets WHERE ticket_id = $1 FOR UPDATE",
+          [item.ticketId]
         )
       )
     );
 
-    // 4. Mettre à jour la disponibilité des billets
-    await Promise.all(
-      items.map((item) =>
+    const totalAmount = tickets.reduce((sum, result, index) => {
+      if (result.rows.length === 0)
+        throw new Error(`Ticket ${items[index].ticketId} introuvable`);
+      if (result.rows[0].available < items[index].quantity)
+        throw new Error("Stock insuffisant");
+      return sum + result.rows[0].price * items[index].quantity;
+    }, 0);
+
+    // 2. Création commande (sans statut)
+    const order = await client.query(
+      "INSERT INTO orders (user_id, total_amount) VALUES ($1, $2) RETURNING *",
+      [userId, totalAmount]
+    );
+
+    // 3. Ajout des articles + mise à jour stock
+    await Promise.all([
+      ...items.map((item, index) =>
+        client.query(
+          "INSERT INTO order_items (order_id, ticket_id, quantity, price) VALUES ($1, $2, $3, $4)",
+          [
+            order.rows[0].order_id,
+            item.ticketId,
+            item.quantity,
+            tickets[index].rows[0].price,
+          ]
+        )
+      ),
+      ...items.map((item, index) =>
         client.query(
           "UPDATE tickets SET available = available - $1 WHERE ticket_id = $2",
           [item.quantity, item.ticketId]
         )
-      )
-    );
+      ),
+    ]);
 
     await client.query("COMMIT");
-
-    res.status(201).json({
-      ...order,
-      items: orderItems.map((item) => item.rows[0]),
-    });
+    res.status(201).json(order.rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
-    handleError(res, "Error creating order", error);
+    handleError(res, "Erreur lors de la commande", error);
   } finally {
     client.release();
   }
 };
 
-// GET /api/orders - Récupérer les commandes de l'utilisateur
+// GET /api/orders - Récupérer les commandes avec items
 export const getUserOrders = async (req, res) => {
-  const { userId } = req.query;
-
-  if (!userId) {
-    return res.status(400).json({ error: "User ID is required" });
-  }
-
   try {
-    // Récupérer les commandes avec leurs items
-    const ordersResult = await pool.query(
+    // 1. Récupérer les commandes de base
+    const orders = await pool.query(
       "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC",
-      [userId]
+      [req.query.userId]
     );
 
+    // 2. Pour chaque commande, récupérer les items associés
     const ordersWithItems = await Promise.all(
-      ordersResult.rows.map(async (order) => {
-        const itemsResult = await pool.query(
-          "SELECT oi.*, t.types as ticket_type, e.title as event_title " +
-            "FROM order_items oi " +
-            "JOIN tickets t ON oi.ticket_id = t.ticket_id " +
-            "JOIN events e ON t.event_id = e.event_id " +
-            "WHERE oi.order_id = $1",
+      orders.rows.map(async (order) => {
+        const items = await pool.query(
+          `SELECT 
+            oi.order_item_id as id,
+            oi.ticket_id,
+            oi.quantity,
+            oi.price,
+            t.types as ticket_type,
+            e.title as event_title,
+            e.event_datetime as event_date
+           FROM order_items oi
+           JOIN tickets t ON oi.ticket_id = t.ticket_id
+           JOIN events e ON t.event_id = e.event_id
+           WHERE oi.order_id = $1`,
           [order.order_id]
         );
+
         return {
           ...order,
-          items: itemsResult.rows,
+          items: items.rows,
         };
       })
     );
 
     res.status(200).json(ordersWithItems);
   } catch (error) {
-    handleError(res, "Error fetching orders", error);
+    handleError(res, "Erreur de récupération", error);
   }
 };
 
-// GET /api/orders/:orderId - Récupérer une commande spécifique
-export const getOrderById = async (req, res) => {
-  const { orderId } = req.params;
-  const { userId } = req.query;
+// DELETE /api/orders/:orderId - Annuler une commande
+export const cancelOrder = async (req, res) => {
+  const client = await pool.connect();
 
   try {
-    // Vérifier que l'utilisateur est propriétaire de la commande
-    const orderResult = await pool.query(
-      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
-      [orderId, userId]
+    await client.query("BEGIN");
+
+    // 1. Récupère les articles avec verrouillage
+    const items = await client.query(
+      `SELECT oi.ticket_id, oi.quantity 
+       FROM order_items oi
+       WHERE oi.order_id = $1 FOR UPDATE`,
+      [req.params.orderId]
     );
 
-    if (orderResult.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Order not found or access denied" });
-    }
-
-    const order = orderResult.rows[0];
-
-    // Récupérer les items de la commande
-    const itemsResult = await pool.query(
-      "SELECT oi.*, t.types as ticket_type, e.title as event_title " +
-        "FROM order_items oi " +
-        "JOIN tickets t ON oi.ticket_id = t.ticket_id " +
-        "JOIN events e ON t.event_id = e.event_id " +
-        "WHERE oi.order_id = $1",
-      [orderId]
+    // 2. Remet les tickets en stock
+    await Promise.all(
+      items.rows.map((item) =>
+        client.query(
+          "UPDATE tickets SET available = available + $1 WHERE ticket_id = $2",
+          [item.quantity, item.ticket_id]
+        )
+      )
     );
 
-    res.status(200).json({
-      ...order,
-      items: itemsResult.rows,
-    });
+    // 3. Supprime la commande (CASCADE supprimera les items)
+    await client.query("DELETE FROM orders WHERE order_id = $1", [
+      req.params.orderId,
+    ]);
+
+    await client.query("COMMIT");
+    res.status(204).end();
   } catch (error) {
-    handleError(res, "Error fetching order", error);
-  }
-};
-
-// PUT /api/orders/:orderId - Mettre à jour le statut (admin seulement)
-export const updateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
-  const { status } = req.body;
-  const { role } = req.user;
-
-  if (role !== "admin") {
-    return res.status(403).json({ error: "Forbidden: admin access required" });
-  }
-
-  if (!["pending", "completed", "cancelled"].includes(status)) {
-    return res.status(400).json({ error: "Invalid status" });
-  }
-
-  try {
-    const result = await pool.query(
-      "UPDATE orders SET status_order = $1 WHERE order_id = $2 RETURNING *",
-      [status, orderId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    res.status(200).json(result.rows[0]);
-  } catch (error) {
-    handleError(res, "Error updating order status", error);
+    await client.query("ROLLBACK");
+    handleError(res, "Erreur d'annulation", error);
+  } finally {
+    client.release();
   }
 };

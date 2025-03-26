@@ -4,7 +4,7 @@ const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
 
-/*--------get all events GET /api/events USER--------- */
+/*--------get all events GET /api/events USER ok--------- */
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -48,7 +48,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-/*--------get 1 event GET /api/events/:eventId USER--------- */
+/*--------get 1 event GET /api/events/:eventId ok USER--------- */
 
 export const getEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -104,7 +104,7 @@ export const getEvent = async (req, res) => {
   }
 };
 
-/*--------UPDATE 1 event POST /api/events/save  ADMIN--------- */
+/*--------UPDATE 1 event POST /api/events/save  ok ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -130,7 +130,7 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-/*----DELETE /api/events/:eventId -----ADMIN*/
+/*----DELETE /api/events/:eventId -----ADMIN ok*/
 
 export const deleteEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -155,7 +155,7 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-/*----POST /api/events -----ADMIN*/
+/*----POST /api/events -----ADMIN ok*/
 
 export const createEvent = async (req, res) => {
   const { role } = req.user;

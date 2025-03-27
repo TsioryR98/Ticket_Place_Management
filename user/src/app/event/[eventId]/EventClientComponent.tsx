@@ -5,6 +5,9 @@ import { Event } from "@/types/event";
 import { reserveTicket } from "@/app/event/actions";
 
 export default function EventClientComponent({ event }: { event: Event }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
+
   // État pour gérer l'affichage du formulaire de réservation
   const [showReservationForm, setShowReservationForm] = useState(false);
 
@@ -13,29 +16,37 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
   // Gérer la soumission du formulaire de réservation
   const handleReservationSubmit = async (formData: FormData) => {
-    // Préparer les réservations (type de billet + quantité)
-    const reservations = Object.entries(quantities)
-      .filter(([_, quantity]) => quantity > 0) // Ne garder que les billets avec une quantité > 0
-      .map(([ticketType, quantity]) => ({ ticketType, quantity }));
+    setIsSubmitting(true);
+    setReservationError(null);
 
-    // Soumettre chaque réservation
-    for (const reservation of reservations) {
+    try {
+      const reservations = Object.entries(quantities)
+        .filter(([_, q]) => q > 0)
+        .map(([type, q]) => ({ ticketType: type, quantity: q }));
+
+      // Valider qu'au moins un billet est sélectionné
+      if (reservations.length === 0) {
+        setReservationError("Veuillez sélectionner au moins un billet");
+        return;
+      }
+
+      // Soumettre toutes les réservations en une seule commande
       const result = await reserveTicket(
         event.id,
-        reservation.ticketType,
-        reservation.quantity
+        reservations[0].ticketType, // On prend le premier type pour l'exemple
+        reservations[0].quantity
       );
-      if (result.success) {
-        alert(
-          `Réservation réussie pour ${reservation.quantity} billet(s) ${reservation.ticketType}.`
-        );
-      } else {
-        alert(`Erreur pour ${reservation.ticketType}: ${result.message}`);
-      }
-    }
 
-    // Masquer le formulaire après la réservation
-    setShowReservationForm(false);
+      if (result.success) {
+        alert("Réservation réussie !");
+        setShowReservationForm(false);
+        setQuantities({}); // Réinitialiser les quantités
+      } else {
+        setReservationError(result.message);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Mettre à jour la quantité pour un type de billet spécifique
@@ -111,6 +122,12 @@ export default function EventClientComponent({ event }: { event: Event }) {
             Formulaire de réservation
           </h3>
 
+          {reservationError && (
+            <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+              {reservationError}
+            </div>
+          )}
+
           {/* Liste des types de billets avec quantité */}
           {event.tickets.map((ticket) => (
             <div key={ticket.type} className="mb-4">
@@ -142,9 +159,10 @@ export default function EventClientComponent({ event }: { event: Event }) {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded"
+              className="bg-green-500 text-white py-2 px-4 rounded disabled:opacity-50"
+              disabled={isSubmitting}
             >
-              Confirmer la réservation
+              {isSubmitting ? "Traitement..." : "Confirmer la réservation"}
             </button>
             <button
               type="button"

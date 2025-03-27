@@ -1,45 +1,48 @@
 "use server";
 
-import eventsData from "@/lib/events.json";
-import { Event } from "@/types/event";
+const API_BASE_URL = "http://localhost:4000/api";
 
 export async function reserveTicket(
   eventId: string,
   ticketType: string,
   quantity: number
 ) {
-  // Simuler un utilisateur connecté (on ajoutera l'authentification plus tard)
-  const user = { id: "123", name: "Utilisateur Test" }; // Remplace par un vrai système d'auth plus tard
-  if (!user) {
+  try {
+    // 1. Récupérer l'événement avec les tickets complets
+    const eventRes = await fetch(`${API_BASE_URL}/events/${eventId}`);
+    if (!eventRes.ok) throw new Error("Failed to fetch event");
+    const event = await eventRes.json();
+
+    // 2. Trouver le ticket complet
+    const ticket = event.tickets.find((t: any) => t.type === ticketType);
+    if (!ticket) throw new Error(`Ticket type ${ticketType} not found`);
+    if (!ticket.ticket_id) throw new Error("Ticket ID is missing");
+
+    // 3. Créer la commande
+    const res = await fetch(`${API_BASE_URL}/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: [
+          {
+            ticketId: ticket.ticket_id, // Utilisez le ticket_id
+            quantity: quantity,
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Échec de la réservation");
+    }
+
+    return { success: true, message: "Réservation confirmée!" };
+  } catch (error) {
+    console.error("Reservation error:", error);
     return {
       success: false,
-      message: "Vous devez être connecté pour réserver un billet.",
+      message: error instanceof Error ? error.message : "Erreur inconnue",
     };
   }
-
-  // Trouver l'événement
-  const event: Event | undefined = eventsData.find((e) => e.id === eventId);
-  if (!event) {
-    return { success: false, message: "Événement non trouvé." };
-  }
-
-  // Trouver le billet demandé
-  const ticket = event.tickets.find((t) => t.type === ticketType);
-  if (!ticket) {
-    return { success: false, message: "Type de billet invalide." };
-  }
-
-  // Vérifier la disponibilité
-  if (ticket.available < quantity) {
-    return { success: false, message: "Stock insuffisant pour ce billet." };
-  }
-
-  // Mettre à jour la disponibilité (simulation, pas encore d'écriture dans le fichier)
-  ticket.available -= quantity;
-
-  // Retourner une confirmation
-  return {
-    success: true,
-    message: `Réservation confirmée pour ${quantity} billet(s) ${ticketType}.`,
-  };
 }

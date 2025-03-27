@@ -64,26 +64,32 @@ export default function EventClientComponent({ event }: { event: Event }) {
       </div>
 
       <h2 className="mt-6 text-xl font-semibold">Billets disponibles</h2>
-      <table className="w-full mt-2 border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">Type</th>
-            <th className="border p-2">Prix (€)</th>
-            <th className="border p-2">Disponibilité</th>
-            <th className="border p-2">Limite/personne</th>
-          </tr>
-        </thead>
-        <tbody>
-          {event.tickets.map((ticket) => (
-            <tr key={ticket.type}>
-              <td className="border p-2">{ticket.type}</td>
-              <td className="border p-2">{ticket.price}</td>
-              <td className="border p-2">{ticket.available}</td>
-              <td className="border p-2">{ticket.limitPerPerson}</td>
+      {event.tickets && event.tickets.length > 0 ? (
+        <table className="w-full mt-2 border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">Type</th>
+              <th className="border p-2">Prix (€)</th>
+              <th className="border p-2">Disponibilité</th>
+              <th className="border p-2">Limite/personne</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {event.tickets.map((ticket) => (
+              <tr key={ticket.type}>
+                <td className="border p-2">{ticket.type}</td>
+                <td className="border p-2">{ticket.price}</td>
+                <td className="border p-2">{ticket.available}</td>
+                <td className="border p-2">{ticket.limitPerPerson}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="mt-4 text-gray-500">
+          Aucun billet disponible pour le moment.
+        </p>
+      )}
 
       {/* Bouton "Réserver" */}
       <div className="mt-6">

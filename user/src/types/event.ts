@@ -9,10 +9,11 @@ export type Event = {
   id: string;
   title: string;
   description: string;
-  date: string;
-  time: string;
+  date: string; // Format: YYYY-MM-DD
+  time: string; // Format: HH:MM
   location: string;
   organizer: string;
-  category : string;
+  category: string;
   tickets: Ticket[];
+  imagePath?: string; // Optionnel si vous voulez ajouter l'image
 };

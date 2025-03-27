@@ -72,13 +72,14 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// GET /api/orders - Récupérer les commandes avec items
+// GET /api/orders - Récupérer les commandes avec items d'un client
 export const getUserOrders = async (req, res) => {
+  const userId = req.user?.userId;
   try {
     // 1. Récupérer les commandes de base
     const orders = await pool.query(
       "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC",
-      [req.query.userId]
+      [userId]
     );
 
     // 2. Pour chaque commande, récupérer les items associés
@@ -86,13 +87,12 @@ export const getUserOrders = async (req, res) => {
       orders.rows.map(async (order) => {
         const items = await pool.query(
           `SELECT 
-            oi.order_item_id as id,
+            oi.order_item_id,
             oi.ticket_id,
             oi.quantity,
             oi.price,
-            t.types as ticket_type,
-            e.title as event_title,
-            e.event_datetime as event_date
+            t.types,
+            e.title
            FROM order_items oi
            JOIN tickets t ON oi.ticket_id = t.ticket_id
            JOIN events e ON t.event_id = e.event_id
@@ -107,6 +107,48 @@ export const getUserOrders = async (req, res) => {
       })
     );
 
+    res.status(200).json(ordersWithItems);
+  } catch (error) {
+    handleError(res, "Erreur de récupération", error);
+  }
+};
+
+/*GET /api/orders/:orderId : Récupérer une commande spécifique */
+
+export const getSelectedOrders = async (req, res) => {
+  const userId = req.user?.userId;
+  const { orderId } = req.params;
+
+  try {
+    // 1. Récupérer les commandes de base
+    const orders = await pool.query(
+      "SELECT * FROM orders WHERE user_id = $1 AND order_id=$2",
+      [userId, orderId]
+    );
+    // 2. Pour chaque commande, récupérer les items associés
+    const ordersWithItems = await Promise.all(
+      orders.rows.map(async (order) => {
+        const items = await pool.query(
+          `SELECT 
+            oi.order_item_id,
+            oi.ticket_id,
+            oi.quantity,
+            oi.price,
+            t.types,
+            e.title
+           FROM order_items oi
+           JOIN tickets t ON oi.ticket_id = t.ticket_id
+           JOIN events e ON t.event_id = e.event_id
+           WHERE oi.order_id = $1`,
+          [order.order_id]
+        );
+
+        return {
+          ...order,
+          items: items.rows,
+        };
+      })
+    );
     res.status(200).json(ordersWithItems);
   } catch (error) {
     handleError(res, "Erreur de récupération", error);

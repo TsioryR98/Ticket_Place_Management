@@ -87,12 +87,10 @@ export const addItemForOrder = async (req, res) => {
       );
 
       await client.query("COMMIT");
-      res
-        .status(200)
-        .json({
-          message: "Item added to order",
-          item: newItemForOrder.rows[0],
-        });
+      res.status(200).json({
+        message: "Item added to order",
+        item: newItemForOrder.rows[0],
+      });
     } catch (error) {
       await client.query("ROLLBACK");
       res.status(400).json({ error: error.message });
@@ -101,3 +99,38 @@ export const addItemForOrder = async (req, res) => {
     handleError(res, "Error during adding item into order", error);
   }
 };
+
+/**  ------GET api/orders/:orderId/items USER------- */
+
+export const getOrderItems = async (req, res) => {
+  const userId = req.user?.userId;
+  const { orderId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+        oi.order_item_id,
+        oi.order_id,
+        oi.ticket_id,
+        t.types as ticket_type,
+        oi.quantity,
+        oi.price,
+        oi.created_at
+      FROM order_items oi
+      LEFT JOIN tickets t ON oi.ticket_id = t.ticket_id
+      WHERE oi.order_id = $1 AND oi.order_id IN (SELECT order_id FROM orders WHERE user_id = $2)`,
+      [orderId, userId]
+    );
+
+    if (result.rows[0].length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.status(200).json({ message: "Order items", items: result.rows });
+  } catch (error) {
+    handleError(res, "Erreur de récupération", error);
+  }
+};
+
+/*-------PUT /api/orders/:orderId/items/:itemId  -------*/
+
+export const updateOrderItem = async (req, res) => {};

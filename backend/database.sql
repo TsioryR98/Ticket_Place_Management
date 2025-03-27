@@ -532,28 +532,93 @@ VALUES
         NOW ()
     );
 
+    BEGIN;
 
-BEGIN;
 
--- Vérifier la disponibilité du ticket
-SELECT available, price, limit_per_person 
-FROM tickets 
-WHERE ticket_id = $1 
+
+
+-----INSERT FOR ORDER -------------
+
+
+
+
+
+
+
+-- Récupérer les informations actuelles
+SELECT oi.quantity as old_quantity, oi.price, oi.ticket_id, t.available
+FROM order_items oi
+JOIN tickets t ON oi.ticket_id = t.ticket_id
+WHERE oi.order_item_id = $1
 FOR UPDATE;
 
--- Insérer l'article dans la commande
-INSERT INTO order_items (order_id, ticket_id, quantity, price)
-VALUES ($1, $2, $3, (SELECT price FROM tickets WHERE ticket_id = $2))
-RETURNING *;
+-- Calculer la différence de quantité
+-- Mettre à jour l'article
+UPDATE order_items
+SET quantity = $2
+WHERE order_item_id = $1;
 
 -- Mettre à jour la disponibilité du ticket
-UPDATE tickets 
-SET available = available - $3 
-WHERE ticket_id = $2;
+UPDATE tickets
+SET available = available + ($3 - $2)
+WHERE ticket_id = $4;
 
--- Mettre à jour le montant total de la commande
+-- Mettre à jour le total de la commande
 UPDATE orders
-SET total_amount = total_amount + ($3 * (SELECT price FROM tickets WHERE ticket_id = $2))
-WHERE order_id = $1;
+SET total_amount = total_amount + (($2 - $3) * $5)
+WHERE order_id = $6;
 
 COMMIT;
+
+
+-- Order 1 for user1 (a2a7ab5d-08de-40a6-a264-7cf54bd99f5e)
+INSERT INTO orders (user_id, total_amount) 
+VALUES ('a2a7ab5d-08de-40a6-a264-7cf54bd99f5e', 270.00);
+
+-- Order items for order 1 (assuming some tickets exist)
+
+-- VIP ticket for event d8344a6b-7cf4-43bb-9a0e-b07bc5bd9ff4 (1 ticket)
+INSERT INTO order_items (order_id, ticket_id, quantity, price)
+VALUES ('d7817f40-88f0-48dc-aa93-31534bc34db3', '9dfff25d-05d8-4744-896f-da1ba561c50a', 1, 200.00);
+
+-- Early Bird ticket for event db42b716-fb48-4726-a09f-f3bd3be422e7 (1 ticket)
+INSERT INTO order_items (order_id, ticket_id, quantity, price)
+VALUES ('d7817f40-88f0-48dc-aa93-31534bc34db3', '00e0eda7-1d9d-4111-a2d6-d31bbb0f3fc0', 1, 70.00);
+
+
+
+---Order 2 for user2 (0165f456-6e80-4c81-a170-90408a832f0a)
+
+INSERT INTO orders (user_id, total_amount) 
+VALUES ('0165f456-6e80-4c81-a170-90408a832f0a', 175.00);
+
+
+-- Standard ticket for event 9d515b65-4cac-4400-913d-3c28772752e7 (2 tickets)
+INSERT INTO order_items (order_id, ticket_id, quantity, price)
+VALUES ('bd5c3efb-899f-4a63-b108-a6aba992c0d5', 'f98cb3ce-a230-4029-bdc3-d348011f7e9b', 2, 25.00);
+
+-- Early Bird ticket for event ea5af19b-7e93-43a1-86d9-40b3466e2b6b (1 ticket)
+INSERT INTO order_items ( order_id, ticket_id, quantity, price)
+VALUES ('bd5c3efb-899f-4a63-b108-a6aba992c0d5', 'bdb01ceb-50a3-404e-9c82-efdfd03cf1f4', 1, 40.00);
+
+-- Participation ticket for event 6d05d771-64b4-4475-8650-be70a1aa6935 (3 tickets)
+INSERT INTO order_items (order_id, ticket_id, quantity, price)
+VALUES ('bd5c3efb-899f-4a63-b108-a6aba992c0d5', '54e4f8e0-ba85-4b8f-b7f8-c8d2de8c6c44', 3, 20.00);
+
+
+
+-- View order details with items
+SELECT 
+    o.order_id,
+    u.user_name,
+    e.title,
+    t.types,
+    oi.quantity,
+    oi.price,
+    (oi.quantity * oi.price) AS item_total
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN users u ON o.user_id = u.user_id
+LEFT JOIN tickets t ON oi.ticket_id = t.ticket_id
+LEFT JOIN events e ON t.event_id = e.event_id;
+WHERE u.user_id='a2a7ab5d-08de-40a6-a264-7cf54bd99f5e';

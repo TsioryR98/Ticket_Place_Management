@@ -55,32 +55,33 @@ export const getEvent = async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT\n" +
-        "*\n" +
-        "FROM\n" +
-        "events e\n" +
-        "JOIN tickets t ON e.event_id = t.event_id\n" +
-        "WHERE\n" +
-        "e.event_id =$1",
+      `SELECT 
+        e.event_id, e.title, e.descriptions, 
+        e.event_datetime, e.locations, e.organizer, e.category,
+        t.ticket_id, t.types, t.price, t.available, t.limit_per_person
+       FROM events e
+       JOIN tickets t ON e.event_id = t.event_id
+       WHERE e.event_id = $1`,
       [eventId]
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "event not found" });
     }
-    // format rows0 to string
+
     const event = {
       id: result.rows[0].event_id,
       title: result.rows[0].title,
-      description: result.rows[0].descriptions, ///    "date": "2025-06-10T07:00:00.000Z","time": "09:00:00 GMT+0200
-      date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0], // Format YYYY-MM-DD from T
+      description: result.rows[0].descriptions,
+      date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0],
       time: new Date(result.rows[0].event_datetime)
         .toTimeString()
-        .split(" ")[0], // Format HH:MM:SS
+        .split(" ")[0],
       location: result.rows[0].locations,
       organizer: result.rows[0].organizer,
       category: result.rows[0].category,
       tickets: result.rows.map((row) => ({
+        ticket_id: row.ticket_id,
         type: row.types,
         price: Number(row.price),
         available: row.available,

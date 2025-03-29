@@ -65,6 +65,7 @@ export const getEvent = async (req, res) => {
         "  e.locations,\n" +
         "  e.organizer,\n" +
         "  e.category,\n" +
+        "  e.imagepath,\n" +
         "  t.ticket_id,\n" +
         "  t.types,\n" +
         "  t.price,\n" +
@@ -91,6 +92,7 @@ export const getEvent = async (req, res) => {
       location: result.rows[0].locations,
       organizer: result.rows[0].organizer,
       category: result.rows[0].category,
+      images: event.imagepath,
       tickets: result.rows.map((row) => ({
         types: row.types,
         price: Number(row.price),

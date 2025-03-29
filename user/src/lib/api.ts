@@ -79,3 +79,14 @@ export async function getOrderById(orderId: string) {
     throw error;
   }
 }
+
+export async function getUserReservations(userId: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/orders?userId=${userId}`);
+    if (!res.ok) throw new Error("Failed to fetch reservations");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching reservations:", error);
+    throw error;
+  }
+}

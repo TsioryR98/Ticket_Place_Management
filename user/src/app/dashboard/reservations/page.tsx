@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUserReservations } from "@/lib/api";
+import { cancelReservation, getUserReservations } from "@/lib/api";
 import { Order } from "@/types/order";
 import Link from "next/link";
 
@@ -58,6 +58,60 @@ export default function ReservationList() {
         : 0;
       return aDate - bDate;
     });
+
+  // Dans votre page.tsx
+  async function handleCancel(orderId: string, ticketId: string) {
+    if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?"))
+      return;
+
+    try {
+      // Trouver l'item à annuler pour vérifier la date
+      const order = orders.find((o) => o.order_id === orderId);
+      const item = order?.items.find((i) => i.ticket_id === ticketId);
+
+      if (!item || !item.event_date) {
+        throw new Error("Billet non trouvé");
+      }
+
+      const eventDate = new Date(item.event_date);
+      const currentDate = new Date();
+
+      if (eventDate < currentDate) {
+        alert("Impossible d'annuler un billet pour un événement passé");
+        return;
+      }
+
+      // Appel API pour annuler
+      await cancelReservation(orderId, ticketId);
+
+      // Mise à jour optimiste de l'interface
+      setOrders(
+        (prev) =>
+          prev
+            .map((order) =>
+              order.order_id === orderId
+                ? {
+                    ...order,
+                    items: order.items.filter(
+                      (item) => item.ticket_id !== ticketId
+                    ),
+                    total_amount:
+                      order.total_amount - item.price * item.quantity,
+                  }
+                : order
+            )
+            .filter((order) => order.items.length > 0) // Supprime les commandes vides
+      );
+
+      alert("Annulation effectuée avec succès");
+    } catch (error) {
+      alert(
+        "Erreur lors de l'annulation : " +
+          (error instanceof Error ? error.message : String(error))
+      );
+      console.error(error);
+    }
+  }
 
   if (loading) {
     return <div className="p-4 text-center">Chargement en cours...</div>;
@@ -159,37 +213,56 @@ export default function ReservationList() {
               </div>
 
               <div className="p-6">
-                {order.items.map((item, index) => (
-                  <div key={index} className="mb-4 last:mb-0">
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="font-medium">
-                          {item.quantity}x {item.ticket_type} - {item.price}€
-                        </p>
-                        <p className="text-gray-600">{item.event_title}</p>
-                      </div>
-                      <p className="font-semibold">
-                        {(item.price * item.quantity).toFixed(2)}€
-                      </p>
-                    </div>
-                    {item.event_date && (
-                      <div className="mt-1 text-sm text-gray-500">
-                        <p>
-                          {new Date(item.event_date).toLocaleDateString(
-                            "fr-FR",
-                            {
-                              weekday: "long",
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            }
-                          )}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {order.items.map((item, index) => {
+                  const eventDate = item.event_date
+                    ? new Date(item.event_date)
+                    : null;
+                  const isUpcoming = eventDate && eventDate >= new Date();
 
+                  return (
+                    <div key={index} className="mb-4 last:mb-0">
+                      <div className="flex justify-between">
+                        <div>
+                          <p className="font-medium">
+                            {item.quantity}x {item.ticket_type} - {item.price}€
+                          </p>
+                          <p className="text-gray-600">{item.event_title}</p>
+                        </div>
+                        <p className="font-semibold">
+                          {(item.price * item.quantity).toFixed(2)}€
+                        </p>
+                      </div>
+
+                      {item.event_date && (
+                        <div className="mt-1 text-sm text-gray-500">
+                          <p>
+                            {new Date(item.event_date).toLocaleDateString(
+                              "fr-FR",
+                              {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </p>
+
+                          {isUpcoming && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancel(order.order_id, item.ticket_id);
+                              }}
+                              className="mt-2 px-3 py-1 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100"
+                            >
+                              Annuler ce billet
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 <div className="mt-4 pt-4 border-t flex justify-between items-center">
                   <p className="font-semibold">Total</p>
                   <p className="text-lg font-bold">

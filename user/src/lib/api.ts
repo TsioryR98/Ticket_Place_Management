@@ -105,14 +105,23 @@ export async function getUserReservations(userId: string) {
   }
 }
 
-// cancel ticket reservation
-export async function cancelTicket(orderId: string, ticketId: string) {
-  const res = await fetch(
-    `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
-    {
-      method: "DELETE",
-    }
-  );
-  if (!res.ok) throw new Error("Échec de l'annulation");
-  return res.json();
+// cancel reservation
+export async function cancelReservation(orderId: string, ticketId: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) throw new Error("Échec de l'annulation");
+    return await res.json();
+  } catch (error) {
+    console.error("Error cancelling reservation:", error);
+    throw error;
+  }
 }

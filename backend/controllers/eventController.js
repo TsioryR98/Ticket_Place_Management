@@ -57,15 +57,6 @@ export const getEvent = async (req, res) => {
   try {
     //LEFT JOIN all macth from event
     const result = await pool.query(
-<<<<<<< HEAD
-      `SELECT 
-        e.event_id, e.title, e.descriptions, 
-        e.event_datetime, e.locations, e.organizer, e.category,
-        t.ticket_id, t.types, t.price, t.available, t.limit_per_person
-       FROM events e
-       JOIN tickets t ON e.event_id = t.event_id
-       WHERE e.event_id = $1`,
-=======
       "SELECT\n" +
         "  e.event_id,\n" +
         "  e.title,\n" +
@@ -83,7 +74,6 @@ export const getEvent = async (req, res) => {
         "FROM events e\n" +
         "LEFT JOIN tickets t ON e.event_id = t.event_id\n" +
         "WHERE e.event_id = $1",
->>>>>>> feature/adminLogin
       [eventId]
     );
 
@@ -104,12 +94,7 @@ export const getEvent = async (req, res) => {
       category: result.rows[0].category,
       images: event.imagepath,
       tickets: result.rows.map((row) => ({
-<<<<<<< HEAD
-        ticket_id: row.ticket_id,
-        type: row.types,
-=======
         types: row.types,
->>>>>>> feature/adminLogin
         price: Number(row.price),
         available: row.available,
         limitPerPerson: row.limit_per_person,

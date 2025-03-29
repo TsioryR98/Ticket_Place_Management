@@ -1,6 +1,6 @@
 import { Event } from "@/types/event";
 
-const API_BASE_URL = "http://localhost:4000/api"; // Adjust if your backend runs on a different port
+const API_BASE_URL = "http://localhost:4000/api";
 
 export async function fetchEvents() {
   try {
@@ -63,6 +63,19 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
     };
   } catch (error) {
     console.error("Error fetching event with tickets:", error);
+    throw error;
+  }
+}
+
+export async function getOrderById(orderId: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/orders/${orderId}?userId=11111111-1111-1111-1111-111111111111`
+    );
+    if (!res.ok) throw new Error("Échec de la récupération de la commande");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching order:", error);
     throw error;
   }
 }

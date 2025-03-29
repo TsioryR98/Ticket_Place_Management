@@ -15,32 +15,25 @@ export default function EventClientComponent({ event }: { event: Event }) {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   // Gérer la soumission du formulaire de réservation
-  const handleReservationSubmit = async (formData: FormData) => {
+  const handleReservationSubmit = async () => {
     setIsSubmitting(true);
     setReservationError(null);
 
     try {
-      const reservations = Object.entries(quantities)
+      // Préparer toutes les réservations avec quantité > 0
+      const activeReservations = Object.entries(quantities)
         .filter(([_, q]) => q > 0)
         .map(([type, q]) => ({ ticketType: type, quantity: q }));
 
-      // Valider qu'au moins un billet est sélectionné
-      if (reservations.length === 0) {
+      if (activeReservations.length === 0) {
         setReservationError("Veuillez sélectionner au moins un billet");
         return;
       }
 
-      // Soumettre toutes les réservations en une seule commande
-      const result = await reserveTicket(
-        event.id,
-        reservations[0].ticketType, // On prend le premier type pour l'exemple
-        reservations[0].quantity
-      );
+      const result = await reserveTicket(event.id, activeReservations);
 
-      if (result.success) {
-        alert("Réservation réussie !");
-        setShowReservationForm(false);
-        setQuantities({}); // Réinitialiser les quantités
+      if (result.success && result.orderId) {
+        window.location.href = `/dashboard/reservations/${result.orderId}`;
       } else {
         setReservationError(result.message);
       }

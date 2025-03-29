@@ -13,7 +13,9 @@ export const createOrder = async (req, res) => {
   const userId = "11111111-1111-1111-1111-111111111111"; // ID du user test
 
   const { items } = req.body; // On ne prend plus userId du body
-
+  if (!items || !Array.isArray(items)) {
+    return res.status(400).json({ error: "Items must be an array" });
+  }
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "Items are required" });
   }

@@ -8,8 +8,9 @@ export default async function OrderConfirmation({
 }: {
   params: { orderId: string };
 }) {
+  const { orderId } = await params;
   try {
-    const order = await getOrderById(params.orderId);
+    const order = await getOrderById(orderId);
 
     return (
       <div className="max-w-3xl mx-auto p-6">

@@ -1,0 +1,67 @@
+import { getOrderById } from "@/lib/api";
+import { OrderItem } from "@/types/order";
+import { format } from "date-fns";
+
+export default async function OrderConfirmation({
+  params,
+}: {
+  params: { orderId: string };
+}) {
+  try {
+    const order = await getOrderById(params.orderId);
+
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h1 className="text-2xl font-bold text-green-600 mb-2">
+            Réservation confirmée
+          </h1>
+          <p className="text-gray-500 mb-6">
+            Référence: #{order.order_id} • Le{" "}
+            {format(new Date(order.created_at), "dd/MM/yyyy à HH:mm")}
+          </p>
+
+          <div className="space-y-4">
+            <div className="flex justify-between py-2 border-b">
+              <span>Statut:</span>
+              <span className="font-medium capitalize">
+                {order.status_order}
+              </span>
+            </div>
+
+            <h2 className="text-xl font-semibold pt-2">Détails</h2>
+            {order.items.map((item: OrderItem) => (
+              <div key={item.order_item_id} className="py-2 border-b">
+                <div className="flex justify-between">
+                  <span>
+                    {item.quantity}x {item.ticket_type}
+                  </span>
+                  <span>{item.price * item.quantity}€</span>
+                </div>
+                {item.event_title && (
+                  <p className="text-sm text-gray-500">{item.event_title}</p>
+                )}
+              </div>
+            ))}
+
+            <div className="flex justify-between font-bold text-lg pt-4">
+              <span>Total</span>
+              <span>{order.total_amount}€</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4">
+          <h2 className="font-bold text-red-700">Erreur</h2>
+          <p className="text-red-600">
+            {error instanceof Error ? error.message : "Commande introuvable"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+}

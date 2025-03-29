@@ -5,6 +5,7 @@ import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
 import { usersRouter } from "./routes/userRoutes.js";
 import { eventRouter } from "./routes/eventRoute.js";
+import { ticketRouter } from "./routes/ticketRoute.js";
 import { orderRouter } from "./routes/orderRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +31,8 @@ app.use("/api/users", usersRouter);
 app.use("/api/events", eventRouter);
 //route for order
 app.use("/api/orders", orderRouter);
+//route for ticket
+app.use("/api/events", ticketRouter);
 
 app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

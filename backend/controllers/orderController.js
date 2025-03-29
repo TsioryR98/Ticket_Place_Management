@@ -187,7 +187,7 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-// PUT /api/orders/:orderId - Mettre à jour le statut (admin seulement)
+// PUT /api/orders/:orderId - ADMIN Mettre à jour le statut (admin seulement)
 export const updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
@@ -219,7 +219,11 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 // cancel the reservation
+=======
+// cancel the reservation  /api/orders/:orderId/items/:itemId
+>>>>>>> feature/adminLogin
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;
   const userId = "11111111-1111-1111-1111-111111111111"; // À remplacer par l'userId de la session
@@ -262,11 +266,17 @@ export const cancelOrderItem = async (req, res) => {
     const currentDate = new Date();
 
     if (eventDate < currentDate) {
+<<<<<<< HEAD
       return res
         .status(400)
         .json({
           error: "Impossible d'annuler un billet pour un événement passé",
         });
+=======
+      return res.status(400).json({
+        error: "Impossible d'annuler un billet pour un événement passé",
+      });
+>>>>>>> feature/adminLogin
     }
 
     // 3. Supprimer l'item de la commande

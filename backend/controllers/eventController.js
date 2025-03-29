@@ -4,7 +4,7 @@ const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
 
-/*--------get all events GET /api/events USER--------- */
+/*--------get all events GET /api/events USER ok--------- */
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -39,6 +39,7 @@ export const getAllEvents = async (req, res) => {
         location: event.locations,
         organizer: event.organizer,
         category: event.category,
+        images: event.imagepath,
         tickets: eventTicket,
       };
     });
@@ -48,13 +49,15 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-/*--------get 1 event GET /api/events/:eventId USER--------- */
+/*--------get 1 event GET /api/events/:eventId ok USER--------- */
 
 export const getEvent = async (req, res) => {
   const { eventId } = req.params;
 
   try {
+    //LEFT JOIN all macth from event
     const result = await pool.query(
+<<<<<<< HEAD
       `SELECT 
         e.event_id, e.title, e.descriptions, 
         e.event_datetime, e.locations, e.organizer, e.category,
@@ -62,6 +65,24 @@ export const getEvent = async (req, res) => {
        FROM events e
        JOIN tickets t ON e.event_id = t.event_id
        WHERE e.event_id = $1`,
+=======
+      "SELECT\n" +
+        "  e.event_id,\n" +
+        "  e.title,\n" +
+        "  e.descriptions,\n" +
+        "  e.event_datetime,\n" +
+        "  e.locations,\n" +
+        "  e.organizer,\n" +
+        "  e.category,\n" +
+        "  t.ticket_id,\n" +
+        "  t.types,\n" +
+        "  t.price,\n" +
+        "  t.available,\n" +
+        "  t.limit_per_person\n" +
+        "FROM events e\n" +
+        "LEFT JOIN tickets t ON e.event_id = t.event_id\n" +
+        "WHERE e.event_id = $1",
+>>>>>>> feature/adminLogin
       [eventId]
     );
 
@@ -81,8 +102,12 @@ export const getEvent = async (req, res) => {
       organizer: result.rows[0].organizer,
       category: result.rows[0].category,
       tickets: result.rows.map((row) => ({
+<<<<<<< HEAD
         ticket_id: row.ticket_id,
         type: row.types,
+=======
+        types: row.types,
+>>>>>>> feature/adminLogin
         price: Number(row.price),
         available: row.available,
         limitPerPerson: row.limit_per_person,
@@ -95,7 +120,7 @@ export const getEvent = async (req, res) => {
   }
 };
 
-/*--------UPDATE 1 event POST /api/events/save  ADMIN--------- */
+/*--------UPDATE 1 event POST /api/events/save  ok ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -121,7 +146,7 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-/*----DELETE /api/events/:eventId -----ADMIN*/
+/*----DELETE /api/events/:eventId -----ADMIN ok*/
 
 export const deleteEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -131,15 +156,54 @@ export const deleteEvent = async (req, res) => {
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
-    const result = await pool.query("DELETE FROM events WHERE event_id=$1", [
-      eventId,
-    ]);
-    if (result.rows.length === 0) {
+    const result = await pool.query(
+      "DELETE FROM events WHERE event_id=$1 RETURNING *",
+      [eventId]
+    );
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: "event not found" });
     }
     const event = result.rows[0];
+
     res.status(200).json(event);
   } catch (error) {
     handleError(res, "Error while getting event", error);
+  }
+};
+
+/*----POST /api/events -----ADMIN ok*/
+
+export const createEvent = async (req, res) => {
+  const { role } = req.user;
+  const { title, description, date, time, locations, organizer, category } =
+    req.body;
+  const eventDatetime = `${date} ${time}`;
+
+  if (role !== "user") {
+    // only for user and change role into admin and organizer if exist
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+  try {
+    const result = await pool.query(
+      "INSERT INTO events (title, descriptions, event_datetime , locations ,organizer ,category )VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [title, description, eventDatetime, locations, organizer, category]
+    );
+    // Input validation
+    if (
+      !title ||
+      !description ||
+      !date ||
+      !time ||
+      !locations ||
+      !organizer ||
+      !category
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    const event = result.rows[0];
+
+    res.status(201).json(event);
+  } catch (error) {
+    handleError(res, "Error while creating event", error);
   }
 };

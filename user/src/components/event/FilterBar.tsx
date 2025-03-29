@@ -80,7 +80,7 @@
                             variant="outline"
                             role="combobox"
                             aria-expanded={open}
-                            className="w-[200px] justify-between"
+                            className="w-[200px] justify-between overflow-hidden"
                         >
                             {value
                                 ? locations.find((location) => location.value === value)?.label

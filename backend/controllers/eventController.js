@@ -82,7 +82,7 @@ export const getEvent = async (req, res) => {
     }
 
     const event = {
-      id: result.rows[0].event_id,
+      eventId: eventId,
       title: result.rows[0].title,
       description: result.rows[0].descriptions,
       date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0],
@@ -92,7 +92,7 @@ export const getEvent = async (req, res) => {
       location: result.rows[0].locations,
       organizer: result.rows[0].organizer,
       category: result.rows[0].category,
-      images: event.imagepath,
+      images: result.rows[0].imagepath,
       tickets: result.rows.map((row) => ({
         types: row.types,
         price: Number(row.price),

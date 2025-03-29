@@ -1,6 +1,7 @@
 import { getOrderById } from "@/lib/api";
 import { OrderItem } from "@/types/order";
 import { format } from "date-fns";
+import Link from "next/link";
 
 export default async function OrderConfirmation({
   params,
@@ -48,6 +49,21 @@ export default async function OrderConfirmation({
               <span>Total</span>
               <span>{order.total_amount}€</span>
             </div>
+          </div>
+          <div className="mt-6 flex justify-between">
+            <Link
+              href="/" // Retour à l'accueil
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            >
+              ← Retour à l'accueil
+            </Link>
+
+            <Link
+              href="/dashboard/reservations" // Vers la liste des réservations
+              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+            >
+              Voir toutes mes réservations →
+            </Link>
           </div>
         </div>
       </div>

@@ -112,6 +112,7 @@ export const getUserOrders = async (req, res) => {
         );
         return {
           ...order,
+          total_amount: Number(order.total_amount),
           items: itemsResult.rows,
         };
       })

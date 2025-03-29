@@ -18,5 +18,6 @@ export type Order = {
   total_amount: number;
   status_order: "pending" | "confirmed" | "cancelled";
   created_at: string;
-  items: OrderItem[]; // Contient maintenant toutes les infos nécessaires
+  items: OrderItem[];
+  event_date?: Date;
 };

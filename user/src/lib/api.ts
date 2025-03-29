@@ -84,9 +84,21 @@ export async function getOrderById(orderId: string) {
 // get the user reservations
 export async function getUserReservations(userId: string) {
   try {
-    const res = await fetch(`${API_BASE_URL}/orders?userId=${userId}`);
+    const res = await fetch(
+      `${API_BASE_URL}/orders?userId=${userId}&includeEventDetails=true`
+    );
     if (!res.ok) throw new Error("Failed to fetch reservations");
-    return await res.json();
+    const orders = await res.json();
+
+    return orders.map((order: any) => ({
+      ...order,
+      created_at: new Date(order.created_at),
+      items: order.items.map((item: any) => ({
+        ...item,
+        price: Number(item.price),
+        event_date: item.event_date ? new Date(item.event_date) : null,
+      })),
+    }));
   } catch (error) {
     console.error("Error fetching reservations:", error);
     throw error;

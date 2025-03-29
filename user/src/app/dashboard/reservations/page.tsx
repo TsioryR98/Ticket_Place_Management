@@ -14,7 +14,7 @@ export default function ReservationList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // À remplacer par le vrai ID utilisateur (via NextAuth ou contexte)
+        // À remplacer par le vrai ID utilisateur (via NextAuth)
         const userId = "11111111-1111-1111-1111-111111111111";
         const data = await getUserReservations(userId);
         setOrders(data);
@@ -30,19 +30,37 @@ export default function ReservationList() {
 
   const currentDate = new Date();
 
-  const filteredOrders = orders.filter((order) => {
-    const eventDate = new Date(order.items[0]?.event_date || 0);
-    if (filter === "upcoming") return eventDate >= currentDate;
-    if (filter === "past") return eventDate < currentDate;
-    return true;
-  });
+  // Fonction pour déterminer si un événement est à venir
+  const isEventUpcoming = (eventDateStr: string) => {
+    const eventDate = new Date(eventDateStr);
+    const currentDate = new Date();
+    return eventDate >= currentDate;
+  };
+
+  // Filtrer et trier les commandes
+  const filteredOrders = orders
+    .filter((order) => {
+      const hasUpcomingEvents = order.items.some(
+        (item) => item.event_date && isEventUpcoming(item.event_date)
+      );
+
+      if (filter === "upcoming") return hasUpcomingEvents;
+      if (filter === "past") return !hasUpcomingEvents;
+      return true;
+    })
+    .sort((a, b) => {
+      // Trier par date d'événement la plus proche
+      const aDate = a.items[0]?.event_date
+        ? new Date(a.items[0].event_date).getTime()
+        : 0;
+      const bDate = b.items[0]?.event_date
+        ? new Date(b.items[0].event_date).getTime()
+        : 0;
+      return aDate - bDate;
+    });
 
   if (loading) {
-    return (
-      <div className="p-4 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <div className="p-4 text-center">Chargement en cours...</div>;
   }
 
   if (error) {
@@ -111,9 +129,10 @@ export default function ReservationList() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h2 className="text-lg font-semibold">
-                      Commande #{order.order_id}
+                      Commande #{order.order_id.slice(0, 8)}
                     </h2>
                     <p className="text-sm text-gray-500">
+                      Réservé le{" "}
                       {new Date(order.created_at).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -121,7 +140,15 @@ export default function ReservationList() {
                       })}
                     </p>
                   </div>
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      order.status_order === "confirmed"
+                        ? "bg-green-100 text-green-800"
+                        : order.status_order === "cancelled"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
                     {order.status_order === "confirmed"
                       ? "Confirmée"
                       : order.status_order === "cancelled"
@@ -132,54 +159,41 @@ export default function ReservationList() {
               </div>
 
               <div className="p-6">
-                {order.items.map((item, index) => {
-                  const eventDate = new Date(item.event_date || 0);
-                  const isUpcoming = eventDate >= currentDate;
-
-                  return (
-                    <div key={index} className="mb-4 last:mb-0">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="font-medium">
-                            {item.quantity}x {item.ticket_type}
-                          </p>
-                          <p className="text-gray-600">{item.event_title}</p>
-                        </div>
-                        <p className="font-semibold">
-                          {(item.price * item.quantity).toFixed(2)}€
+                {order.items.map((item, index) => (
+                  <div key={index} className="mb-4 last:mb-0">
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium">
+                          {item.quantity}x {item.ticket_type} - {item.price}€
                         </p>
+                        <p className="text-gray-600">{item.event_title}</p>
                       </div>
+                      <p className="font-semibold">
+                        {(item.price * item.quantity).toFixed(2)}€
+                      </p>
+                    </div>
+                    {item.event_date && (
                       <div className="mt-1 text-sm text-gray-500">
                         <p>
-                          {item.event_location} •{" "}
-                          {eventDate.toLocaleDateString("fr-FR", {
-                            weekday: "long",
-                            day: "numeric",
-                            month: "long",
-                          })}
+                          {new Date(item.event_date).toLocaleDateString(
+                            "fr-FR",
+                            {
+                              weekday: "long",
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
                         </p>
                       </div>
-                      {isUpcoming && order.status_order === "confirmed" && (
-                        <button
-                          onClick={() =>
-                            handleCancel(order.order_id, item.ticket_id)
-                          }
-                          className="mt-2 text-sm text-red-500 hover:text-red-700"
-                        >
-                          Annuler ce billet
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+                    )}
+                  </div>
+                ))}
 
                 <div className="mt-4 pt-4 border-t flex justify-between items-center">
                   <p className="font-semibold">Total</p>
                   <p className="text-lg font-bold">
-                    {typeof order.total_amount === "number"
-                      ? order.total_amount.toFixed(2)
-                      : Number(order.total_amount).toFixed(2)}
-                    €
+                    {order.total_amount.toFixed(2)}€
                   </p>
                 </div>
               </div>
@@ -189,33 +203,4 @@ export default function ReservationList() {
       )}
     </div>
   );
-
-  async function handleCancel(orderId: string, ticketId: string) {
-    if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?"))
-      return;
-
-    try {
-      // TODO: Implémenter l'appel API d'annulation
-      console.log(`Annulation: orderId=${orderId}, ticketId=${ticketId}`);
-
-      // Mise à jour optimiste de l'interface
-      setOrders((prev) =>
-        prev.map((order) =>
-          order.order_id === orderId
-            ? {
-                ...order,
-                items: order.items.filter(
-                  (item) => item.ticket_id !== ticketId
-                ),
-              }
-            : order
-        )
-      );
-
-      alert("Annulation effectuée avec succès");
-    } catch (error) {
-      alert("Erreur lors de l'annulation");
-      console.error(error);
-    }
-  }
 }

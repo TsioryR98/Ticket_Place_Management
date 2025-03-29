@@ -39,6 +39,7 @@ export const getAllEvents = async (req, res) => {
         location: event.locations,
         organizer: event.organizer,
         category: event.category,
+        images: event.imagepath,
         tickets: eventTicket,
       };
     });

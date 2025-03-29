@@ -94,31 +94,55 @@ export const getUserOrders = async (req, res) => {
   }
 
   try {
-    // Récupérer les commandes avec leurs items
     const ordersResult = await pool.query(
-      "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC",
+      `SELECT 
+        o.*,
+        oi.order_item_id,
+        oi.ticket_id,
+        oi.quantity,
+        oi.price,
+        oi.created_at as item_created_at,
+        t.types as ticket_type,
+        e.title as event_title,
+        e.event_datetime as event_date,
+        e.locations as event_location
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN tickets t ON oi.ticket_id = t.ticket_id
+      JOIN events e ON t.event_id = e.event_id
+      WHERE o.user_id = $1
+      ORDER BY e.event_datetime ASC`,
       [userId]
     );
 
-    const ordersWithItems = await Promise.all(
-      ordersResult.rows.map(async (order) => {
-        const itemsResult = await pool.query(
-          "SELECT oi.*, t.types as ticket_type, e.title as event_title " +
-            "FROM order_items oi " +
-            "JOIN tickets t ON oi.ticket_id = t.ticket_id " +
-            "JOIN events e ON t.event_id = e.event_id " +
-            "WHERE oi.order_id = $1",
-          [order.order_id]
-        );
-        return {
-          ...order,
-          total_amount: Number(order.total_amount),
-          items: itemsResult.rows,
-        };
-      })
-    );
+    const ordersMap = new Map();
+    ordersResult.rows.forEach((row) => {
+      if (!ordersMap.has(row.order_id)) {
+        ordersMap.set(row.order_id, {
+          order_id: row.order_id,
+          user_id: row.user_id,
+          total_amount: Number(row.total_amount),
+          status_order: row.status_order,
+          created_at: row.created_at,
+          items: [],
+        });
+      }
 
-    res.status(200).json(ordersWithItems);
+      ordersMap.get(row.order_id).items.push({
+        order_item_id: row.order_item_id,
+        ticket_id: row.ticket_id,
+        quantity: row.quantity,
+        price: Number(row.price),
+        ticket_type: row.ticket_type,
+        event_title: row.event_title,
+        event_date: row.event_date,
+        event_location: row.event_location,
+        created_at: row.item_created_at,
+      });
+    });
+
+    const orders = Array.from(ordersMap.values());
+    res.status(200).json(orders);
   } catch (error) {
     handleError(res, "Error fetching orders", error);
   }

@@ -16,8 +16,6 @@ import {
 } from "react-admin";
 
 import { fetchUtils } from "react-admin";
-import queryString from "query-string";
-import { authProvider } from "./authProvider";
 
 interface User {
   user_id: Identifier;
@@ -27,7 +25,7 @@ interface User {
   created_at: string;
 }
 
-const urlAPI = "http://localhost:4000/api/users";
+const urlAPI = "http://localhost:4000/api";
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
@@ -40,12 +38,13 @@ export const userDataProvider: DataProvider = {
       const { page = 1, perPage = 10 } = params.pagination || {};
       const query = {
         page,
-        perPage,
+        per_page: perPage,
+        ...params.filter,
       };
       const offset = (page - 1) * perPage;
 
       // get data with HTTPS and URL
-      const url = `${urlAPI}?${queryString.stringify(query)}`;
+      const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
       const token = localStorage.getItem("token");
 
       if (!token) {

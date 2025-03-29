@@ -5,6 +5,7 @@ import {
   getUserOrders,
   getOrderById,
   updateOrderStatus,
+  cancelOrderItem,
 } from "../controllers/orderController.js";
 import { authenticationToken } from "../middleware/authMiddleware.js";
 
@@ -25,5 +26,8 @@ router.get("/:orderId", getOrderById);
 // Mettre à jour le statut (admin seulement)
 // router.put("/:orderId", authenticationToken, updateOrderStatus);
 router.put("/:orderId", updateOrderStatus);
+
+// annuler reservation
+router.delete("/:orderId/items/:ticketId", cancelOrderItem);
 
 export { router as orderRouter };

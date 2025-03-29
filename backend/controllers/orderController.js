@@ -218,3 +218,81 @@ export const updateOrderStatus = async (req, res) => {
     handleError(res, "Error updating order status", error);
   }
 };
+
+// cancel the reservation
+export const cancelOrderItem = async (req, res) => {
+  const { orderId, ticketId } = req.params;
+  const userId = "11111111-1111-1111-1111-111111111111"; // À remplacer par l'userId de la session
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // 1. Vérifier que l'item appartient bien à l'utilisateur
+    const orderCheck = await client.query(
+      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
+      [orderId, userId]
+    );
+
+    if (orderCheck.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Commande non trouvée ou accès refusé" });
+    }
+
+    // 2. Récupérer la quantité annulée et vérifier la date de l'événement
+    const itemResult = await client.query(
+      `SELECT oi.quantity, e.event_datetime 
+       FROM order_items oi
+       JOIN tickets t ON oi.ticket_id = t.ticket_id
+       JOIN events e ON t.event_id = e.event_id
+       WHERE oi.order_id = $1 AND oi.ticket_id = $2`,
+      [orderId, ticketId]
+    );
+
+    if (itemResult.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Billet non trouvé dans la commande" });
+    }
+
+    const { quantity, event_datetime } = itemResult.rows[0];
+    const eventDate = new Date(event_datetime);
+    const currentDate = new Date();
+
+    if (eventDate < currentDate) {
+      return res
+        .status(400)
+        .json({
+          error: "Impossible d'annuler un billet pour un événement passé",
+        });
+    }
+
+    // 3. Supprimer l'item de la commande
+    await client.query(
+      "DELETE FROM order_items WHERE order_id = $1 AND ticket_id = $2",
+      [orderId, ticketId]
+    );
+
+    // 4. Remettre les billets en stock
+    await client.query(
+      "UPDATE tickets SET available = available + $1 WHERE ticket_id = $2",
+      [quantity, ticketId]
+    );
+
+    // 5. Mettre à jour le montant total de la commande
+    await client.query(
+      "UPDATE orders SET total_amount = total_amount - ($1 * (SELECT price FROM tickets WHERE ticket_id = $2)) WHERE order_id = $3",
+      [quantity, ticketId, orderId]
+    );
+
+    await client.query("COMMIT");
+    res.status(200).json({ message: "Annulation réussie" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    handleError(res, "Erreur lors de l'annulation", error);
+  } finally {
+    client.release();
+  }
+};

@@ -2,6 +2,7 @@ import { Event } from "@/types/event";
 
 const API_BASE_URL = "http://localhost:4000/api";
 
+// fetch all events
 export async function fetchEvents() {
   try {
     const response = await fetch(`${API_BASE_URL}/events`);
@@ -16,6 +17,7 @@ export async function fetchEvents() {
   }
 }
 
+// fetch event by id
 export async function fetchEventById(eventId: string) {
   try {
     const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
@@ -30,21 +32,19 @@ export async function fetchEventById(eventId: string) {
   }
 }
 
+// fetch event
 export async function fetchEventWithTickets(eventId: string): Promise<Event> {
   try {
-    // Fetch event details
     const eventResponse = await fetch(`${API_BASE_URL}/events/${eventId}`);
     if (!eventResponse.ok) throw new Error("Failed to fetch event");
     const event = await eventResponse.json();
 
-    // Fetch tickets for this event
     const ticketsResponse = await fetch(
       `${API_BASE_URL}/events/${eventId}/tickets`
     );
     if (!ticketsResponse.ok) throw new Error("Failed to fetch tickets");
     const tickets = await ticketsResponse.json();
 
-    // Transform data to match frontend types
     return {
       id: event.event_id,
       title: event.title,
@@ -67,6 +67,7 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
   }
 }
 
+// get order by id
 export async function getOrderById(orderId: string) {
   try {
     const res = await fetch(
@@ -80,6 +81,7 @@ export async function getOrderById(orderId: string) {
   }
 }
 
+// get the user reservations
 export async function getUserReservations(userId: string) {
   try {
     const res = await fetch(`${API_BASE_URL}/orders?userId=${userId}`);
@@ -89,4 +91,16 @@ export async function getUserReservations(userId: string) {
     console.error("Error fetching reservations:", error);
     throw error;
   }
+}
+
+// cancel ticket reservation
+export async function cancelTicket(orderId: string, ticketId: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
+    {
+      method: "DELETE",
+    }
+  );
+  if (!res.ok) throw new Error("Échec de l'annulation");
+  return res.json();
 }

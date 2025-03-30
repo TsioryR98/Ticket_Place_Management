@@ -1,20 +1,33 @@
+"use client"
 import { mockUser } from "@/lib/mockUser";
 import Image from "next/image";
 import Mi from "../../../../public/mock_user.jpg"
-import { CiBookmark , CiSettings } from "react-icons/ci";
+import { CiBookmark , CiSettings, CiMail, CiUser, CiLock   } from "react-icons/ci";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
+import {Input} from "@/components/ui/input";
+
 
 export default function UserProfile() {
   return (
     <div className="flex flex-row items-center gap-x-10 justify-center mt-8">
         <div className="flex flex-col gap-y-8">
-            <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl transition-all duration-300">
+            <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl">
                 <h1 className="font-semibold text-lg flex items-center">Account Settings <CiSettings className="ms-4 text-2xl"/></h1>
                 <p className="text-sm">Details about your information</p>
             </div>
             <Link href={`/dashboard/reservations`}>
-                <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl transition-all duration-300">
+                <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl">
                     <h1 className="font-semibold text-lg flex items-center">My reservations <CiBookmark className="ms-4 text-2xl"/></h1>
                     <p className="text-sm">Check all of your bookings</p>
                 </div>
@@ -26,7 +39,38 @@ export default function UserProfile() {
                     <Image src={Mi} alt={"Test"} height={100} width={100} className="rounded-full"/>
                     <h1>Your profile</h1>
                 </div>
-                <Button variant={"outline"} className="cursor-pointer">Update</Button>
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button variant={"outline"} className="cursor-pointer">Update</Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>Edit profile</SheetTitle>
+                            <SheetDescription>
+                                Make changes to your profile here. Click save when you&#39;re done.
+                            </SheetDescription>
+                        </SheetHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="flex px-8 items-center">
+                                <CiUser className='text-2xl absolute left-10'/>
+                                <Input id="name"  className="text-right" placeholder="New user name"/>
+                            </div>
+                            <div className="flex px-8 items-center">
+                                <CiMail className='text-2xl absolute left-10'/>
+                                <Input id="username" className="text-right" placeholder="New email address"/>
+                            </div>
+                            <div className="flex px-8 items-center">
+                                <CiLock className='text-2xl absolute left-10'/>
+                                <Input type={"password"} className="text-right" placeholder="New password"/>
+                            </div>
+                        </div>
+                        <SheetFooter>
+                            <SheetClose asChild>
+                                <Button type="submit">Save changes</Button>
+                            </SheetClose>
+                        </SheetFooter>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div className="shadow-md p-8 hover:shadow-xl transition-all duration-300">

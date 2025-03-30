@@ -90,7 +90,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="landing_page h-[25vh] bg-green-400"></div>
+      <div className="landing_page h-[25vh] bg-blue-900"></div>
       <section id="events" className="w-full">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <FilterBar

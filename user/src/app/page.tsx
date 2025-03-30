@@ -26,6 +26,13 @@ export default function Home() {
     const loadEvents = async () => {
       try {
         const data = await fetchEvents();
+        console.log(
+          "Events with images:",
+          data.map((e: Event) => ({
+            title: e.title,
+            imagePath: e.imagePath,
+          }))
+        );
         setEvents(data);
         setLoading(false);
       } catch (err) {
@@ -96,25 +103,20 @@ export default function Home() {
           setSelectedLocation={setSelectedLocation}
         />
         <ul className="grid grid-cols-2 gap-8 px-8 mt-8">
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <li key={event.id}>
-                <EventCardHome
-                  title={event.title}
-                  description={event.description}
-                  date={event.date}
-                  time={event.time}
-                  location={event.location}
-                  organizer={event.organizer}
-                  link={`/event/${event.id}`}
-                />
-              </li>
-            ))
-          ) : (
-            <p className="text-center text-2xl font-semibold">
-              No events found.
-            </p>
-          )}
+          {filteredEvents.map((event) => (
+            <li key={event.id}>
+              <EventCardHome
+                title={event.title}
+                description={event.description}
+                date={event.date}
+                time={event.time}
+                location={event.location}
+                organizer={event.organizer}
+                link={`/event/${event.id}`}
+                imagePath={event.imagePath}
+              />
+            </li>
+          ))}
         </ul>
       </section>
     </>

@@ -3,14 +3,17 @@ import { Event } from "@/types/event";
 const API_BASE_URL = "http://localhost:4000/api";
 
 // fetch all events
-export async function fetchEvents() {
+export async function fetchEvents(): Promise<Event[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/events`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch events");
-    }
+    if (!response.ok) throw new Error("Failed to fetch events");
+
     const data = await response.json();
-    return data;
+
+    return data.map((event: any) => ({
+      ...event,
+      imagePath: event.images,
+    }));
   } catch (error) {
     console.error("Error fetching events:", error);
     throw error;

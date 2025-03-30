@@ -91,33 +91,36 @@ export default function Home() {
   return (
     <>
       <div className="landing_page h-[25vh] bg-green-400"></div>
-      <section id="events" className="flex items-center flex-col">
-        <FilterBar
-          locations={locations}
-          selectedDateRange={selectedDateRange}
-          selectedCategory={selectedCategory}
-          categories={categories}
-          selectedLocation={selectedLocation}
-          setSelectedCategory={setSelectedCategory}
-          setSelectedDateRange={setSelectedDateRange}
-          setSelectedLocation={setSelectedLocation}
-        />
-        <ul className="grid grid-cols-2 gap-8 px-8 mt-8">
-          {filteredEvents.map((event) => (
-            <li key={event.id}>
-              <EventCardHome
-                title={event.title}
-                description={event.description}
-                date={event.date}
-                time={event.time}
-                location={event.location}
-                organizer={event.organizer}
-                link={`/event/${event.id}`}
-                imagePath={event.imagePath}
-              />
-            </li>
-          ))}
-        </ul>
+      <section id="events" className="w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <FilterBar
+            locations={locations}
+            selectedDateRange={selectedDateRange}
+            selectedCategory={selectedCategory}
+            categories={categories}
+            selectedLocation={selectedLocation}
+            setSelectedCategory={setSelectedCategory}
+            setSelectedDateRange={setSelectedDateRange}
+            setSelectedLocation={setSelectedLocation}
+          />
+
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            {filteredEvents.map((event) => (
+              <li key={event.id} className="w-full h-full">
+                <EventCardHome
+                  title={event.title}
+                  description={event.description}
+                  date={event.date}
+                  time={event.time}
+                  location={event.location}
+                  organizer={event.organizer}
+                  link={`/event/${event.id}`}
+                  imagePath={event.imagePath}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </>
   );

@@ -13,11 +13,17 @@ import {
   UpdateResult,
   DeleteParams,
   DeleteResult,
+  DeleteManyParams,
+  DeleteManyResult,
+  GetManyParams,
+  GetManyReferenceParams,
+  GetManyReferenceResult,
+  GetManyResult,
+  UpdateManyParams,
+  UpdateManyResult,
 } from "react-admin";
 
 import { fetchUtils } from "react-admin";
-import queryString from "query-string";
-import { authProvider } from "./authProvider";
 
 interface User {
   user_id: Identifier;
@@ -27,25 +33,26 @@ interface User {
   created_at: string;
 }
 
-const urlAPI = "http://localhost:4000/api/users";
+const urlAPI = "http://localhost:4000/api";
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
   getList: async function <RecordType extends RaRecord = any>(
     resource: string,
-    params: GetListParams & QueryFunctionContext,
+    params: GetListParams & QueryFunctionContext
   ): Promise<GetListResult<RecordType>> {
     try {
       const { page = 1, perPage = 10 } = params.pagination || {};
       const query = {
         page,
-        perPage,
+        per_page: perPage,
+        ...params.filter,
       };
       const offset = (page - 1) * perPage;
 
       // get data with HTTPS and URL
-      const url = `${urlAPI}?${queryString.stringify(query)}`;
+      const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -82,11 +89,11 @@ export const userDataProvider: DataProvider = {
   },
 
   /*
-    
-    */
+      
+      */
   delete: async function <RecordType extends RaRecord = any>(
     resource: string,
-    params: DeleteParams<RecordType>,
+    params: DeleteParams<RecordType>
   ): Promise<DeleteResult<RecordType>> {
     try {
       const token = localStorage.getItem("token");
@@ -107,23 +114,47 @@ export const userDataProvider: DataProvider = {
 
   getOne: function <RecordType extends RaRecord = any>(
     resource: string,
-    params: GetOneParams<RecordType> & QueryFunctionContext,
+    params: GetOneParams<RecordType> & QueryFunctionContext
   ): Promise<GetOneResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
   update: function <RecordType extends RaRecord = any>(
     resource: string,
-    params: UpdateParams,
+    params: UpdateParams
   ): Promise<UpdateResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
   create: function <
     RecordType extends Omit<RaRecord, "id"> = any,
-    ResultRecordType extends RaRecord = RecordType & { id: Identifier },
+    ResultRecordType extends RaRecord = RecordType & { id: Identifier }
   >(
     resource: string,
-    params: CreateParams,
+    params: CreateParams
   ): Promise<CreateResult<ResultRecordType>> {
+    throw new Error("Function not implemented.");
+  },
+  getMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: GetManyParams<RecordType> & QueryFunctionContext
+  ): Promise<GetManyResult<RecordType>> {
+    throw new Error("Function not implemented.");
+  },
+  getManyReference: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: GetManyReferenceParams & QueryFunctionContext
+  ): Promise<GetManyReferenceResult<RecordType>> {
+    throw new Error("Function not implemented.");
+  },
+  updateMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: UpdateManyParams
+  ): Promise<UpdateManyResult<RecordType>> {
+    throw new Error("Function not implemented.");
+  },
+  deleteMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: DeleteManyParams<RecordType>
+  ): Promise<DeleteManyResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
 };

@@ -1,18 +1,26 @@
 import * as React from "react";
 import { useLogin, useNotify } from "react-admin";
 import {
-  Box,
   Button,
   CssBaseline,
   Divider,
-  FormControl,
   Link,
   TextField,
   Typography,
   Stack,
+  FormHelperText,
   Card as MuiCard,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControl from "@mui/material/FormControl";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 import ForgotPassword from "../loginPage/ForgotPassword";
 
 // for sign card connection
@@ -60,6 +68,21 @@ const LoginPage: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
   const login = useLogin();
   const notify = useNotify();
@@ -149,23 +172,34 @@ const LoginPage: React.FC = () => {
                 onChange={handleOnChangeEmail}
               />
             </FormControl>
-            <FormControl>
-              <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                name="password"
-                placeholder="••••••"
-                type="password"
+            <FormControl fullWidth error={passwordError} variant="outlined">
+              <InputLabel htmlFor="input-password">Password</InputLabel>
+              <OutlinedInput
                 id="input-password"
-                label="Password"
-                variant="outlined"
-                autoComplete="current-password"
-                required
-                fullWidth
-                color={passwordError ? "error" : "primary"}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={handleOnChangePassword}
+                autoComplete="current-password"
+                required
+                label="Password"
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
               />
+              {passwordError && (
+                <FormHelperText error>{passwordErrorMessage}</FormHelperText>
+              )}
             </FormControl>
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button

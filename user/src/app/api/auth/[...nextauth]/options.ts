@@ -28,31 +28,35 @@ const option: NextAuthOptions = {
 
       async authorize(credentials) {
         try {
-          //call Express rooute
-          const url = process.env.BACK_END_URL as string;
-          const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials?.email,
-              password: credentials?.password,
-            }),
-          });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials?.email,
+                password: credentials?.password,
+              }),
+            }
+          );
+
           const data = await res.json();
-          if (data.user) {
-            return {
-              id: data.user.user_id,
-              name: data.user.user_name,
-              email: data.user.user_email,
-              role: data.user.role,
-              //token
-              accessToken: data.tokens.accessToken,
-              refreshToken: data.tokens.refreshToken,
-            };
+
+          if (!res.ok) {
+            throw new Error(data.error || "Login failed");
           }
-          return null;
+
+          return {
+            id: data.user.user_id,
+            name: data.user.user_name,
+            email: data.user.user_email,
+            role: data.user.role,
+            accessToken: data.tokens.accessToken,
+            refreshToken: data.tokens.refreshToken,
+          };
         } catch (error) {
-          throw new Error("Invalid email or password");
+          console.error("Auth error:", error);
+          return null;
         }
       },
     }),
@@ -60,21 +64,34 @@ const option: NextAuthOptions = {
 
   //callbacks
   callbacks: {
-    //jwt token and user
     async jwt({ token, user }) {
       if (user) {
-        (token.id = user.id),
-          (token.role = user.role),
-          (token.accessToken = user.accessToken);
+        return {
+          ...token,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+        };
       }
       return token;
     },
 
-    //session
     async session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.role = token.role as string;
-      return session;
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          role: token.role,
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken,
+        },
+      };
     },
   },
   // if we need defaut route for login or logout

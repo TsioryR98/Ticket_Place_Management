@@ -55,7 +55,7 @@ export const eventDataProvider: DataProvider = {
         ...params.filter,
       };
 
-      const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
+      const url = `${urlAPI}/api/${resource}?${fetchUtils.queryParameters(query)}`;
       const token = localStorage.getItem("token");
 
       if (!token) {

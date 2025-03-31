@@ -52,7 +52,7 @@ export const userDataProvider: DataProvider = {
       const offset = (page - 1) * perPage;
 
       // get data with HTTPS and URL
-      const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
+      const url = `${urlAPI}/api/${resource}?${fetchUtils.queryParameters(query)}`;
       const token = localStorage.getItem("token");
 
       if (!token) {

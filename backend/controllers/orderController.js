@@ -8,11 +8,18 @@ const handleError = (res, message, error) => {
 
 // POST /api/orders - Créer une nouvelle commande
 export const createOrder = async (req, res) => {
-  //const { userId, items } = req.body; // items: [{ticketId, quantity}]
-  // Simulation d'user ID pour les tests
-  const userId = "11111111-1111-1111-1111-111111111111"; // ID du user test
+  const userId = req.user?.userId;
+  console.log("User ID from token:", req.user?.userId); // Debug
+  console.log("Request body:", req.body); // Debug
 
-  const { items } = req.body; // On ne prend plus userId du body
+  if (!req.user?.userId) {
+    return res.status(401).json({
+      code: "MISSING_AUTH",
+      error: "Authentification requise",
+    });
+  }
+
+  const { items } = req.body;
   if (!items || !Array.isArray(items)) {
     return res.status(400).json({ error: "Items must be an array" });
   }
@@ -87,7 +94,7 @@ export const createOrder = async (req, res) => {
 
 // GET /api/orders - Récupérer les commandes de l'utilisateur
 export const getUserOrders = async (req, res) => {
-  const { userId } = req.query;
+  const userId = req.user?.userId;
 
   if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
@@ -151,7 +158,7 @@ export const getUserOrders = async (req, res) => {
 // GET /api/orders/:orderId - Récupérer une commande spécifique
 export const getOrderById = async (req, res) => {
   const { orderId } = req.params;
-  const { userId } = req.query;
+  const userId = req.user?.userId;
 
   try {
     // Vérifier que l'utilisateur est propriétaire de la commande
@@ -222,7 +229,7 @@ export const updateOrderStatus = async (req, res) => {
 // cancel the reservation
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;
-  const userId = "11111111-1111-1111-1111-111111111111"; // À remplacer par l'userId de la session
+  const userId = req.user.userId; // Extrait du JWT
 
   const client = await pool.connect();
 

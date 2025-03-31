@@ -31,7 +31,8 @@ export default async function OrderConfirmation({
     );
   }
   try {
-    const order = await getOrderById(params.orderId);
+    const { orderId } = await params;
+    const order = await getOrderById(orderId);
 
     if (order.user_id !== session.user.id) {
       throw new Error("Cette commande ne vous appartient pas");

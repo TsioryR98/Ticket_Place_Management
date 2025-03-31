@@ -25,7 +25,7 @@ import {
 
 import { fetchUtils } from "react-admin";
 
-const urlAPI = "http://localhost:4000/api";
+const urlAPI = process.env.BACKEND_URL;
 const httpClient = fetchUtils.fetchJson;
 
 interface Event {

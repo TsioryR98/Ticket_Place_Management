@@ -33,7 +33,7 @@ interface User {
   created_at: string;
 }
 
-const urlAPI = "http://localhost:4000/api";
+const urlAPI = process.env.BACKEND_URL;
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page

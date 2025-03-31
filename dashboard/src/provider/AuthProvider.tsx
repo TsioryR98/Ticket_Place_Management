@@ -1,8 +1,9 @@
 import type { AuthProvider } from "react-admin";
 
+const backendUrl = process.env.BACKEND_URL;
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
-    const request = new Request("http://localhost:4000/api/users/login", {
+    const request = new Request(`${backendUrl}/api/users/login`, {
       method: "POST",
       body: JSON.stringify({ email, password }),
       headers: new Headers({ "Content-Type": "application/json" }),

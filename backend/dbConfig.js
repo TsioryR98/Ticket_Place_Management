@@ -11,7 +11,7 @@ const isProduction = process.env.NODE_ENV === "production"; // it'll will be set
 
 const connectionString = process.env.DATABASE_DEPLOYMENT_URL;
 const pool = new Pool({
-  connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
+  connectionString: connectionString,
 });
 
 export default pool;

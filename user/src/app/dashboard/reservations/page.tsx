@@ -12,22 +12,29 @@ export default function ReservationList() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
 
+  const session = useSession();
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setLoading(true);
         const data = await getUserReservations();
-        setOrders(data);
+        setOrders(data || []); // Garantit un tableau même si data est null
       } catch (err) {
+        // Seules les vraies erreurs API seront catchées ici
         setError(err instanceof Error ? err.message : "Erreur de chargement");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
-  }, []);
-
-  const session = useSession();
+    // Ne fetch que si authentifié
+    if (session.status === "authenticated") {
+      fetchOrders();
+    } else {
+      setOrders([]); // Vide les réservations si déconnecté
+    }
+  }, [session.status]); // Déclenché quand le statut change
 
   if (session.status === "unauthenticated") {
     return (

@@ -77,6 +77,8 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
 export async function getOrderById(orderId: string) {
   try {
     const res = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}`);
+    if (!res) return null;
+
     return await res.json();
   } catch (error) {
     console.error("Error fetching order:", error);
@@ -86,11 +88,11 @@ export async function getOrderById(orderId: string) {
 
 // get the user reservations
 export async function getUserReservations() {
-  // Retire le paramètre userId
   try {
     const res = await fetchWithAuth(`${API_BASE_URL}/orders`);
-    const orders = await res.json();
+    if (!res) return []; // Retourne un tableau vide si non authentifié
 
+    const orders = await res.json();
     return orders.map((order: any) => ({
       ...order,
       created_at: new Date(order.created_at),
@@ -115,6 +117,8 @@ export async function cancelReservation(orderId: string, ticketId: string) {
         method: "DELETE",
       }
     );
+    if (!res) return false; // Échec si non authentifié
+
     return await res.json();
   } catch (error) {
     console.error("Error cancelling reservation:", error);
@@ -122,31 +126,29 @@ export async function cancelReservation(orderId: string, ticketId: string) {
   }
 }
 
-async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  // Détection du contexte
+async function fetchWithAuth(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response | null> {
   const isServer = typeof window === "undefined";
 
-  let session;
-
   try {
-    // Récupération de la session adaptée au contexte
+    let session;
+
     if (isServer) {
       session = await getServerSession(authOptions);
     } else {
-      // Pour le client, utilisez une requête API dédiée
       const sessionRes = await fetch("/api/auth/session");
+      if (!sessionRes.ok) return null;
       session = await sessionRes.json();
     }
 
     if (!session?.user?.accessToken) {
-      throw new Error("Not authenticated");
+      return null; // Au lieu de throw une erreur
     }
 
-    // Configuration des headers
-    const headers = new Headers({
-      "Content-Type": "application/json",
-      ...options.headers,
-    });
+    const headers = new Headers(options.headers);
+    headers.set("Content-Type", "application/json");
     headers.set("Authorization", `Bearer ${session.user.accessToken}`);
 
     const response = await fetch(url, {
@@ -154,11 +156,6 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
       headers,
       cache: "no-store",
     });
-
-    if (response.status === 401) {
-      // Token invalide ou expiré
-      throw new Error("Session expired - Please login again");
-    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

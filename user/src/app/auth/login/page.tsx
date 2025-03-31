@@ -1,60 +1,98 @@
 "use client";
 
-function LoginModal() {
-  return (
-    <>
-      <button
-        type="button"
-        className="btn btn-primary"
-        aria-haspopup="dialog"
-        aria-expanded="false"
-        aria-controls="middle-center-modal"
-        data-overlay="#middle-center-modal"
-      >
-        Middle center
-      </button>
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
 
-      <div
-        id="middle-center-modal"
-        className="overlay modal overlay-open:opacity-100 modal-middle hidden"
-        role="dialog"
-      >
-        <div className="modal-dialog overlay-open:opacity-100">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3 className="modal-title">Dialog Title</h3>
-              <button
-                type="button"
-                className="btn btn-text btn-circle btn-sm absolute end-3 top-3"
-                aria-label="Close"
-                data-overlay="#middle-center-modal"
-              >
-                <span className="icon-[tabler--x] size-4"></span>
-              </button>
-            </div>
-            <div className="modal-body">
-              This is some placeholder content to show the scrolling behavior
-              for modals. Instead of repeating the text in the modal, we use an
-              inline style to set a minimum height, thereby extending the length
-              of the overall modal and demonstrating the overflow scrolling.
-              When content becomes longer than the height of the viewport,
-              scrolling will move the modal as needed.
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-soft btn-secondary"
-                data-overlay="#middle-center-modal"
-              >
-                Close
-              </button>
-              <button type="button" className="btn btn-primary">
-                Save changes
-              </button>
-            </div>
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+
+        {error && (
+          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+            {error}
           </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Login
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <Link
+            href="/auth/signup"
+            className="text-indigo-600 hover:text-indigo-500"
+          >
+            Don't have an account? Sign up
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

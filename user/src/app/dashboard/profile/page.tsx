@@ -16,9 +16,21 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import {Input} from "@/components/ui/input";
+import {useState} from "react";
 
 
 export default function UserProfile() {
+    const [newUserName, setNewUserName] = useState<string>("");
+    const [newEmailAddress, setNewEmailAddress] = useState<string>("");
+    const [newPassword, setNewPassword] = useState("");
+    const handleSubmit = () => {
+        console.log({
+            newUserName,
+            newEmailAddress,
+            newPassword
+        })
+    }
+
   return (
     <div className="flex flex-row items-center gap-x-10 justify-center mt-8">
         <div className="flex flex-col gap-y-8">
@@ -53,20 +65,20 @@ export default function UserProfile() {
                         <div className="grid gap-4 py-4">
                             <div className="flex px-8 items-center">
                                 <CiUser className='text-2xl absolute left-10'/>
-                                <Input id="name"  className="text-right" placeholder="New user name"/>
+                                <Input id="name"  className="text-right" placeholder="New user name" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
                             </div>
                             <div className="flex px-8 items-center">
                                 <CiMail className='text-2xl absolute left-10'/>
-                                <Input id="username" className="text-right" placeholder="New email address"/>
+                                <Input id="username" className="text-right" placeholder="New email address" value={newEmailAddress} onChange={(e) => setNewEmailAddress(e.target.value)}/>
                             </div>
                             <div className="flex px-8 items-center">
                                 <CiLock className='text-2xl absolute left-10'/>
-                                <Input type={"password"} className="text-right" placeholder="New password"/>
+                                <Input type={"password"} className="text-right" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
                             </div>
                         </div>
                         <SheetFooter>
                             <SheetClose asChild>
-                                <Button type="submit">Save changes</Button>
+                                <Button onClick={handleSubmit}>Save changes</Button>
                             </SheetClose>
                         </SheetFooter>
                     </SheetContent>

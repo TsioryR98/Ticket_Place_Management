@@ -1,4 +1,7 @@
 import { Event } from "@/types/event";
+import { getServerSession } from "next-auth";
+import authOptions from "@/app/api/auth/[...nextauth]/options";
+import { getSession } from "next-auth/react";
 
 const API_BASE_URL = "http://localhost:4000/api";
 
@@ -73,10 +76,7 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
 // get order by id
 export async function getOrderById(orderId: string) {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/orders/${orderId}?userId=11111111-1111-1111-1111-111111111111`
-    );
-    if (!res.ok) throw new Error("Échec de la récupération de la commande");
+    const res = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}`);
     return await res.json();
   } catch (error) {
     console.error("Error fetching order:", error);
@@ -85,12 +85,10 @@ export async function getOrderById(orderId: string) {
 }
 
 // get the user reservations
-export async function getUserReservations(userId: string) {
+export async function getUserReservations() {
+  // Retire le paramètre userId
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/orders?userId=${userId}&includeEventDetails=true`
-    );
-    if (!res.ok) throw new Error("Failed to fetch reservations");
+    const res = await fetchWithAuth(`${API_BASE_URL}/orders`);
     const orders = await res.json();
 
     return orders.map((order: any) => ({
@@ -111,20 +109,65 @@ export async function getUserReservations(userId: string) {
 // cancel reservation
 export async function cancelReservation(orderId: string, ticketId: string) {
   try {
-    const res = await fetch(
+    const res = await fetchWithAuth(
       `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
       {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }
     );
-
-    if (!res.ok) throw new Error("Échec de l'annulation");
     return await res.json();
   } catch (error) {
     console.error("Error cancelling reservation:", error);
+    throw error;
+  }
+}
+
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  // Détection du contexte
+  const isServer = typeof window === "undefined";
+
+  let session;
+
+  try {
+    // Récupération de la session adaptée au contexte
+    if (isServer) {
+      session = await getServerSession(authOptions);
+    } else {
+      // Pour le client, utilisez une requête API dédiée
+      const sessionRes = await fetch("/api/auth/session");
+      session = await sessionRes.json();
+    }
+
+    if (!session?.user?.accessToken) {
+      throw new Error("Not authenticated");
+    }
+
+    // Configuration des headers
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      ...options.headers,
+    });
+    headers.set("Authorization", `Bearer ${session.user.accessToken}`);
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      cache: "no-store",
+    });
+
+    if (response.status === 401) {
+      // Token invalide ou expiré
+      throw new Error("Session expired - Please login again");
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Request failed");
+    }
+
+    return response;
+  } catch (error) {
+    console.error("FetchWithAuth error:", error);
     throw error;
   }
 }

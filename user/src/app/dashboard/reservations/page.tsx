@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { cancelReservation, getUserReservations } from "@/lib/api";
 import { Order } from "@/types/order";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function ReservationList() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -14,9 +15,7 @@ export default function ReservationList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // À remplacer par le vrai ID utilisateur (via NextAuth)
-        const userId = "11111111-1111-1111-1111-111111111111";
-        const data = await getUserReservations(userId);
+        const data = await getUserReservations();
         setOrders(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur de chargement");
@@ -27,6 +26,19 @@ export default function ReservationList() {
 
     fetchOrders();
   }, []);
+
+  const session = useSession();
+
+  if (session.status === "unauthenticated") {
+    return (
+      <div className="p-4 text-center">
+        <p>Vous devez être connecté pour voir vos réservations</p>
+        <Link href="/auth/login" className="text-blue-500 hover:underline">
+          Se connecter
+        </Link>
+      </div>
+    );
+  }
 
   const currentDate = new Date();
 

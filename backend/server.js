@@ -14,7 +14,7 @@ const __dirname = dirname(__filename); //static files
 const app = express();
 const PORT = process.env.PORT || 4000;
 const corsOptions = {
-  origin: [process.env.BACKEND_RENDER, process.env.DASHBOARD_RENDER], //allow front and backend => ["..",".."]by CORS and replace during deployement
+  origin: ["https://tickify-backend.onrender.com","https://tickify-dashboard.onrender.com"], //allow front and backend => ["..",".."]by CORS and replace during deployement
   credentials: true,
   origin: process.env.URL || "*",
   exposedHeaders: ["X-Total-Count"], //allow cors to expose X-Total-Count

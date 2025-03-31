@@ -33,7 +33,7 @@ interface User {
   created_at: string;
 }
 
-const urlAPI = process.env.BACKEND_URL;
+const urlAPI = "https://tickify-backend.onrender.com";
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page

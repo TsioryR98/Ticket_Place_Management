@@ -25,7 +25,7 @@ import {
 
 import { fetchUtils } from "react-admin";
 
-const urlAPI = process.env.BACKEND_URL;
+const urlAPI ="https://tickify-backend.onrender.com";
 const httpClient = fetchUtils.fetchJson;
 
 interface Event {

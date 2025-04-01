@@ -17,18 +17,33 @@ import {
 } from "@/components/ui/sheet"
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
+import {useSession} from "next-auth/react";
 
 
 export default function UserProfile() {
     const [newUserName, setNewUserName] = useState<string>("");
     const [newEmailAddress, setNewEmailAddress] = useState<string>("");
     const [newPassword, setNewPassword] = useState("");
+
+    const session = useSession();
+
     const handleSubmit = () => {
         console.log({
             newUserName,
             newEmailAddress,
             newPassword
         })
+    }
+
+    if(session.status === "unauthenticated") {
+        return <div className="text-center mt-8 space-y-4">
+            <h1 className="text-xl font-semibold text-amber-500">You need to sign up to see this page</h1>
+            <Link href={"/auth/login"}>
+                <Button variant={"outline"}>
+                    Sign In
+                </Button>
+            </Link>
+        </div>
     }
 
   return (

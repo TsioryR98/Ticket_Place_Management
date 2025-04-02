@@ -166,3 +166,58 @@ export const updateUser = async (req, res) => {
     handleError(res, "Error while update user", error);
   }
 };
+/*-----------------PATCH /api/users/role/:id --------------------*/
+
+export const updateUserRole = async (req, res) => {
+  const { userId } = req.params; // User ID from the route parameter
+  const { role } = req.body; // New role from the request body
+  const { role: currentUserRole } = req.user; // Current user's role from JWT
+
+  if (currentUserRole !== "admin") {
+    return res.status(403).json({ error: "Forbidden request" });
+  }
+
+  try {
+    const userExists = await pool.query(
+      "SELECT * FROM users WHERE user_id = $1",
+      [userId]
+    );
+    if (userExists.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const query = await pool.query(
+      "UPDATE users SET user_role = $1 WHERE user_id = $2 RETURNING *",
+      [role, userId]
+    );
+
+    res
+      .status(200)
+      .json({ message: "User role updated successfully", user: query.rows[0] });
+  } catch (error) {
+    handleError(res, "Error while updating user role", error);
+  }
+};
+
+/*-----------------GET /api/users/:id --------------------*/
+export const getUserById = async (req, res) => {
+  const { userId } = req.params; // User ID from the route parameter
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE user_id =$1", [
+      userId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const user = {
+      userId: userId,
+      username: result.rows[0].user_name,
+      email: result.rows[0].user_email,
+      role: result.rows[0].role,
+    };
+
+    res.status(200).json(user);
+  } catch (error) {
+    handleError(res, "Error while getting user", error);
+  }
+};

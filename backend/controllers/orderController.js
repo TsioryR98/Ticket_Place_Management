@@ -219,7 +219,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-// cancel the reservation  /api/orders/:orderId/items/:itemId
+// cancel the reservation
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;
   const userId = "11111111-1111-1111-1111-111111111111"; // À remplacer par l'userId de la session

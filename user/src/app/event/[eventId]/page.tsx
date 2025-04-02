@@ -8,7 +8,7 @@ export default async function EventPage({
 }: {
   params: { eventId: string };
 }) {
-  const { eventId } = params;
+  const { eventId } = await params;
 
   try {
     const event: Event = await fetchEventById(eventId);

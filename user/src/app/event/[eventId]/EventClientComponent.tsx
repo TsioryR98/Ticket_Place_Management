@@ -5,6 +5,9 @@ import { Event } from "@/types/event";
 import { reserveTicket } from "@/app/event/actions";
 
 export default function EventClientComponent({ event }: { event: Event }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
+
   // État pour gérer l'affichage du formulaire de réservation
   const [showReservationForm, setShowReservationForm] = useState(false);
 
@@ -12,30 +15,31 @@ export default function EventClientComponent({ event }: { event: Event }) {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   // Gérer la soumission du formulaire de réservation
-  const handleReservationSubmit = async (formData: FormData) => {
-    // Préparer les réservations (type de billet + quantité)
-    const reservations = Object.entries(quantities)
-      .filter(([_, quantity]) => quantity > 0) // Ne garder que les billets avec une quantité > 0
-      .map(([ticketType, quantity]) => ({ ticketType, quantity }));
+  const handleReservationSubmit = async () => {
+    setIsSubmitting(true);
+    setReservationError(null);
 
-    // Soumettre chaque réservation
-    for (const reservation of reservations) {
-      const result = await reserveTicket(
-        event.id,
-        reservation.ticketType,
-        reservation.quantity
-      );
-      if (result.success) {
-        alert(
-          `Réservation réussie pour ${reservation.quantity} billet(s) ${reservation.ticketType}.`
-        );
-      } else {
-        alert(`Erreur pour ${reservation.ticketType}: ${result.message}`);
+    try {
+      // Préparer toutes les réservations avec quantité > 0
+      const activeReservations = Object.entries(quantities)
+        .filter(([_, q]) => q > 0)
+        .map(([type, q]) => ({ ticketType: type, quantity: q }));
+
+      if (activeReservations.length === 0) {
+        setReservationError("Veuillez sélectionner au moins un billet");
+        return;
       }
-    }
 
-    // Masquer le formulaire après la réservation
-    setShowReservationForm(false);
+      const result = await reserveTicket(event.id, activeReservations);
+
+      if (result.success && result.orderId) {
+        window.location.href = `/dashboard/reservations/${result.orderId}`;
+      } else {
+        setReservationError(result.message);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Mettre à jour la quantité pour un type de billet spécifique
@@ -64,26 +68,32 @@ export default function EventClientComponent({ event }: { event: Event }) {
       </div>
 
       <h2 className="mt-6 text-xl font-semibold">Billets disponibles</h2>
-      <table className="w-full mt-2 border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">Type</th>
-            <th className="border p-2">Prix (€)</th>
-            <th className="border p-2">Disponibilité</th>
-            <th className="border p-2">Limite/personne</th>
-          </tr>
-        </thead>
-        <tbody>
-          {event.tickets.map((ticket) => (
-            <tr key={ticket.type}>
-              <td className="border p-2">{ticket.type}</td>
-              <td className="border p-2">{ticket.price}</td>
-              <td className="border p-2">{ticket.available}</td>
-              <td className="border p-2">{ticket.limitPerPerson}</td>
+      {event.tickets && event.tickets.length > 0 ? (
+        <table className="w-full mt-2 border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">Type</th>
+              <th className="border p-2">Prix (€)</th>
+              <th className="border p-2">Disponibilité</th>
+              <th className="border p-2">Limite/personne</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {event.tickets.map((ticket) => (
+              <tr key={ticket.type}>
+                <td className="border p-2">{ticket.type}</td>
+                <td className="border p-2">{ticket.price}</td>
+                <td className="border p-2">{ticket.available}</td>
+                <td className="border p-2">{ticket.limitPerPerson}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="mt-4 text-gray-500">
+          Aucun billet disponible pour le moment.
+        </p>
+      )}
 
       {/* Bouton "Réserver" */}
       <div className="mt-6">
@@ -104,6 +114,12 @@ export default function EventClientComponent({ event }: { event: Event }) {
           <h3 className="text-lg font-semibold mb-4">
             Formulaire de réservation
           </h3>
+
+          {reservationError && (
+            <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+              {reservationError}
+            </div>
+          )}
 
           {/* Liste des types de billets avec quantité */}
           {event.tickets.map((ticket) => (
@@ -136,9 +152,10 @@ export default function EventClientComponent({ event }: { event: Event }) {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded"
+              className="bg-green-500 text-white py-2 px-4 rounded disabled:opacity-50"
+              disabled={isSubmitting}
             >
-              Confirmer la réservation
+              {isSubmitting ? "Traitement..." : "Confirmer la réservation"}
             </button>
             <button
               type="button"

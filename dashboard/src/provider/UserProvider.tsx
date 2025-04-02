@@ -25,10 +25,10 @@ import {
 
 import { fetchUtils } from "react-admin";
 
-interface User {
-  user_id: Identifier;
-  user_name: string;
-  user_email: string;
+interface User extends RaRecord {
+  id: Identifier; // Add the required 'id' property
+  username: string;
+  email: string;
   role: string;
   created_at: string;
 }
@@ -38,7 +38,7 @@ const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
-  getList: async function <RecordType extends RaRecord = any>(
+  getList: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: GetListParams & QueryFunctionContext
   ): Promise<GetListResult<RecordType>> {
@@ -67,14 +67,14 @@ export const userDataProvider: DataProvider = {
       const total = Number(headers.get("X-Total-Count"));
       const pageNumber = Math.ceil(total / perPage);
 
+      const resultDataAdmin = json.map((item: any) => ({
+        ...item,
+        id: item.userId,
+      }));
+
       //convert into id required by react admin
       const result: GetListResult = {
-        data: json
-          .map((user: User) => ({
-            id: user.user_id,
-            ...user, // Include all other user fields in User interface
-          }))
-          .slice(offset, offset + perPage),
+        data: resultDataAdmin.slice(offset, offset + perPage),
         total: total,
         pageInfo: {
           hasNextPage: page < pageNumber,
@@ -88,7 +88,45 @@ export const userDataProvider: DataProvider = {
     }
   },
 
+  getOne: async function <RecordType extends RaRecord = User>(
+    resource: string,
+    params: GetOneParams<RecordType> & QueryFunctionContext
+  ): Promise<GetOneResult<RecordType>> {
+    const { id } = params; // Correctly destructure the id
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
+        headers: new Headers({ Authorization: `Bearer ${token}` }),
+        method: "GET",
+      });
+
+      const result: GetOneResult = {
+        data: await {
+          id: json.userId,
+          ...json,
+        },
+      };
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  update: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: UpdateParams
+  ): Promise<UpdateResult<RecordType>> {
+    throw new Error("Function not implemented.");
+  },
+
   /*
+
+  
       
       */
   delete: async function <RecordType extends RaRecord = any>(
@@ -112,18 +150,6 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  getOne: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: GetOneParams<RecordType> & QueryFunctionContext
-  ): Promise<GetOneResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
-  update: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: UpdateParams
-  ): Promise<UpdateResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
   create: function <
     RecordType extends Omit<RaRecord, "id"> = any,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier }

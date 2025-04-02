@@ -8,20 +8,22 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query; // Extract pagination parameters
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + Number(limit, 10);
+
     const [resultEvent, totalResult, resultTicket] = await Promise.all([
       pool.query("SELECT * FROM events"),
       pool.query("SELECT COUNT(*) FROM events"),
-      pool.query("SELECT*FROM tickets"),
+      pool.query("SELECT * FROM tickets"),
     ]);
 
-    const total = parseInt(totalResult.rows[0].count, 10);
-    //Add x-total-Count and getting from headers for pagination
+    const total = Number(totalResult.rows[0].count, 10);
+    res.set("X-Total-Count", total); // Set total count in headers for pagination
 
-    res.set("X-Total-Count", total);
-
-    //filter ticket for on event ( ticket.event_id === event.event_id
-    const events = resultEvent.rows.map((event) => {
-      const eventTicket = resultTicket.rows
+    // Filter and map tickets for each event
+    const events = resultEvent.rows.slice(startIndex, endIndex).map((event) => {
+      const eventTickets = resultTicket.rows
         .filter((ticket) => ticket.event_id === event.event_id)
         .map((ticket) => ({
           type: ticket.types,
@@ -34,18 +36,19 @@ export const getAllEvents = async (req, res) => {
         id: event.event_id,
         title: event.title,
         description: event.descriptions,
-        date: new Date(event.event_datetime).toISOString().split("T")[0], // Format YYYY-MM-DD
-        time: new Date(event.event_datetime).toTimeString().split(" ")[0], // Format HH:MM:SS
+        date: new Date(event.event_datetime).toISOString().split("T")[0],
+        time: new Date(event.event_datetime).toTimeString().split(" ")[0],
         location: event.locations,
         organizer: event.organizer,
         category: event.category,
         images: event.imagepath,
-        tickets: eventTicket,
+        tickets: eventTickets,
       };
     });
+
     res.status(200).json(events);
   } catch (error) {
-    handleError(res, "Error during fecthing from database", error);
+    handleError(res, "Error during fetching events from database", error);
   }
 };
 

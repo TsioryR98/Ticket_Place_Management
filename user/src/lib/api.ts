@@ -168,3 +168,37 @@ async function fetchWithAuth(
     throw error;
   }
 }
+
+export async function fetchServerEvents(): Promise<Event[]> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // Timeout après 5s
+
+    const response = await fetch(`${API_BASE_URL}/events`, {
+      signal: controller.signal,
+      next: { revalidate: 3600 },
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorData = await response.text().catch(() => null);
+      console.error("API Error:", {
+        status: response.status,
+        url: response.url,
+        error: errorData,
+      });
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.map((event: any) => ({
+      ...event,
+      imagePath: event.images || "/default-event-image.jpg", // Fallback image
+    }));
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    // Retourner des données mockées en cas d'erreur
+    return require("./events.json");
+  }
+}

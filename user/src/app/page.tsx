@@ -1,48 +1,32 @@
-"use client";
 import EventCardHome from "@/components/event/EventCardHome";
 import FilterBar from "@/components/event/FilterBar";
 import { isWithinInterval, parseISO } from "date-fns";
-import { useState, useEffect } from "react";
-import { fetchEvents } from "@/lib/api";
 import { Event } from "@/types/event";
+import { fetchServerEvents } from "@/lib/api";
 
-export default function Home() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface HomeProps {
+  searchParams: {
+    location?: string;
+    category?: string;
+    start?: string;
+    end?: string;
+  };
+}
 
-  const [selectedDateRange, setSelectedDateRange] = useState<{
-    start: Date | null;
-    end: Date | null;
-  }>({ start: null, end: null });
-  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
-    undefined
-  );
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-    undefined
-  );
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const data = await fetchEvents();
-        console.log(
-          "Events with images:",
-          data.map((e: Event) => ({
-            title: e.title,
-            imagePath: e.imagePath,
-          }))
-        );
-        setEvents(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load events");
-        setLoading(false);
-      }
-    };
+export default async function Home({ searchParams }: HomeProps) {
+  const { location, category, start, end } = await searchParams;
 
-    loadEvents();
-  }, []);
+  const selectedLocation = location;
+  const selectedCategory = category === "all" ? undefined : category;
+  const selectedDateRange = {
+    start: start ? parseISO(start) : null,
+    end: end ? parseISO(end) : null,
+  };
+
+  const events = await fetchServerEvents();
 
   const locations = [...new Set(events.map((event) => event.location))].map(
     (location) => ({
@@ -54,39 +38,36 @@ export default function Home() {
   const categories = [...new Set(events.map((event) => event.category))];
 
   const filteredEvents = events.filter((event) => {
+    const eventDate = parseISO(event.date);
     const noFilterApplied =
       !selectedDateRange.start &&
       !selectedDateRange.end &&
       !selectedLocation &&
       !selectedCategory;
+
     if (noFilterApplied) return true;
 
-    const eventDate = parseISO(event.date);
+    // Filtre par date
     const matchDate =
-      selectedDateRange.start !== null && selectedDateRange.end !== null
+      selectedDateRange.start && selectedDateRange.end
         ? isWithinInterval(eventDate, {
             start: selectedDateRange.start,
             end: selectedDateRange.end,
           })
         : true;
 
+    // Filtre par localisation
     const matchLocation = selectedLocation
       ? event.location.toLowerCase().replace(/\s+/g, "-") === selectedLocation
       : true;
+
+    // Filtre par catégorie
     const matchCategory = selectedCategory
       ? event.category === selectedCategory
       : true;
 
     return matchDate && matchLocation && matchCategory;
   });
-
-  if (loading) {
-    return <div className="text-center py-8">Loading events...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center py-8 text-red-500">{error}</div>;
-  }
 
   return (
     <>
@@ -96,14 +77,12 @@ export default function Home() {
           <FilterBar
             locations={locations}
             selectedDateRange={selectedDateRange}
-            selectedCategory={selectedCategory}
+            selectedCategory={selectedCategory || "all"} // "all" pour la valeur par défaut
             categories={categories}
             selectedLocation={selectedLocation}
-            setSelectedCategory={setSelectedCategory}
-            setSelectedDateRange={setSelectedDateRange}
-            setSelectedLocation={setSelectedLocation}
           />
 
+          {/* Liste des événements filtrés */}
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {filteredEvents.map((event) => (
               <li key={event.id} className="w-full h-full">
@@ -120,6 +99,16 @@ export default function Home() {
               </li>
             ))}
           </ul>
+
+          {/* Message si aucun résultat */}
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-semibold">Aucun événement trouvé</h3>
+              <p className="text-muted-foreground mt-2">
+                Essayez de modifier vos critères de recherche
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </>

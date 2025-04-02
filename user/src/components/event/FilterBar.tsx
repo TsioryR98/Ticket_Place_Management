@@ -33,19 +33,20 @@ import DateRangeType from "@/types/DateRangeType";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 
+interface FilterBarProps {
+  selectedDateRange: DateRangeType;
+  selectedLocation: string | undefined;
+  selectedCategory: string | undefined;
+  locations: LocationType[];
+  categories: string[];
+}
 const FilterBar = ({
   selectedDateRange,
   selectedLocation,
   selectedCategory,
   locations,
   categories,
-}: {
-  selectedDateRange: DateRangeType;
-  selectedLocation: string | undefined;
-  selectedCategory: string | undefined;
-  locations: LocationType[];
-  categories: string[];
-}) => {
+}: FilterBarProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);

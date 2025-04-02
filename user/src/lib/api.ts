@@ -169,12 +169,17 @@ async function fetchWithAuth(
   }
 }
 
-export async function fetchServerEvents(): Promise<{
-  events: Event[];
-  total: number;
-}> {
+export async function fetchServerEvents(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<{ events: Event[]; total: number }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/events`);
+    const url = new URL(`${API_BASE_URL}/events`);
+    if (params?.page) url.searchParams.append("page", params.page.toString());
+    if (params?.limit)
+      url.searchParams.append("limit", params.limit.toString());
+
+    const response = await fetch(url.toString());
     if (!response.ok) throw new Error("Failed to fetch events");
 
     const total = parseInt(response.headers.get("X-Total-Count") || "0", 10);
@@ -183,13 +188,16 @@ export async function fetchServerEvents(): Promise<{
     return {
       events: data.map((event: any) => ({
         ...event,
-        imagePath: event.images,
+        imagePath: event.images || "/default-event.jpg",
       })),
       total,
     };
   } catch (error) {
     console.error("Error fetching events:", error);
     const fallback = require("./events.json");
-    return { events: fallback, total: fallback.length };
+    return {
+      events: fallback.slice(0, params?.limit || 12),
+      total: fallback.length,
+    };
   }
 }

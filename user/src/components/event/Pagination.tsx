@@ -1,19 +1,15 @@
-// components/Pagination.tsx
 import Link from "next/link";
-import { URLSearchParams } from "url";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   baseUrl?: string;
-  searchParams?: { [key: string]: string | undefined };
 }
 
 export default function Pagination({
   currentPage,
   totalPages,
   baseUrl = "/",
-  searchParams = {},
 }: PaginationProps) {
   const getPageNumbers = () => {
     const pages = [];
@@ -32,25 +28,12 @@ export default function Pagination({
     return pages;
   };
 
-  const constructUrl = (pageNum: number) => {
-    const params = new URLSearchParams();
-
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value && key !== "page") {
-        params.set(key, value);
-      }
-    });
-
-    params.set("page", pageNum.toString());
-    return `${baseUrl}?${params.toString()}`;
-  };
-
   return (
     <div className="flex items-center justify-center gap-2 mt-8">
       {/* Bouton Précédent */}
       {currentPage > 1 && (
         <Link
-          href={constructUrl(currentPage - 1)}
+          href={`${baseUrl}?page=${currentPage - 1}`}
           className="px-3 py-1 border rounded hover:bg-gray-100"
         >
           &lt;
@@ -61,7 +44,7 @@ export default function Pagination({
       {getPageNumbers().map((pageNum) => (
         <Link
           key={pageNum}
-          href={constructUrl(pageNum)}
+          href={`${baseUrl}?page=${pageNum}`}
           className={`px-3 py-1 border rounded ${
             pageNum === currentPage
               ? "bg-blue-500 text-white"
@@ -75,7 +58,7 @@ export default function Pagination({
       {/* Bouton Suivant */}
       {currentPage < totalPages && (
         <Link
-          href={constructUrl(currentPage + 1)}
+          href={`${baseUrl}?page=${currentPage + 1}`}
           className="px-3 py-1 border rounded hover:bg-gray-100"
         >
           &gt;

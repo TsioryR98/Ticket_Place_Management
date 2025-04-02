@@ -219,3 +219,8 @@ button {
 html {
   scroll-behavior: smooth;
 }
+
+.object-cover {
+  object-fit: cover;
+  object-position: center;
+}

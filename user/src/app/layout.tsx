@@ -6,6 +6,7 @@ SSR only , if you have client components , redirect it into "@/components/Client
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import ClientLayout from "@/components/ClientLayout";
+import Footer from "@/components/navbar/Footer";
 
 export const metadata: Metadata = {
   title: "Tickify – Book Your Tickets for Unforgettable Events!",
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased bg-white">
         <ClientLayout>{children}</ClientLayout>
+      <Footer />
       </body>
     </html>
   );

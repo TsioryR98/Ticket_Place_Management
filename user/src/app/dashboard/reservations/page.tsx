@@ -4,29 +4,60 @@ import { useEffect, useState } from "react";
 import { cancelReservation, getUserReservations } from "@/lib/api";
 import { Order } from "@/types/order";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useLoginModal } from "@/context/ModalContext";
 
 export default function ReservationList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  //call modalcontext of login inside nav
+  const { loginOpenModal, openModal, closeModal } = useLoginModal();
+
+  const handleLoginClick = () => {
+    loginOpenModal();
+  };
+  const session = useSession();
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // À remplacer par le vrai ID utilisateur (via NextAuth)
-        const userId = "11111111-1111-1111-1111-111111111111";
-        const data = await getUserReservations(userId);
-        setOrders(data);
+        setLoading(true);
+        const data = await getUserReservations();
+        setOrders(data || []); // Garantit un tableau même si data est null
       } catch (err) {
+        // Seules les vraies erreurs API seront catchées ici
         setError(err instanceof Error ? err.message : "Erreur de chargement");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
-  }, []);
+    // Ne fetch que si authentifié
+    if (session.status === "authenticated") {
+      fetchOrders();
+    } else {
+      setOrders([]); // Vide les réservations si déconnecté
+    }
+  }, [session.status]); // Déclenché quand le statut change
+
+  if (session.status === "unauthenticated") {
+    return (
+      <div className="p-4 text-center">
+        <p>Vous devez être connecté pour voir vos réservations</p>
+        <button
+          onClick={handleLoginClick}
+          aria-expanded={openModal}
+          aria-controls="scroll-inside-modal"
+          data-overlay="#scroll-inside-modal"
+          className="text-blue-500 hover:underline"
+        >
+          Se connecter
+        </button>
+      </div>
+    );
+  }
 
   const currentDate = new Date();
 

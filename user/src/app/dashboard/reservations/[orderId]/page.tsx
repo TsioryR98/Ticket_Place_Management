@@ -1,16 +1,42 @@
 import { getOrderById } from "@/lib/api";
 import { OrderItem } from "@/types/order";
 import { format } from "date-fns";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
+import authOptions from "@/app/api/auth/[...nextauth]/options";
 
 export default async function OrderConfirmation({
   params,
 }: {
   params: { orderId: string };
 }) {
-  const { orderId } = await params;
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.accessToken) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4">
+          <h2 className="font-bold text-red-700">Accès refusé</h2>
+          <p className="text-red-600">
+            Vous devez être connecté pour voir cette commande
+          </p>
+          <Link
+            href="/auth/login"
+            className="text-blue-500 hover:underline mt-2"
+          >
+            Se connecter
+          </Link>
+        </div>
+      </div>
+    );
+  }
   try {
+    const { orderId } = await params;
     const order = await getOrderById(orderId);
+
+    if (order.user_id !== session.user.id) {
+      throw new Error("Cette commande ne vous appartient pas");
+    }
 
     return (
       <div className="max-w-3xl mx-auto p-6">
@@ -70,6 +96,7 @@ export default async function OrderConfirmation({
       </div>
     );
   } catch (error) {
+    console.error("Erreur:", error);
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
@@ -77,6 +104,12 @@ export default async function OrderConfirmation({
           <p className="text-red-600">
             {error instanceof Error ? error.message : "Commande introuvable"}
           </p>
+          <Link
+            href="/dashboard/reservations"
+            className="text-blue-500 hover:underline mt-2"
+          >
+            Retour à mes réservations
+          </Link>
         </div>
       </div>
     );

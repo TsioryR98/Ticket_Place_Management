@@ -55,25 +55,24 @@ export const getEvent = async (req, res) => {
   const { eventId } = req.params;
 
   try {
-    //LEFT JOIN all macth from event
     const result = await pool.query(
-      "SELECT\n" +
-        "  e.event_id,\n" +
-        "  e.title,\n" +
-        "  e.descriptions,\n" +
-        "  e.event_datetime,\n" +
-        "  e.locations,\n" +
-        "  e.organizer,\n" +
-        "  e.category,\n" +
-        "  e.imagepath,\n" +
-        "  t.ticket_id,\n" +
-        "  t.types,\n" +
-        "  t.price,\n" +
-        "  t.available,\n" +
-        "  t.limit_per_person\n" +
-        "FROM events e\n" +
-        "LEFT JOIN tickets t ON e.event_id = t.event_id\n" +
-        "WHERE e.event_id = $1",
+      `SELECT 
+        e.event_id,
+        e.title,
+        e.descriptions,
+        e.event_datetime,
+        e.locations,
+        e.organizer,
+        e.category,
+        e.imagepath,
+        t.ticket_id,
+        t.types,
+        t.price,
+        t.available,
+        t.limit_per_person
+      FROM events e
+      LEFT JOIN tickets t ON e.event_id = t.event_id
+      WHERE e.event_id = $1`,
       [eventId]
     );
 
@@ -82,7 +81,7 @@ export const getEvent = async (req, res) => {
     }
 
     const event = {
-      eventId: eventId,
+      id: eventId,
       title: result.rows[0].title,
       description: result.rows[0].descriptions,
       date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0],
@@ -92,13 +91,16 @@ export const getEvent = async (req, res) => {
       location: result.rows[0].locations,
       organizer: result.rows[0].organizer,
       category: result.rows[0].category,
-      images: result.rows[0].imagepath,
-      tickets: result.rows.map((row) => ({
-        types: row.types,
-        price: Number(row.price),
-        available: row.available,
-        limitPerPerson: row.limit_per_person,
-      })),
+      imagePath: result.rows[0].imagepath,
+      tickets: result.rows[0].ticket_id
+        ? result.rows.map((row) => ({
+            ticket_id: row.ticket_id,
+            type: row.types,
+            price: Number(row.price),
+            available: row.available,
+            limitPerPerson: row.limit_per_person,
+          }))
+        : [],
     };
 
     res.status(200).json(event);

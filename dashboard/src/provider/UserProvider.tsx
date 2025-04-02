@@ -162,22 +162,27 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  delete: async function <RecordType extends RaRecord = any>(
+  delete: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: DeleteParams<RecordType>
   ): Promise<DeleteResult<RecordType>> {
+    const { id } = params; // Correctly destructure the id
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found in localStorage");
       }
 
-      await httpClient(`${urlAPI}/${params.id}`, {
+      await httpClient(`${urlAPI}/${resource}/${id}/delete`, {
         method: "DELETE",
         headers: new Headers({ Authorization: `Bearer ${token}` }),
       });
 
-      return { data: params.previousData ?? ({ id: params.id } as RecordType) };
+      // Assuming the delete operation doesn't return any data
+      const result: DeleteResult = {
+        data: params.previousData,
+      };
+      return result;
     } catch (error) {
       throw error;
     }

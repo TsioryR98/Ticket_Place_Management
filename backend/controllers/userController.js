@@ -98,10 +98,10 @@ export const loginUser = async (req, res) => {
   }
 };
 
-/*-------delete an user GET /api/users/delete/:id  ADMIN--------- */
+/*-------delete an user GET /api/users/:id/delete  ADMIN--------- */
 
 export const deleteUser = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params;
   const { role } = req.user;
   if (role !== "user") {
     return res.status(403).json({ error: "Forbidden request" });
@@ -110,15 +110,13 @@ export const deleteUser = async (req, res) => {
   try {
     const userExists = await pool.query(
       "SELECT * FROM users WHERE user_id = $1",
-      [userId]
+      [id]
     );
     if (userExists.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [
-      userId,
-    ]);
+    await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [id]);
 
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {

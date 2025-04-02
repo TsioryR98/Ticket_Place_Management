@@ -8,8 +8,8 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query; // Récupérer les paramètres de pagination
-    const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
+    const { page = 1, limit = 10 } = req.query; // Pagination parameters
+    const offset = (page - 1) * limit; // Pagination
 
     // Requêtes SQL optimisées avec pagination
     const [resultEvent, totalResult] = await Promise.all([

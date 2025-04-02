@@ -3,6 +3,7 @@ import FilterBar from "@/components/event/FilterBar";
 import { isWithinInterval, parseISO } from "date-fns";
 import { Event } from "@/types/event";
 import { fetchServerEvents } from "@/lib/api";
+import Pagination from "@/components/event/Pagination";
 
 interface HomeProps {
   searchParams: {
@@ -11,6 +12,7 @@ interface HomeProps {
     start?: string;
     end?: string;
     search?: string;
+    page?: string;
   };
 }
 
@@ -18,7 +20,10 @@ export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { location, category, start, end, search } = await searchParams;
+  const { location, category, start, end, search, page = "1" } = searchParams;
+
+  const currentPage = Number(page) || 1;
+  const itemsPerPage = 12;
 
   const selectedLocation = location;
   const selectedCategory = category === "all" ? undefined : category;
@@ -27,18 +32,18 @@ export default async function Home({ searchParams }: HomeProps) {
     end: end ? parseISO(end) : null,
   };
 
-  const events = await fetchServerEvents();
+  const { events: allEvents, total } = await fetchServerEvents();
 
-  const locations = [...new Set(events.map((event) => event.location))].map(
+  const locations = [...new Set(allEvents.map((event) => event.location))].map(
     (location) => ({
       value: location.toLowerCase().replace(/\s+/g, "-"),
       label: location,
     })
   );
 
-  const categories = [...new Set(events.map((event) => event.category))];
+  const categories = [...new Set(allEvents.map((event) => event.category))];
 
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = allEvents.filter((event) => {
     const eventDate = parseISO(event.date);
     const noFilterApplied =
       !selectedDateRange.start &&
@@ -56,7 +61,6 @@ export default async function Home({ searchParams }: HomeProps) {
         event.organizer.toLowerCase().includes(search.toLowerCase())
       : true;
 
-    // Filtre par date
     const matchDate =
       selectedDateRange.start && selectedDateRange.end
         ? isWithinInterval(eventDate, {
@@ -65,18 +69,24 @@ export default async function Home({ searchParams }: HomeProps) {
           })
         : true;
 
-    // Filtre par localisation
     const matchLocation = selectedLocation
       ? event.location.toLowerCase().replace(/\s+/g, "-") === selectedLocation
       : true;
 
-    // Filtre par catégorie
     const matchCategory = selectedCategory
       ? event.category === selectedCategory
       : true;
 
     return matchSearch && matchDate && matchLocation && matchCategory;
   });
+
+  const totalFiltered = filteredEvents.length;
+  const totalPages = Math.ceil(totalFiltered / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEvents = filteredEvents.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   return (
     <>
@@ -86,14 +96,14 @@ export default async function Home({ searchParams }: HomeProps) {
           <FilterBar
             locations={locations}
             selectedDateRange={selectedDateRange}
-            selectedCategory={selectedCategory || "all"} // "all" pour la valeur par défaut
+            selectedCategory={selectedCategory || "all"}
             categories={categories}
             selectedLocation={selectedLocation}
           />
 
-          {/* Liste des événements filtrés */}
+          {/* Liste des événements filtrés ET paginés */}
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {filteredEvents.map((event) => (
+            {paginatedEvents.map((event) => (
               <li key={event.id} className="w-full h-full">
                 <EventCardHome
                   title={event.title}
@@ -110,13 +120,20 @@ export default async function Home({ searchParams }: HomeProps) {
           </ul>
 
           {/* Message si aucun résultat */}
-          {filteredEvents.length === 0 && (
+          {filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-xl font-semibold">Aucun événement trouvé</h3>
               <p className="text-muted-foreground mt-2">
                 Essayez de modifier vos critères de recherche
               </p>
             </div>
+          ) : (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl="/"
+              searchParams={searchParams}
+            />
           )}
         </div>
       </section>

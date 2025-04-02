@@ -11,7 +11,7 @@ export const getAllEvents = async (req, res) => {
     const { page = 1, limit = 10 } = req.query; // Pagination parameters
     const offset = (page - 1) * limit; // Pagination
 
-    // Requêtes SQL optimisées avec pagination
+    //take page and limit from query
     const [resultEvent, totalResult] = await Promise.all([
       pool.query(
         `SELECT * FROM events ORDER BY event_datetime LIMIT $1 OFFSET $2`,

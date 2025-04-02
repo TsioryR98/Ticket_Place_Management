@@ -18,6 +18,6 @@ router.post("/login", loginUser);
 router.delete("/:userId", authenticationToken, deleteUser);
 router.get("/:userId", getUserById);
 router.get("/me", authenticationToken, getUser);
-router.put("/me", authenticationToken, updateUser);
+router.patch("/me", authenticationToken, updateUser);
 
 export { router as usersRouter };

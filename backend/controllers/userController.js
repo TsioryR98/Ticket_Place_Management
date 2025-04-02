@@ -145,27 +145,67 @@ export const getUser = async (req, res) => {
   }
 };
 
-/*-----------------PUT /api/users/me --------------------*/
-
+//*-----------------PATCH /api/users/me --------------------*/
 export const updateUser = async (req, res) => {
-  const userId = req.user?.userId; //jwt key
-  const { username, email } = req.body;
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const userId = req.user?.userId; // JWT
+  const { username, email, password } = req.body;
+
   try {
-    const query = await pool.query(
-      "UPDATE users SET user_name=$1, user_email=$2, user_passwords=$3 WHERE user_id=$4 RETURNING *",
-      [username, email, hashedPassword, userId]
-    );
-    if (query.rows.length === 0) {
-      return res.status(404).json({ error: "Ticket not found" });
+    //params for request
+    const updateFields = [];
+    const queryParams = [];
+    let paramIndex = 1;
+
+    if (username) {
+      updateFields.push(`user_name = $${paramIndex}`);
+      queryParams.push(username);
+      paramIndex++;
     }
-    res
-      .status(200)
-      .json({ message: "User updated successfully", user: query.rows[0] });
+
+    if (email) {
+      updateFields.push(`user_email = $${paramIndex}`);
+      queryParams.push(email);
+      paramIndex++;
+    }
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateFields.push(`user_passwords = $${paramIndex}`);
+      queryParams.push(hashedPassword);
+      paramIndex++;
+    }
+
+    queryParams.push(userId);
+
+    const queryText = `
+      UPDATE users 
+      SET ${updateFields.join(", ")} 
+      WHERE user_id = $${paramIndex} 
+      RETURNING *
+    `;
+
+    const query = await pool.query(queryText, queryParams);
+
+    if (query.rows.length === 0) {
+      return res.status(404).json({ error: "User not found " });
+    }
+
+    const user = query.rows[0];
+    delete user.user_passwords;
+
+    res.status(200).json({
+      message: "update successfully",
+      user: {
+        user_id: user.user_id,
+        user_name: user.user_name,
+        user_email: user.user_email,
+      },
+    });
   } catch (error) {
-    handleError(res, "Error while update user", error);
+    handleError(res, "Error during update", error);
   }
 };
+
 /*-----------------PATCH /api/users/role/:id --------------------*/
 
 export const updateUserRole = async (req, res) => {

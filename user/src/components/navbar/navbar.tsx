@@ -14,7 +14,7 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="sticky top-0 z-2 border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
+    <nav className="sticky top-0 z-[1000] border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
       <div className="flex items-center gap-4 flex-1 justify-end">
         {/** Button et user menu 
         <button className="btn btn-sm btn-text btn-circle size-[2.125rem] md:hidden">

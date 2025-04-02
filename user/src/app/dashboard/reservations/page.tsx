@@ -5,13 +5,19 @@ import { cancelReservation, getUserReservations } from "@/lib/api";
 import { Order } from "@/types/order";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useLoginModal } from "@/context/ModalContext";
 
 export default function ReservationList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  //call modalcontext of login inside nav
+  const { loginOpenModal, openModal, closeModal } = useLoginModal();
 
+  const handleLoginClick = () => {
+    loginOpenModal();
+  };
   const session = useSession();
 
   useEffect(() => {
@@ -40,9 +46,15 @@ export default function ReservationList() {
     return (
       <div className="p-4 text-center">
         <p>Vous devez être connecté pour voir vos réservations</p>
-        <Link href="/auth/login" className="text-blue-500 hover:underline">
+        <button
+          onClick={handleLoginClick}
+          aria-expanded={openModal}
+          aria-controls="scroll-inside-modal"
+          data-overlay="#scroll-inside-modal"
+          className="text-blue-500 hover:underline"
+        >
           Se connecter
-        </Link>
+        </button>
       </div>
     );
   }

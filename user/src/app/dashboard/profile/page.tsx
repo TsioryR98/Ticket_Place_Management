@@ -57,12 +57,12 @@ export default function UserProfile() {
   return (
     <div className="flex flex-row items-center gap-x-10 justify-center mt-8">
         <div className="flex flex-col gap-y-8">
-            <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl">
+            <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl transition-all duration-300">
                 <h1 className="font-semibold text-lg flex items-center">Account Settings <CiSettings className="ms-4 text-2xl"/></h1>
                 <p className="text-sm">Details about your information</p>
             </div>
             <Link href={`/dashboard/reservations`}>
-                <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl">
+                <div className="p-5 shadow-md flex items-center flex-col cursor-pointer hover:shadow-xl transition-all duration-300">
                     <h1 className="font-semibold text-lg flex items-center">My reservations <CiBookmark className="ms-4 text-2xl"/></h1>
                     <p className="text-sm">Check all of your bookings</p>
                 </div>

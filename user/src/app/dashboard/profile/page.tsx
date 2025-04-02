@@ -1,7 +1,4 @@
 "use client"
-import { mockUser } from "@/lib/mockUser";
-import Image from "next/image";
-import Mi from "../../../../public/mock_user.jpg"
 import { CiBookmark , CiSettings, CiMail, CiUser, CiLock   } from "react-icons/ci";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
@@ -25,7 +22,10 @@ export default function UserProfile() {
     const [newEmailAddress, setNewEmailAddress] = useState<string>("");
     const [newPassword, setNewPassword] = useState("");
 
-    const session = useSession();
+    const {data :session, status} = useSession();
+    const formatName  = (name ?: string) => {
+        return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : "N/A";
+    }
 
     const handleSubmit = () => {
         console.log({
@@ -35,7 +35,13 @@ export default function UserProfile() {
         })
     }
 
-    if(session.status === "unauthenticated") {
+    if(status === "loading") {
+        return <div className="text-center">
+            <p>Loading ...</p>
+        </div>
+    }
+
+    if(status === "unauthenticated") {
         return <div className="text-center mt-8 space-y-4">
             <h1 className="text-xl font-semibold text-amber-500">You need to sign up to see this page</h1>
             <Link href={"/auth/login"}>
@@ -45,6 +51,8 @@ export default function UserProfile() {
             </Link>
         </div>
     }
+
+    const user = session?.user;
 
   return (
     <div className="flex flex-row items-center gap-x-10 justify-center mt-8">
@@ -61,9 +69,11 @@ export default function UserProfile() {
             </Link>
         </div>
         <div className="flex flex-col gap-y-8">
-            <div className="flex items-center gap-x-20 p-8 shadow-md hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center  p-8 shadow-md hover:shadow-xl transition-all duration-300 justify-between">
                 <div className="flex items-center gap-x-8">
-                    <Image src={Mi} alt={"Test"} height={100} width={100} className="rounded-full"/>
+                    <div className="w-20 h-20 flex items-center justify-center rounded-full bg-gray-500 text-white text-2xl  font-semibold text-center">
+                        {formatName(user?.name)?.slice(0, 2)}
+                    </div>
                     <h1>Your profile</h1>
                 </div>
                 <Sheet>
@@ -105,11 +115,11 @@ export default function UserProfile() {
                 <div className="grid grid-cols-2 gap-8">
                     <span>
                         <p>Full Name</p>
-                        <p className="font-semibold">{mockUser.name}</p>
+                        <p className="font-semibold">{formatName(user?.name)?.slice(0, 2)}</p>
                     </span>
                     <span>
                         <p>Email Address</p>
-                        <p className="font-semibold">{mockUser.email}</p>
+                        <p className="font-semibold">{user?.email || "N/A"}</p>
                     </span>
                 </div>
             </div>

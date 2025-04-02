@@ -30,9 +30,9 @@ export const getAllUsers = async (req, res) => {
       ...user,
       created_at: new Date(user.created_at).toISOString(), //for adminPage show but timestamp is already correct
     }));
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (error) {
-    handleError(res, "Error during fecthing from database", error);
+    return handleError(res, "Error during fecthing from database", error);
   }
 };
 
@@ -48,9 +48,9 @@ export const registerUser = async (req, res) => {
       [username, email, hashedPassword]
     );
 
-    res.status(201).json({ user: newUser.rows[0] });
+    return res.status(201).json({ user: newUser.rows[0] });
   } catch (error) {
-    handleError(res, "Error during insert into database:", error);
+    return handleError(res, "Error during insert into database:", error);
   }
 };
 
@@ -89,12 +89,12 @@ export const loginUser = async (req, res) => {
       maxAge: 10 * 60 * 1000, //milliseconds
     });
 
-    res.json({
+    return res.json({
       tokens,
       user: users.rows[0],
     });
   } catch (error) {
-    handleError(res, "Error during connection", error);
+    return handleError(res, "Error during connection", error);
   }
 };
 
@@ -120,9 +120,9 @@ export const deleteUser = async (req, res) => {
       userId,
     ]);
 
-    res.status(200).json({ message: "User deleted successfully" });
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    handleError(res, "Error while deleting user", error);
+    return handleError(res, "Error while deleting user", error);
   }
 };
 
@@ -139,9 +139,9 @@ export const getUser = async (req, res) => {
     }
     const user = result.rows[0];
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (error) {
-    handleError(res, "Error while getting user", error);
+    return handleError(res, "Error while getting user", error);
   }
 };
 
@@ -193,7 +193,7 @@ export const updateUser = async (req, res) => {
     const user = query.rows[0];
     delete user.user_passwords;
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "update successfully",
       user: {
         user_id: user.user_id,
@@ -202,7 +202,7 @@ export const updateUser = async (req, res) => {
       },
     });
   } catch (error) {
-    handleError(res, "Error during update", error);
+    return handleError(res, "Error during update", error);
   }
 };
 
@@ -231,33 +231,35 @@ export const updateUserRole = async (req, res) => {
       [role, userId]
     );
 
-    res
+    return res
       .status(200)
       .json({ message: "User role updated successfully", user: query.rows[0] });
   } catch (error) {
-    handleError(res, "Error while updating user role", error);
+    return handleError(res, "Error while updating user role", error);
   }
 };
 
 /*-----------------GET /api/users/:id --------------------*/
 export const getUserById = async (req, res) => {
-  const { userId } = req.params; // User ID from the route parameter
+  const { id } = req.params; // User ID from the route parameter
   try {
     const result = await pool.query("SELECT * FROM users WHERE user_id =$1", [
-      userId,
+      id,
     ]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    const user = {
-      userId: userId,
-      username: result.rows[0].user_name,
-      email: result.rows[0].user_email,
-      role: result.rows[0].role,
-    };
+    const user = result.rows[0];
 
-    res.status(200).json(user);
+    //format response for admin
+    return res.status(200).json({
+      id: user.user_id,
+      username: user.user_name,
+      email: user.user_email,
+      role: user.role,
+      created_at: user.created_at,
+    });
   } catch (error) {
-    handleError(res, "Error while getting user", error);
+    return handleError(res, "Error while getting user", error);
   }
 };

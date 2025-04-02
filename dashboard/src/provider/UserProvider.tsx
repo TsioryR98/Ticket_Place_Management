@@ -21,6 +21,7 @@ import {
   GetManyResult,
   UpdateManyParams,
   UpdateManyResult,
+  email,
 } from "react-admin";
 
 import { fetchUtils } from "react-admin";
@@ -68,8 +69,12 @@ export const userDataProvider: DataProvider = {
       const pageNumber = Math.ceil(total / perPage);
 
       const resultDataAdmin = json.map((item: any) => ({
-        ...item,
-        id: item.userId,
+        id: item.user_id,
+        username: item.user_name,
+        email: item.user_email,
+        role: item.role,
+        created_at: item.created_at,
+        //reponse from Json
       }));
 
       //convert into id required by react admin
@@ -100,15 +105,20 @@ export const userDataProvider: DataProvider = {
       }
 
       const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
-        headers: new Headers({ Authorization: `Bearer ${token}` }),
         method: "GET",
       });
 
+      //already mapped in server express
+      const mappedData = {
+        id: json.id,
+        username: json.username,
+        email: json.email,
+        role: json.role,
+        created_at: json.created_at,
+      };
+
       const result: GetOneResult = {
-        data: await {
-          id: json.userId,
-          ...json,
-        },
+        data: mappedData,
       };
 
       return result;
@@ -117,18 +127,6 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  update: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: UpdateParams
-  ): Promise<UpdateResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
-
-  /*
-
-  
-      
-      */
   delete: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteParams<RecordType>
@@ -148,6 +146,13 @@ export const userDataProvider: DataProvider = {
     } catch (error) {
       throw error;
     }
+  },
+
+  update: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: UpdateParams
+  ): Promise<UpdateResult<RecordType>> {
+    throw new Error("Function not implemented.");
   },
 
   create: function <

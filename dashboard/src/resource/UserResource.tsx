@@ -24,14 +24,14 @@ export const UserList = () => {
     <List>
       {isSmall ? (
         <SimpleList
-          primaryText={(record) => record.user_name}
-          secondaryText={(record) => record.user_email}
+          primaryText={(record) => record.username}
+          secondaryText={(record) => record.email}
           tertiaryText={(record) => record.role}
         />
       ) : (
         <Datagrid>
-          <TextField source="user_name" />
-          <EmailField source="user_email" />
+          <TextField source="username" />
+          <EmailField source="email" />
           <TextField source="role" />
           <DateField source="created_at" />
           <EditButton />
@@ -46,8 +46,8 @@ export const UserShow = () => {
   return (
     <Show>
       <SimpleShowLayout>
-        <TextField source="user_name" />
-        <EmailField source="user_email" />
+        <TextField source="username" />
+        <EmailField source="email" />
         <TextField source="role" />
         <DateField source="created_at" />
       </SimpleShowLayout>

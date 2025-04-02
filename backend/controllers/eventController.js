@@ -8,21 +8,29 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query; // Extract pagination parameters
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + Number(limit, 10);
+    const { page = 1, limit = 10 } = req.query; // Récupérer les paramètres de pagination
+    const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
 
-    const [resultEvent, totalResult, resultTicket] = await Promise.all([
-      pool.query("SELECT * FROM events"),
-      pool.query("SELECT COUNT(*) FROM events"),
-      pool.query("SELECT * FROM tickets"),
+    // Requêtes SQL optimisées avec pagination
+    const [resultEvent, totalResult] = await Promise.all([
+      pool.query(
+        `SELECT * FROM events ORDER BY event_datetime LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      pool.query(`SELECT COUNT(*) FROM events`),
     ]);
 
-    const total = Number(totalResult.rows[0].count, 10);
-    res.set("X-Total-Count", total); // Set total count in headers for pagination
+    const total = parseInt(totalResult.rows[0].count, 10);
+    res.set("X-Total-Count", total);
 
-    // Filter and map tickets for each event
-    const events = resultEvent.rows.slice(startIndex, endIndex).map((event) => {
+    const eventIds = resultEvent.rows.map((event) => event.event_id);
+    const resultTicket = await pool.query(
+      `SELECT * FROM tickets WHERE event_id = ANY($1::uuid[])`,
+      [eventIds]
+    );
+
+    // tickets for events
+    const events = resultEvent.rows.map((event) => {
       const eventTickets = resultTicket.rows
         .filter((ticket) => ticket.event_id === event.event_id)
         .map((ticket) => ({

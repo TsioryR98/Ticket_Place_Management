@@ -31,6 +31,7 @@ import {
 import LocationType from "@/types/LocationType";
 import DateRangeType from "@/types/DateRangeType";
 import { useRouter, useSearchParams } from "next/navigation";
+import { SearchIcon } from "lucide-react";
 
 const FilterBar = ({
   selectedDateRange,
@@ -51,9 +52,9 @@ const FilterBar = ({
   const [value, setValue] = useState<string | undefined>(
     selectedLocation || ""
   );
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
-    // Synchronise la valeur interne avec le searchParam
     setValue(selectedLocation || "");
   }, [selectedLocation]);
 
@@ -69,6 +70,14 @@ const FilterBar = ({
     });
 
     router.replace(`?${newParams.toString()}`);
+  };
+
+  // Nouvelle fonction pour gérer la recherche
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    updateSearchParams({
+      search: query || null,
+    });
   };
 
   const handleDateChange = (range: { from?: Date; to?: Date } | undefined) => {
@@ -106,7 +115,18 @@ const FilterBar = ({
   };
 
   return (
-    <div className="p-5 shadow-2xl mt-8 rounded-sm flex items-center gap-8">
+    <div className="p-5 shadow-2xl mt-8 rounded-sm flex items-center gap-8 flex-wrap">
+      {/* Nouvelle barre de recherche */}
+      <div className="relative w-full md:w-auto">
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Rechercher des événements..."
+          className="pl-10 pr-4 py-2 border rounded-md w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
       <Popover>
         <PopoverTrigger asChild>
           <Button

@@ -10,6 +10,7 @@ interface HomeProps {
     category?: string;
     start?: string;
     end?: string;
+    search?: string;
   };
 }
 
@@ -17,7 +18,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { location, category, start, end } = await searchParams;
+  const { location, category, start, end, search } = await searchParams;
 
   const selectedLocation = location;
   const selectedCategory = category === "all" ? undefined : category;
@@ -43,9 +44,17 @@ export default async function Home({ searchParams }: HomeProps) {
       !selectedDateRange.start &&
       !selectedDateRange.end &&
       !selectedLocation &&
-      !selectedCategory;
+      !selectedCategory &&
+      !search;
 
     if (noFilterApplied) return true;
+
+    const matchSearch = search
+      ? event.title.toLowerCase().includes(search.toLowerCase()) ||
+        event.description.toLowerCase().includes(search.toLowerCase()) ||
+        event.location.toLowerCase().includes(search.toLowerCase()) ||
+        event.organizer.toLowerCase().includes(search.toLowerCase())
+      : true;
 
     // Filtre par date
     const matchDate =
@@ -66,7 +75,7 @@ export default async function Home({ searchParams }: HomeProps) {
       ? event.category === selectedCategory
       : true;
 
-    return matchDate && matchLocation && matchCategory;
+    return matchSearch && matchDate && matchLocation && matchCategory;
   });
 
   return (

@@ -18,11 +18,14 @@ import {useSession} from "next-auth/react";
 
 
 export default function UserProfile() {
-    const [newUserName, setNewUserName] = useState<string>("");
-    const [newEmailAddress, setNewEmailAddress] = useState<string>("");
+    const {data :session, status} = useSession();
+
+    const user = session?.user;
+    const [newUserName, setNewUserName] = useState<string>(user?.name);
+    const [newEmailAddress, setNewEmailAddress] = useState<string>(user?.email);
     const [newPassword, setNewPassword] = useState("");
 
-    const {data :session, status} = useSession();
+
     const formatName  = (name ?: string) => {
         return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : "N/A";
     }
@@ -52,7 +55,7 @@ export default function UserProfile() {
         </div>
     }
 
-    const user = session?.user;
+
 
   return (
     <div className="flex flex-row items-center gap-x-10 justify-center mt-8">

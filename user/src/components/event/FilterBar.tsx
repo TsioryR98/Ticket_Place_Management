@@ -106,11 +106,13 @@ const FilterBar = ({
   };
 
   const resetFilters = () => {
+    setSearchQuery("");
     updateSearchParams({
       start: null,
       end: null,
       location: null,
       category: null,
+      search: null,
     });
   };
 

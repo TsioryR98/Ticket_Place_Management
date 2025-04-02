@@ -9,6 +9,7 @@ import {
   EditButton,
   Edit,
   SimpleForm,
+  SelectInput,
   TextInput,
   Create,
   CreateButton,
@@ -58,12 +59,15 @@ export const UserShow = () => {
 export const UserEdit = () => {
   return (
     <Edit>
-      <SimpleShowLayout>
-        <TextField source="user_name" />
-        <EmailField source="user_email" />
-        <TextField source="role" />
-        <DateField source="created_at" />
-      </SimpleShowLayout>
+      <SimpleForm>
+        <SelectInput
+          source="role"
+          choices={[
+            { id: "user", name: "user" },
+            { id: "admin", name: "admin" },
+          ]}
+        />
+      </SimpleForm>
     </Edit>
   );
 };

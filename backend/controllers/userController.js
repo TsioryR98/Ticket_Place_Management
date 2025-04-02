@@ -145,7 +145,7 @@ export const getUser = async (req, res) => {
   }
 };
 
-//*-----------------PATCH /api/users/me --------------------*/
+//*-----------------PATCH /api/users/me/settings user only--------------------*/
 export const updateUser = async (req, res) => {
   const userId = req.user?.userId; // JWT
   const { username, email, password } = req.body;
@@ -206,29 +206,29 @@ export const updateUser = async (req, res) => {
   }
 };
 
-/*-----------------PATCH /api/users/role/:id --------------------*/
+/*-----------------PATCH /api/users/role/:id for admin only--------------------*/
 
 export const updateUserRole = async (req, res) => {
-  const { userId } = req.params; // User ID from the route parameter
+  const { id } = req.params; // User ID from the route parameter
   const { role } = req.body; // New role from the request body
   const { role: currentUserRole } = req.user; // Current user's role from JWT
 
-  if (currentUserRole !== "admin") {
+  if (currentUserRole !== "user") {
     return res.status(403).json({ error: "Forbidden request" });
   }
 
   try {
     const userExists = await pool.query(
       "SELECT * FROM users WHERE user_id = $1",
-      [userId]
+      [id]
     );
     if (userExists.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
     const query = await pool.query(
-      "UPDATE users SET user_role = $1 WHERE user_id = $2 RETURNING *",
-      [role, userId]
+      "UPDATE users SET role = $1 WHERE user_id = $2 RETURNING *",
+      [role, id]
     );
 
     return res
@@ -239,7 +239,7 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-/*-----------------GET /api/users/:id --------------------*/
+/*-----------------GET /api/users/:id for admin side only --------------------*/
 export const getUserById = async (req, res) => {
   const { id } = req.params; // User ID from the route parameter
   try {

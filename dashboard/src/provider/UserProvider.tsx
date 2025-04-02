@@ -127,6 +127,41 @@ export const userDataProvider: DataProvider = {
     }
   },
 
+  update: async function <RecordType extends RaRecord = User>(
+    resource: string,
+    params: UpdateParams
+  ): Promise<UpdateResult<RecordType>> {
+    const { id, data } = params; // data is the updated data
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+      const { json, headers } = await httpClient(
+        `${urlAPI}/${resource}/role/${id}`,
+        {
+          headers: new Headers({ Authorization: `Bearer ${token}` }),
+          method: "PATCH",
+          body: JSON.stringify({ role: data.role }), //body of the request
+        }
+      );
+      const updatedData = {
+        id: json.id,
+        username: json.username,
+        email: json.email,
+        role: json.role,
+        created_at: json.created_at,
+      };
+
+      const result: UpdateResult = {
+        data: updatedData,
+      };
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   delete: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteParams<RecordType>
@@ -146,13 +181,6 @@ export const userDataProvider: DataProvider = {
     } catch (error) {
       throw error;
     }
-  },
-
-  update: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: UpdateParams
-  ): Promise<UpdateResult<RecordType>> {
-    throw new Error("Function not implemented.");
   },
 
   create: function <

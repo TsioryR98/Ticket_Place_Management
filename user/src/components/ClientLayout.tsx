@@ -18,7 +18,6 @@ export default function ClientLayout({
     <LoginModalContext>
       <SessionProvider>
         <NavBar />
-        <SideNavbar />
         <LoginModal />
         {children}
       </SessionProvider>

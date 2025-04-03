@@ -162,16 +162,16 @@ export const updateEvent = async (req, res) => {
 /*----DELETE /api/events/:eventId -----ADMIN ok*/
 
 export const deleteEvent = async (req, res) => {
-  const { eventId } = req.params;
+  const { id } = req.params;
   const { role } = req.user;
-  if (role !== "user") {
+  if (role !== "admin") {
     // only for user and change role into admin and organizer
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     const result = await pool.query(
       "DELETE FROM events WHERE event_id=$1 RETURNING *",
-      [eventId]
+      [id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "event not found" });
@@ -188,18 +188,18 @@ export const deleteEvent = async (req, res) => {
 
 export const createEvent = async (req, res) => {
   const { role } = req.user;
-  const { title, description, date, time, locations, organizer, category } =
+  const { title, description, date, time, location, organizer, category } =
     req.body;
   const eventDatetime = `${date} ${time}`;
 
-  if (role !== "user") {
+  if (role !== "admin") {
     // only for user and change role into admin and organizer if exist
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     const result = await pool.query(
       "INSERT INTO events (title, descriptions, event_datetime , locations ,organizer ,category )VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [title, description, eventDatetime, locations, organizer, category]
+      [title, description, eventDatetime, location, organizer, category]
     );
     // Input validation
     if (
@@ -207,7 +207,7 @@ export const createEvent = async (req, res) => {
       !description ||
       !date ||
       !time ||
-      !locations ||
+      !location ||
       !organizer ||
       !category
     ) {

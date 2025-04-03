@@ -109,7 +109,7 @@ export const loginUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
-  if (role !== "user") {
+  if (role !== "admin") {
     return res.status(403).json({ error: "Forbidden request" });
   }
 
@@ -152,12 +152,12 @@ export const getUser = async (req, res) => {
 //*-----------------PATCH /api/users/me/settings user only--------------------*/
 export const updateUser = async (req, res) => {
   const userId = req.user?.userId; // JWT
-  const { username, email, password , oldPassword} = req.body;
+  const { username, email, password, oldPassword } = req.body;
 
   try {
     //Check if there is no info sent
-    if(!username && !email && !password) {
-      return res.status(400).json({ error : "No updates provided"})
+    if (!username && !email && !password) {
+      return res.status(400).json({ error: "No updates provided" });
     }
     //params for request
     const updateFields = [];
@@ -177,19 +177,26 @@ export const updateUser = async (req, res) => {
     }
 
     if (password) {
-      if(!oldPassword) {
-        return res.status(400).json({ error: "Old password is required to update password" });
+      if (!oldPassword) {
+        return res
+          .status(400)
+          .json({ error: "Old password is required to update password" });
       }
 
       // Check current password
-      const userQuery = await pool.query("SELECT user_passwords FROM users WHERE user_id = $1", [userId]);
+      const userQuery = await pool.query(
+        "SELECT user_passwords FROM users WHERE user_id = $1",
+        [userId]
+      );
       const user = userQuery.rows[0];
-      const passwordMatch = await bcrypt.compare(oldPassword, user.user_passwords);
+      const passwordMatch = await bcrypt.compare(
+        oldPassword,
+        user.user_passwords
+      );
 
-      if(!passwordMatch) {
+      if (!passwordMatch) {
         return res.status(401).json({ error: "Incorrect old password" });
       }
-
 
       const hashedPassword = await bcrypt.hash(password, 10);
       updateFields.push(`user_passwords = $${paramIndex}`);

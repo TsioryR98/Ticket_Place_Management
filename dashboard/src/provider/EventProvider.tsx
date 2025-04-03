@@ -238,6 +238,31 @@ export const eventDataProvider: DataProvider = {
     }
   },
 
+  delete: async function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: DeleteParams<RecordType>
+  ): Promise<DeleteResult<RecordType>> {
+    const { id } = params; // Correctly destructure the id
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+      await httpClient(`${urlAPI}/${resource}/${id}/delete`, {
+        method: "DELETE",
+        headers: new Headers({ Authorization: `Bearer ${token}` }),
+      });
+
+      const result: DeleteResult = {
+        data: params.previousData,
+      };
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyParams<RecordType> & QueryFunctionContext
@@ -258,12 +283,6 @@ export const eventDataProvider: DataProvider = {
     throw new Error("Function not implemented.");
   },
 
-  delete: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: DeleteParams<RecordType>
-  ): Promise<DeleteResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
   deleteMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteManyParams<RecordType>

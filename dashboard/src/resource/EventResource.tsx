@@ -143,9 +143,9 @@ export const EventCreate = () => {
             { id: "classique", name: "Classique" },
           ]}
         />
-        <ImageInput source="image" label="Upload Image">
+        {/*    <ImageInput source="image" label="Upload Image">
           <ImageField source="src" title="Image Preview" />
-        </ImageInput>
+        </ImageInput> */}
       </SimpleForm>
     </Create>
   );

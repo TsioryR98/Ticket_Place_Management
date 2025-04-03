@@ -409,3 +409,56 @@ export const getOrdersByEvent = async (req, res) => {
     handleError(res, "Error fetching orders by event", error);
   }
 };
+
+// GET /api/orders/admin/:orderId - Admin access to any order
+// orderController.js
+export const getAdminOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+
+  try {
+    // Récupération de la commande
+    const orderResult = await pool.query(
+      `SELECT o.*, u.user_email 
+       FROM orders o
+       JOIN users u ON o.user_id = u.user_id
+       WHERE o.order_id = $1`,
+      [orderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Récupération des items
+    const itemsResult = await pool.query(
+      `SELECT oi.*, 
+        t.types as ticket_type,
+        e.title as event_title,
+        e.event_datetime as event_date,
+        e.locations as event_location
+       FROM order_items oi
+       JOIN tickets t ON oi.ticket_id = t.ticket_id
+       JOIN events e ON t.event_id = e.event_id
+       WHERE oi.order_id = $1`,
+      [orderId]
+    );
+
+    res.status(200).json({
+      ...orderResult.rows[0],
+      items: itemsResult.rows.map((item) => ({
+        ...item,
+        price: Number(item.price), // Conversion explicite
+      })),
+    });
+  } catch (error) {
+    console.error("Error in getAdminOrder:", error);
+    res.status(500).json({
+      message: "Error fetching order",
+      error: error.message,
+    });
+  }
+};

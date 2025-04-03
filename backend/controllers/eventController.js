@@ -8,14 +8,14 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query; // Pagination parameters
-    const offset = (page - 1) * limit; // Pagination
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
 
-    //take page and limit from query
+    // Get paginated events and total count
     const [resultEvent, totalResult] = await Promise.all([
       pool.query(
         `SELECT * FROM events ORDER BY event_datetime LIMIT $1 OFFSET $2`,
-        [limit, offset]
+        [perPage, offset]
       ),
       pool.query(`SELECT COUNT(*) FROM events`),
     ]);
@@ -23,13 +23,14 @@ export const getAllEvents = async (req, res) => {
     const total = parseInt(totalResult.rows[0].count, 10);
     res.set("X-Total-Count", total);
 
+    // Get tickets for all fetched events
     const eventIds = resultEvent.rows.map((event) => event.event_id);
     const resultTicket = await pool.query(
       `SELECT * FROM tickets WHERE event_id = ANY($1::uuid[])`,
       [eventIds]
     );
 
-    // tickets for events
+    // Transform events with their tickets
     const events = resultEvent.rows.map((event) => {
       const eventTickets = resultTicket.rows
         .filter((ticket) => ticket.event_id === event.event_id)
@@ -133,8 +134,8 @@ export const updateEvent = async (req, res) => {
   }
   try {
     const saveQuery = await pool.query(
-      "UPDATE events SET descriptions= $1,event_datetime= $2,locations= $3 WHERE event_id=$4 RETURNING *",
-      [description, eventDatetime, location, eventId]
+      "UPDATE events SET title=$1, descriptions= $2,event_datetime= $23,locations= $4 WHERE event_id=$4 RETURNING *",
+      [title, description, eventDatetime, location, eventId]
     );
 
     if (saveQuery.rows.length === 0) {

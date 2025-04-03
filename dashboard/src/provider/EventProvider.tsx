@@ -50,7 +50,7 @@ export const eventDataProvider: DataProvider = {
       const { page = 1, perPage = 6 } = params.pagination || {}; // 6 éléments par page
       const query = {
         page,
-        per_page: perPage,
+        perPage,
         ...params.filter,
       };
 
@@ -83,7 +83,7 @@ export const eventDataProvider: DataProvider = {
       }));
 
       const result: GetListResult = {
-        data: mappedData.slice((page - 1) * perPage, page * perPage), // Slice the data for pagination
+        data: mappedData, // already slice in back the data for pagination
         total,
         pageInfo: {
           hasNextPage: page < pageNumber,
@@ -166,6 +166,7 @@ export const eventDataProvider: DataProvider = {
       const result: UpdateResult = {
         data: updatedData,
       };
+      return result;
     } catch (error) {
       throw error;
     }

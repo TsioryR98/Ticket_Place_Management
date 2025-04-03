@@ -21,13 +21,17 @@ export default function NavBar() {
 
   return (
     <nav className="sticky top-0 z-[1000] border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
-      <div className="flex items-center gap-4 flex-1 justify-end">
+      <div className="flex items-center gap-8 flex-1 justify-end">
         {/** Button et user menu 
         <button className="btn btn-sm btn-text btn-circle size-[2.125rem] md:hidden">
           <span className="icon-[tabler--search] size-[1.375rem]">testte</span>
         </button>
         */}
         {/*call for loginopenModal to open modal on click */}
+          <Link href={"/"} className="text-black">
+              All events
+          </Link>
+          {session && <Link href={"/dashboard/reservations"}>My events</Link>}
         {session ? (
           <>
             {" "}
@@ -73,6 +77,7 @@ export default function NavBar() {
                       <button
                         type="submit"
                         className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700"
+                        onClick={() => signOut()}
                       >
                         Sign out
                       </button>

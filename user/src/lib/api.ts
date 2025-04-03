@@ -177,7 +177,7 @@ export async function fetchServerEvents(params?: {
     const url = new URL(`${API_BASE_URL}/events`);
     if (params?.page) url.searchParams.append("page", params.page.toString());
     if (params?.limit)
-      url.searchParams.append("limit", params.limit.toString());
+      url.searchParams.append("perPage", params.limit.toString());
 
     const response = await fetch(url.toString());
     if (!response.ok) throw new Error("Failed to fetch events");

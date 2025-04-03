@@ -120,7 +120,6 @@ export const eventDataProvider: DataProvider = {
         category: json.category,
         image: json.imagePath, //imagePath is from the API response
       };
-
       const result: GetOneResult = {
         data: mappedData,
       };
@@ -148,6 +147,7 @@ export const eventDataProvider: DataProvider = {
         date: data.date,
         time: data.time,
         location: data.location,
+        category: data.category,
       };
 
       const { json } = await httpClient(`${urlAPI}/${resource}/${id}/update`, {
@@ -167,6 +167,7 @@ export const eventDataProvider: DataProvider = {
         time: new Date(json.event_datetime).toTimeString().split(" ")[0],
         location: json.locations,
         organizer: json.organizer,
+        category: json.category,
       };
 
       const result: UpdateResult = {

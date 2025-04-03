@@ -21,6 +21,7 @@ import {
   SelectInput,
   ImageInput,
   ImageField,
+  useRecordContext,
 } from "react-admin";
 
 export const EventList = () => {
@@ -69,6 +70,7 @@ export const EventShow = () => {
 
 export const EventEdit = () => {
   //fromat to be insert in database
+  const record = useRecordContext(); //
   const transform = (data: any) => ({
     ...data,
     time: data.time.includes(":") ? data.time.substring(0, 5) : data.time,
@@ -79,16 +81,30 @@ export const EventEdit = () => {
       <SimpleForm>
         <TextInput source="title" fullWidth />
         <TextInput source="description" multiline fullWidth />
-
         <DateInput
           source="date"
-          defaultValue={new Date().toISOString().split("T")[0]}
+          defaultValue={new Date().toISOString().split("T")[0]} //datein database
         />
         <TimeInput source="time" defaultValue="12:00" />
-
         <TextInput source="location" fullWidth />
         <TextInput source="organizer" fullWidth />
-
+        <TextInput
+          source="category"
+          label="Actual category"
+          disabled
+          fullWidth
+        />{" "}
+        <SelectInput
+          source="category"
+          choices={[
+            { id: "musique", name: "Musique" },
+            { id: "jeunepublic", name: "Jeune Public" },
+            { id: "humour", name: "Humour" },
+            { id: "theatre", name: "Théâtre" },
+            { id: "classique", name: "Classique" },
+          ]}
+          defaultValue={record?.category}
+        />
         <ImageField
           source="imagePath"
           title="Current Image"

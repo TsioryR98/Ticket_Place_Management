@@ -3,6 +3,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useLoginModal } from "@/context/ModalContext";
 //import session if authenticate with useSession
 import { signIn, useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function NavBar() {
   const { data: session } = useSession();
@@ -49,12 +50,12 @@ export default function NavBar() {
               >
                 <div className="py-1">
                   <MenuItem>
-                    <a
-                      href="#"
+                    <Link
+                      href="/dashboard/profile"
                       className="block px-4 py-2 text-sm text-gray-700"
                     >
                       Account settings
-                    </a>
+                    </Link>
                   </MenuItem>
                   <MenuItem>
                     <a

@@ -124,24 +124,35 @@ export const getEvent = async (req, res) => {
 /*--------UPDATE 1 event POST /api/events/  ok ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
-  const { eventId } = req.params;
-  const { description, date, time, location } = req.body;
+  const { id } = req.params;
+  const { title, description, date, time, location } = req.body;
   const eventDatetime = `${date} ${time}`;
 
   if (req.user.role !== "admin") {
-    // only for user and change role into admin and organizer
     return res.status(403).json({ error: "Forbidden request" });
   }
+
   try {
     const saveQuery = await pool.query(
-      "UPDATE events SET title=$1, descriptions= $2,event_datetime= $23,locations= $4 WHERE event_id=$4 RETURNING *",
-      [title, description, eventDatetime, location, eventId]
+      "UPDATE events SET title=$1, descriptions=$2, event_datetime=$3, locations=$4 WHERE event_id=$5 RETURNING *",
+      [title, description, eventDatetime, location, id]
     );
 
     if (saveQuery.rows.length === 0) {
-      return res.status(401).json({ error: "this event doesn't exist" });
+      return res.status(404).json({ error: "This event doesn't exist" });
     }
-    res.status(200).json(saveQuery.rows[0]);
+
+    // Format the response to match frontend expectations
+    const updatedEvent = saveQuery.rows[0];
+    const responseData = {
+      title: updatedEvent.title,
+      descriptions: updatedEvent.descriptions,
+      event_datetime: updatedEvent.event_datetime,
+      locations: updatedEvent.locations,
+      organizer: updatedEvent.organizer,
+    };
+
+    res.status(200).json(responseData);
   } catch (error) {
     handleError(res, "Error during update event", error);
   }

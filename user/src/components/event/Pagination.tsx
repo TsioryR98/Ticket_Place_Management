@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface PaginationProps {
   currentPage: number;
@@ -13,29 +14,11 @@ export default function Pagination({
   baseUrl = "/",
   searchParams = {},
 }: PaginationProps) {
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 5; // Nombre maximum de pages visibles
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
+  const router = useRouter();
 
-    // Ajuster si on est trop proche de la fin
-    if (end - start + 1 < maxVisible) {
-      start = Math.max(1, end - maxVisible + 1);
-    }
-
-    // Générer les numéros de page
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  };
-
-  const constructUrl = (pageNum: number) => {
+  const handleNavigation = (pageNum: number) => {
     const params = new URLSearchParams();
 
-    // Conserver les paramètres existants
     Object.entries(searchParams).forEach(([key, value]) => {
       if (value && key !== "page") {
         params.set(key, value);
@@ -43,7 +26,25 @@ export default function Pagination({
     });
 
     params.set("page", pageNum.toString());
-    return `${baseUrl}?${params.toString()}`;
+    const url = `${baseUrl}?${params.toString()}#events`;
+    router.push(url);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   };
 
   const pageNumbers = getPageNumbers();
@@ -52,35 +53,35 @@ export default function Pagination({
     <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
       {/* Bouton Précédent */}
       {currentPage > 1 && (
-        <Link
-          href={constructUrl(currentPage - 1)}
+        <button
+          onClick={() => handleNavigation(currentPage - 1)}
           className="px-4 py-2 border rounded-md hover:bg-gray-100"
           aria-label="Page précédente"
         >
           &lt;
-        </Link>
+        </button>
       )}
 
       {/* Première page */}
       {!pageNumbers.includes(1) && (
         <>
-          <Link
-            href={constructUrl(1)}
+          <button
+            onClick={() => handleNavigation(1)}
             className={`px-4 py-2 border rounded-md ${
               1 === currentPage ? "bg-blue-500 text-white" : "hover:bg-gray-100"
             }`}
           >
             1
-          </Link>
+          </button>
           {!pageNumbers.includes(2) && <span className="px-2">...</span>}
         </>
       )}
 
       {/* Pages centrales */}
       {pageNumbers.map((pageNum) => (
-        <Link
+        <button
           key={pageNum}
-          href={constructUrl(pageNum)}
+          onClick={() => handleNavigation(pageNum)}
           className={`px-4 py-2 border rounded-md ${
             pageNum === currentPage
               ? "bg-blue-500 text-white"
@@ -88,7 +89,7 @@ export default function Pagination({
           }`}
         >
           {pageNum}
-        </Link>
+        </button>
       ))}
 
       {/* Dernière page */}
@@ -97,8 +98,8 @@ export default function Pagination({
           {!pageNumbers.includes(totalPages - 1) && (
             <span className="px-2">...</span>
           )}
-          <Link
-            href={constructUrl(totalPages)}
+          <button
+            onClick={() => handleNavigation(totalPages)}
             className={`px-4 py-2 border rounded-md ${
               totalPages === currentPage
                 ? "bg-blue-500 text-white"
@@ -106,19 +107,19 @@ export default function Pagination({
             }`}
           >
             {totalPages}
-          </Link>
+          </button>
         </>
       )}
 
       {/* Bouton Suivant */}
       {currentPage < totalPages && (
-        <Link
-          href={constructUrl(currentPage + 1)}
+        <button
+          onClick={() => handleNavigation(currentPage + 1)}
           className="px-4 py-2 border rounded-md hover:bg-gray-100"
           aria-label="Page suivante"
         >
           &gt;
-        </Link>
+        </button>
       )}
     </div>
   );

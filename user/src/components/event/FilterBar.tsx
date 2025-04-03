@@ -40,6 +40,7 @@ interface FilterBarProps {
   locations: LocationType[];
   categories: string[];
 }
+
 const FilterBar = ({
   selectedDateRange,
   selectedLocation,
@@ -59,6 +60,15 @@ const FilterBar = ({
     setValue(selectedLocation || "");
   }, [selectedLocation]);
 
+  const scrollToEvents = () => {
+    setTimeout(() => {
+      const eventsSection = document.getElementById("events");
+      if (eventsSection) {
+        eventsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100); // Petit délai pour s'assurer que le DOM est mis à jour
+  };
+
   const updateSearchParams = (params: Record<string, string | null>) => {
     const newParams = new URLSearchParams(searchParams.toString());
 
@@ -70,10 +80,10 @@ const FilterBar = ({
       }
     });
 
-    router.replace(`?${newParams.toString()}`);
+    router.replace(`?${newParams.toString()}`, { scroll: false });
+    scrollToEvents();
   };
 
-  // Nouvelle fonction pour gérer la recherche
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     updateSearchParams({
@@ -108,18 +118,14 @@ const FilterBar = ({
 
   const resetFilters = () => {
     setSearchQuery("");
-    updateSearchParams({
-      start: null,
-      end: null,
-      location: null,
-      category: null,
-      search: null,
-    });
+    setValue("");
+    router.replace("/", { scroll: false });
+    setTimeout(scrollToEvents, 100);
   };
 
   return (
     <div className="p-5 shadow-2xl mt-8 rounded-sm flex items-center gap-8 flex-wrap">
-      {/* Nouvelle barre de recherche */}
+      {/* Barre de recherche */}
       <div className="relative w-full md:w-auto">
         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
@@ -130,6 +136,8 @@ const FilterBar = ({
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
+
+      {/* Sélecteur de date */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -167,6 +175,7 @@ const FilterBar = ({
         </PopoverContent>
       </Popover>
 
+      {/* Sélecteur de location */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -213,6 +222,7 @@ const FilterBar = ({
         </PopoverContent>
       </Popover>
 
+      {/* Sélecteur de catégorie */}
       <Select
         onValueChange={handleCategoryChange}
         value={selectedCategory || "all"}
@@ -233,6 +243,7 @@ const FilterBar = ({
         </SelectContent>
       </Select>
 
+      {/* Bouton de réinitialisation */}
       <Button
         variant="destructive"
         onClick={resetFilters}

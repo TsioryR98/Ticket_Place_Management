@@ -28,6 +28,15 @@ export default function HomePage() {
   const startDate = searchParams.get("start");
   const endDate = searchParams.get("end");
 
+  useEffect(() => {
+    if (window.location.hash === "#events") {
+      const eventsSection = document.getElementById("events");
+      if (eventsSection) {
+        eventsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, []);
+
   // Animation du carousel
   useEffect(() => {
     const interval = setInterval(() => {

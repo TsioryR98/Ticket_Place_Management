@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet"
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
-import {useSession} from "next-auth/react";
+import {getSession, useSession} from "next-auth/react";
 import { z } from "zod"
 
 const emailSchema = z.string().email("Invalid email format");
@@ -23,28 +23,22 @@ const passwordSchema = z.string().min(8, "Password must be at least 8 characters
                                 .regex(/[a-z]/, "Password must contain at least one lowercase letter")
                                 .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
                                 .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+const nameSchema = z.string().min(2, "User name must be at least 2 characters");
 
 export default function UserProfile() {
-    const {data: session, status} = useSession();
+    const {data: session, status, update} = useSession();
 
     const user = session?.user;
-    const [newUserName, setNewUserName] = useState<string>(user?.name);
-    const [newEmailAddress, setNewEmailAddress] = useState<string>(user?.email);
+    const [newUserName, setNewUserName] = useState<string>("");
+    const [newEmailAddress, setNewEmailAddress] = useState<string>("");
     const [newPassword, setNewPassword] = useState("");
     const [oldPassword, setOldPassword] = useState("");
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formatName = (name ?: string) => {
         return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : "N/A";
     }
-
-    const handleSubmit = () => {
-        console.log({
-            newUserName,
-            newEmailAddress,
-            newPassword
-        })
-    }
-
     const isFormValid = () => {
         return (
             newUserName !== "" ||
@@ -53,6 +47,90 @@ export default function UserProfile() {
             oldPassword !== ""
         );
     };
+
+    const validateForm = () => {
+        let validationErrors: { [key: string]: string } = {};
+
+        if (newUserName && !nameSchema.safeParse(newUserName).success) {
+            validationErrors.newUserName = "User name must be at least 2 characters";
+        }
+
+        if (newEmailAddress && !emailSchema.safeParse(newEmailAddress).success) {
+            validationErrors.newEmailAddress = "Invalid email format";
+        }
+
+        if (newPassword && !passwordSchema.safeParse(newPassword).success) {
+            validationErrors.newPassword = "Password must meet security requirements";
+        }
+
+        if (newPassword && !oldPassword) {
+            validationErrors.oldPassword = "Old password is required to update the password";
+        }
+
+        setErrors(validationErrors);
+        return Object.keys(validationErrors).length === 0;
+    };
+
+
+    const handleSubmit = async () => {
+       if(!validateForm()) return;
+
+       setIsSubmitting(true);
+
+        try {
+            const response = await fetch(" http://localhost:4000/api/users/me/settings", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${session?.user?.accessToken}`
+                },
+                body: JSON.stringify({
+                    username: newUserName,
+                    email: newEmailAddress,
+                    password: newPassword,
+                    oldPassword: oldPassword,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data);
+            console.log(response.status)
+
+            if (!response.ok) {
+                setErrors({ general: data.error || "Failed to update profile" });
+                console.log("Error updating : " )
+                return;
+            }
+            if(response.ok) {
+                await update({
+                    user: {
+                        ...session?.user,
+                        name: newUserName || session?.user?.name,
+                        email: newEmailAddress || session?.user?.email,
+                    },
+                });
+
+
+                const updatedSession = await getSession();
+                console.log("Nouvelle session après mise à jour :", updatedSession?.user);
+
+
+                window.location.reload();
+                alert("Profile updated successfully!");
+                setNewUserName("");
+                setNewEmailAddress("");
+                setNewPassword("");
+                setOldPassword("");
+                setErrors({});
+                console.log("User updated successfully");
+            }
+        } catch  {
+            setErrors({ general: "An error occurred. Please try again." });
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
 
     if (status === "loading") {
         return <div className="text-center">
@@ -114,24 +192,22 @@ export default function UserProfile() {
                             <div className="grid gap-4 py-4">
                                 <div className="flex px-8 items-center">
                                     <CiUser className='text-2xl absolute left-10'/>
-                                    <Input id="name" className="text-right" placeholder="New user name"
-                                           value={newUserName} onChange={(e) => setNewUserName(e.target.value)}/>
+                                    <Input id="name" className="text-right" placeholder="New user name" value={newUserName} onChange={(e) => setNewUserName(e.target.value)}/>
                                 </div>
+                                {errors.newUserName && <p className="text-red-500 text-sm text-center">{errors.newUserName}</p>}
                                 <div className="flex px-8 items-center">
                                     <CiMail className='text-2xl absolute left-10'/>
-                                    <Input id="username" className="text-right" placeholder="New email address"
-                                           value={newEmailAddress}
-                                           onChange={(e) => setNewEmailAddress(e.target.value)}/>
+                                    <Input id="username" className="text-right" placeholder="New email address" value={newEmailAddress} onChange={(e) => setNewEmailAddress(e.target.value)}/>
                                 </div>
+                                {errors.newEmailAddress && <p className="text-red-500 text-sm text-center">{errors.newEmailAddress}</p>}
                                 <div className="flex px-8 items-center">
                                     <CiLock className='text-2xl absolute left-10'/>
-                                    <Input type={"password"} className="text-right" placeholder="New password"
-                                           value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+                                    <Input type={"password"} className="text-right" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
                                 </div>
+                                {errors.newPassword && <p className="text-red-500 text-sm text-center">{errors.newPassword}</p>}
                                 <div className="flex px-8 items-center">
                                     <CiLock className='text-2xl absolute left-10'/>
-                                    <Input type={"password"} className="text-right" placeholder="Old password"
-                                           value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
+                                    <Input type={"password"} className="text-right" placeholder="Old password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
                                 </div>
                             </div>
                             <SheetFooter>

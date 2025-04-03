@@ -44,13 +44,12 @@ export const userDataProvider: DataProvider = {
     params: GetListParams & QueryFunctionContext
   ): Promise<GetListResult<RecordType>> {
     try {
-      const { page = 1, perPage = 10 } = params.pagination || {};
+      const { page = 1, perPage = 6 } = params.pagination || {}; // 6 éléments par page
       const query = {
         page,
-        per_page: perPage,
+        perPage,
         ...params.filter,
       };
-      const offset = (page - 1) * perPage;
 
       // get data with HTTPS and URL
       const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
@@ -79,7 +78,7 @@ export const userDataProvider: DataProvider = {
 
       //convert into id required by react admin
       const result: GetListResult = {
-        data: resultDataAdmin.slice(offset, offset + perPage),
+        data: resultDataAdmin,
         total: total,
         pageInfo: {
           hasNextPage: page < pageNumber,

@@ -256,3 +256,7 @@ html {
 .embla__container {
   transition: none !important;
 }
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}

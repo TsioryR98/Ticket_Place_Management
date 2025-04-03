@@ -10,15 +10,21 @@ const handleError = (res, message, error) => {
 
 export const getAllUsers = async (req, res) => {
   //user JWT
+
   if (req.user.role !== "admin") {
     //test only for user
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     //Get Paged Users List  //Get Total of all Users
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
 
     const [userQuery, totalResult] = await Promise.all([
-      pool.query("SELECT * FROM users*"),
+      pool.query("SELECT * FROM users ORDER BY created_at LIMIT $1 OFFSET $2", [
+        perPage,
+        offset,
+      ]),
       pool.query("SELECT COUNT(*) FROM users"),
     ]);
     const total = parseInt(totalResult.rows[0].count, 10);

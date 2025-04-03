@@ -6,7 +6,6 @@ CSR only , if you have server components , redirect it into "@/app/Layout"
 import { SessionProvider } from "next-auth/react";
 import { LoginModalContext } from "@/context/ModalContext";
 import NavBar from "@/components/navbar/navbar";
-import SideNavbar from "@/components/navbar/SideNavbar";
 import LoginModal from "@/components/login/LoginModal";
 
 export default function ClientLayout({

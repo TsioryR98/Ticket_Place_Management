@@ -133,24 +133,32 @@ export const eventDataProvider: DataProvider = {
     resource: string,
     params: UpdateParams
   ): Promise<UpdateResult<RecordType>> {
-    const { id, data } = params; // data is the updated data
+    const { id, data } = params;
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found in localStorage");
       }
 
-      const { json, headers } = await httpClient(
-        `${urlAPI}/${resource}/${id}/update`,
-        {
-          headers: new Headers({ Authorization: `Bearer ${token}` }),
-          method: "PUT",
-          body: JSON.stringify({ data }), //body of the request
-        }
-      );
+      // Format the request body to match backend expectations
+      const requestBody = {
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        time: data.time,
+        location: data.location,
+      };
 
-      console.log({ "sortie fetch": json });
-      //mappedData
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}/update`, {
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }),
+        method: "PUT",
+        body: JSON.stringify(requestBody),
+      });
+
       const updatedData = {
         id: id,
         title: json.title,
@@ -161,13 +169,12 @@ export const eventDataProvider: DataProvider = {
         organizer: json.organizer,
       };
 
-      console.log({ "sortie result": updatedData });
-
       const result: UpdateResult = {
         data: updatedData,
       };
       return result;
     } catch (error) {
+      console.error("Update error:", error);
       throw error;
     }
   },

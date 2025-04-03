@@ -68,21 +68,32 @@ export const EventShow = () => {
 };
 
 export const EventEdit = () => {
+  //fromat to be insert in database
+  const transform = (data: any) => ({
+    ...data,
+    time: data.time.includes(":") ? data.time.substring(0, 5) : data.time,
+  });
+
   return (
-    <Edit>
+    <Edit transform={transform}>
       <SimpleForm>
         <TextInput source="title" fullWidth />
         <TextInput source="description" multiline fullWidth />
 
-        {/* Date and Time separated */}
-        <DateInput source="date" />
-        <TimeInput source="time" />
+        <DateInput
+          source="date"
+          defaultValue={new Date().toISOString().split("T")[0]}
+        />
+        <TimeInput source="time" defaultValue="12:00" />
 
         <TextInput source="location" fullWidth />
         <TextInput source="organizer" fullWidth />
 
-        {/* Image handling */}
-        <ImageField source="imagePath" title="Current Image" />
+        <ImageField
+          source="imagePath"
+          title="Current Image"
+          sx={{ "& img": { maxWidth: 400, maxHeight: 400 } }}
+        />
         <ImageInput source="newImage" label="Replace Image">
           <ImageField source="src" title="New Image Preview" />
         </ImageInput>

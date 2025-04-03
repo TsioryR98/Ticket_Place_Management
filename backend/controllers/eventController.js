@@ -125,7 +125,7 @@ export const getEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   const { id } = req.params;
-  const { title, description, date, time, location } = req.body;
+  const { title, description, date, time, location, category } = req.body;
   const eventDatetime = `${date} ${time}`;
 
   if (req.user.role !== "admin") {
@@ -134,8 +134,8 @@ export const updateEvent = async (req, res) => {
 
   try {
     const saveQuery = await pool.query(
-      "UPDATE events SET title=$1, descriptions=$2, event_datetime=$3, locations=$4 WHERE event_id=$5 RETURNING *",
-      [title, description, eventDatetime, location, id]
+      "UPDATE events SET title=$1, descriptions=$2, event_datetime=$3, locations=$4 , category=$5 WHERE event_id=$6 RETURNING *",
+      [title, description, eventDatetime, location, category, id]
     );
 
     if (saveQuery.rows.length === 0) {
@@ -150,6 +150,7 @@ export const updateEvent = async (req, res) => {
       event_datetime: updatedEvent.event_datetime,
       locations: updatedEvent.locations,
       organizer: updatedEvent.organizer,
+      category: updatedEvent.category,
     };
 
     res.status(200).json(responseData);

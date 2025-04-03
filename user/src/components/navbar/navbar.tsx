@@ -14,15 +14,24 @@ export default function NavBar() {
     loginOpenModal();
   };
 
+    const user = session?.user;
+    const formatName  = (name ?: string) => {
+        return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : "N/A";
+    }
+
   return (
     <nav className="sticky top-0 z-[1000] border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
-      <div className="flex items-center gap-4 flex-1 justify-end">
+      <div className="flex items-center gap-8 flex-1 justify-end">
         {/** Button et user menu 
         <button className="btn btn-sm btn-text btn-circle size-[2.125rem] md:hidden">
           <span className="icon-[tabler--search] size-[1.375rem]">testte</span>
         </button>
         */}
         {/*call for loginopenModal to open modal on click */}
+          <Link href={"/"} className="text-black">
+              All events
+          </Link>
+          {session && <Link href={"/dashboard/reservations"}>My events</Link>}
         {session ? (
           <>
             {" "}
@@ -38,11 +47,9 @@ export default function NavBar() {
             </button>
             <Menu as="div" className="relative inline-block text-left">
               <MenuButton>
-                <img
-                  className="avatar size-9.5 rounded-full"
-                  src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"
-                  alt="avatar 1"
-                />
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-500 text-white text-lg  font-semibold text-center">
+                    {formatName(user?.name)?.slice(0, 2)}
+                </div>
               </MenuButton>
               <MenuItems
                 transition
@@ -70,6 +77,7 @@ export default function NavBar() {
                       <button
                         type="submit"
                         className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700"
+                        onClick={() => signOut()}
                       >
                         Sign out
                       </button>

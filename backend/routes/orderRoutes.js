@@ -6,6 +6,9 @@ import {
   getOrderById,
   updateOrderStatus,
   cancelOrderItem,
+  getAllOrders,
+  testAllOrders,
+  getOrdersByEvent,
 } from "../controllers/orderController.js";
 import { authenticationToken } from "../middleware/authMiddleware.js";
 
@@ -20,5 +23,8 @@ router.delete(
   authenticationToken,
   cancelOrderItem
 );
+router.get("/admin/orders", authenticationToken, getAllOrders);
+router.get("/test/orders", authenticationToken, testAllOrders);
+router.get("/event/:eventId", authenticationToken, getOrdersByEvent);
 
 export { router as orderRouter };

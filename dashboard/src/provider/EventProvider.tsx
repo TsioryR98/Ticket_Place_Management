@@ -180,6 +180,64 @@ export const eventDataProvider: DataProvider = {
     }
   },
 
+  create: async function <
+    RecordType extends Omit<RaRecord, "id"> = Event,
+    ResultRecordType extends RaRecord = RecordType & { id: Identifier }
+  >(
+    resource: string,
+    params: CreateParams<RecordType>
+  ): Promise<CreateResult<ResultRecordType>> {
+    const { data } = params;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      // Format the request body to match backend expectations
+      const requestBody = {
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        time: data.time,
+        location: data.location,
+        organizer: data.organizer,
+        category: data.category,
+        //imagePath: data.image, // Assuming `image` is a link
+      };
+
+      const { json } = await httpClient(`${urlAPI}/${resource}/create`, {
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }),
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      });
+
+      const createdData = {
+        id: json.id,
+        title: json.title,
+        description: json.description,
+        date: json.date,
+        time: json.time,
+        location: json.location,
+        organizer: json.organizer,
+        category: json.category,
+        //image: json.imagePath, // Assuming the API returns the image link
+      };
+
+      const result: CreateResult = {
+        data: createdData,
+      };
+      return result;
+    } catch (error) {
+      console.error("Create error:", error);
+      throw error;
+    }
+  },
+
   getMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyParams<RecordType> & QueryFunctionContext
@@ -199,15 +257,7 @@ export const eventDataProvider: DataProvider = {
   ): Promise<UpdateManyResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
-  create: function <
-    RecordType extends Omit<RaRecord, "id"> = any,
-    ResultRecordType extends RaRecord = RecordType & { id: Identifier }
-  >(
-    resource: string,
-    params: CreateParams
-  ): Promise<CreateResult<ResultRecordType>> {
-    throw new Error("Function not implemented.");
-  },
+
   delete: function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteParams<RecordType>

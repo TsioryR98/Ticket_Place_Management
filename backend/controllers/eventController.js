@@ -184,7 +184,7 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-/*----POST /api/events -----ADMIN ok*/
+/*----POST /api/events/create -----ADMIN ok*/
 
 export const createEvent = async (req, res) => {
   const { role } = req.user;

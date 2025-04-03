@@ -13,15 +13,16 @@ import {
   DateField,
   UrlField,
   Edit,
+  ReferenceInput,
+  useRecordContext,
+  Create,
   SimpleForm,
   TextInput,
-  ReferenceInput,
-  TimeInput,
   DateInput,
+  TimeInput,
   SelectInput,
   ImageInput,
   ImageField,
-  useRecordContext,
 } from "react-admin";
 
 export const EventList = () => {
@@ -88,6 +89,7 @@ export const EventEdit = () => {
         <TimeInput source="time" defaultValue="12:00" />
         <TextInput source="location" fullWidth />
         <TextInput source="organizer" fullWidth />
+        {/*default categorie */}
         <TextInput
           source="category"
           label="Actual category"
@@ -115,5 +117,36 @@ export const EventEdit = () => {
         </ImageInput>
       </SimpleForm>
     </Edit>
+  );
+};
+
+export const EventCreate = () => {
+  return (
+    <Create>
+      <SimpleForm>
+        <TextInput source="title" fullWidth />
+        <TextInput source="description" multiline fullWidth />
+        <DateInput
+          source="date"
+          defaultValue={new Date().toISOString().split("T")[0]} // Default to today's date
+        />
+        <TimeInput source="time" defaultValue="12:00" />
+        <TextInput source="location" fullWidth />
+        <TextInput source="organizer" fullWidth />
+        <SelectInput
+          source="category"
+          choices={[
+            { id: "musique", name: "Musique" },
+            { id: "jeunepublic", name: "Jeune Public" },
+            { id: "humour", name: "Humour" },
+            { id: "theatre", name: "Théâtre" },
+            { id: "classique", name: "Classique" },
+          ]}
+        />
+        <ImageInput source="image" label="Upload Image">
+          <ImageField source="src" title="Image Preview" />
+        </ImageInput>
+      </SimpleForm>
+    </Create>
   );
 };

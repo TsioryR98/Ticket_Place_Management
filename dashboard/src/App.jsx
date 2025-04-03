@@ -2,7 +2,12 @@ import { Admin, Resource } from "react-admin";
 import { authProvider } from "./provider/AuthProvider";
 import { dataProvider } from "./provider/CombinedProvider";
 import { UserEdit, UserList, UserShow } from "./resource/UserResource";
-import { EventEdit, EventList, EventShow } from "./resource/EventResource";
+import {
+  EventCreate,
+  EventEdit,
+  EventList,
+  EventShow,
+} from "./resource/EventResource";
 import SignIn from "./components/loginPage/LoginPage";
 
 export const App = () => (
@@ -17,6 +22,7 @@ export const App = () => (
       list={EventList}
       show={EventShow}
       edit={EventEdit}
+      create={EventCreate}
     />
   </Admin>
 );

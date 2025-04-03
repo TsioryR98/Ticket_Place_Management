@@ -1,7 +1,8 @@
 import { Admin, Resource } from "react-admin";
 import { authProvider } from "./provider/AuthProvider";
 import { dataProvider } from "./provider/CombinedProvider";
-import { userList } from "./resource/UserResource";
+import { UserEdit, UserList, UserShow } from "./resource/UserResource";
+import { EventList, EventShow } from "./resource/EventResource";
 import SignIn from "./components/loginPage/LoginPage";
 import { TicketProvider } from "./provider/TicketProvider";
 
@@ -23,6 +24,7 @@ export const App = () => (
     dataProvider={dataProvider}
     authProvider={authProvider}
   >
+<<<<<<< HEAD
     <Resource name="users" list={userList} />
     <Resource 
       name="tickets" 
@@ -31,6 +33,10 @@ export const App = () => (
       create={ticketCreate}
     />
     {/* Ajoutez d'autres ressources si nécessaire */}
+=======
+    <Resource name="users" list={UserList} show={UserShow} edit={UserEdit} />
+    <Resource name="events" list={EventList} show={EventShow} />
+>>>>>>> c4021a26d233f4402a39aa45d4f80753989cb2a8
   </Admin>
 );
 

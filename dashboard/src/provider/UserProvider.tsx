@@ -21,14 +21,15 @@ import {
   GetManyResult,
   UpdateManyParams,
   UpdateManyResult,
+  email,
 } from "react-admin";
 
 import { fetchUtils } from "react-admin";
 
-interface User {
-  user_id: Identifier;
-  user_name: string;
-  user_email: string;
+interface User extends RaRecord {
+  id: Identifier; // Add the required 'id' property
+  username: string;
+  email: string;
   role: string;
   created_at: string;
 }
@@ -38,7 +39,7 @@ const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
-  getList: async function <RecordType extends RaRecord = any>(
+  getList: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: GetListParams & QueryFunctionContext
   ): Promise<GetListResult<RecordType>> {
@@ -67,14 +68,18 @@ export const userDataProvider: DataProvider = {
       const total = Number(headers.get("X-Total-Count"));
       const pageNumber = Math.ceil(total / perPage);
 
+      const resultDataAdmin = json.map((item: any) => ({
+        id: item.user_id,
+        username: item.user_name,
+        email: item.user_email,
+        role: item.role,
+        created_at: item.created_at,
+        //reponse from Json
+      }));
+
       //convert into id required by react admin
       const result: GetListResult = {
-        data: json
-          .map((user: User) => ({
-            id: user.user_id,
-            ...user, // Include all other user fields in User interface
-          }))
-          .slice(offset, offset + perPage),
+        data: resultDataAdmin.slice(offset, offset + perPage),
         total: total,
         pageInfo: {
           hasNextPage: page < pageNumber,
@@ -88,42 +93,101 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  /*
-      
-      */
-  delete: async function <RecordType extends RaRecord = any>(
+  getOne: async function <RecordType extends RaRecord = User>(
     resource: string,
-    params: DeleteParams<RecordType>
-  ): Promise<DeleteResult<RecordType>> {
+    params: GetOneParams<RecordType> & QueryFunctionContext
+  ): Promise<GetOneResult<RecordType>> {
+    const { id } = params; // Correctly destructure the id
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found in localStorage");
       }
 
-      await httpClient(`${urlAPI}/${params.id}`, {
-        method: "DELETE",
-        headers: new Headers({ Authorization: `Bearer ${token}` }),
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
+        method: "GET",
       });
 
-      return { data: params.previousData ?? ({ id: params.id } as RecordType) };
+      //already mapped in server express
+      const mappedData = {
+        id: json.id,
+        username: json.username,
+        email: json.email,
+        role: json.role,
+        created_at: json.created_at,
+      };
+
+      const result: GetOneResult = {
+        data: mappedData,
+      };
+
+      return result;
     } catch (error) {
       throw error;
     }
   },
 
-  getOne: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: GetOneParams<RecordType> & QueryFunctionContext
-  ): Promise<GetOneResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
-  update: function <RecordType extends RaRecord = any>(
+  update: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: UpdateParams
   ): Promise<UpdateResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    const { id, data } = params; // data is the updated data
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+      const { json, headers } = await httpClient(
+        `${urlAPI}/${resource}/role/${id}`,
+        {
+          headers: new Headers({ Authorization: `Bearer ${token}` }),
+          method: "PATCH",
+          body: JSON.stringify({ role: data.role }), //body of the request
+        }
+      );
+      const updatedData = {
+        id: json.id,
+        username: json.username,
+        email: json.email,
+        role: json.role,
+        created_at: json.created_at,
+      };
+
+      const result: UpdateResult = {
+        data: updatedData,
+      };
+      return result;
+    } catch (error) {
+      throw error;
+    }
   },
+
+  delete: async function <RecordType extends RaRecord = User>(
+    resource: string,
+    params: DeleteParams<RecordType>
+  ): Promise<DeleteResult<RecordType>> {
+    const { id } = params; // Correctly destructure the id
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      await httpClient(`${urlAPI}/${resource}/${id}/delete`, {
+        method: "DELETE",
+        headers: new Headers({ Authorization: `Bearer ${token}` }),
+      });
+
+      // Assuming the delete operation doesn't return any data
+      const result: DeleteResult = {
+        data: params.previousData,
+      };
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   create: function <
     RecordType extends Omit<RaRecord, "id"> = any,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier }

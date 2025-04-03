@@ -12,6 +12,15 @@ import {
   Show,
   DateField,
   UrlField,
+  Edit,
+  SimpleForm,
+  TextInput,
+  ReferenceInput,
+  TimeInput,
+  DateInput,
+  SelectInput,
+  ImageInput,
+  ImageField,
 } from "react-admin";
 
 export const EventList = () => {
@@ -55,5 +64,29 @@ export const EventShow = () => {
         <UrlField source="image" />
       </SimpleShowLayout>
     </Show>
+  );
+};
+
+export const EventEdit = () => {
+  return (
+    <Edit>
+      <SimpleForm>
+        <TextInput source="title" fullWidth />
+        <TextInput source="description" multiline fullWidth />
+
+        {/* Date and Time separated */}
+        <DateInput source="date" />
+        <TimeInput source="time" />
+
+        <TextInput source="location" fullWidth />
+        <TextInput source="organizer" fullWidth />
+
+        {/* Image handling */}
+        <ImageField source="imagePath" title="Current Image" />
+        <ImageInput source="newImage" label="Replace Image">
+          <ImageField source="src" title="New Image Preview" />
+        </ImageInput>
+      </SimpleForm>
+    </Edit>
   );
 };

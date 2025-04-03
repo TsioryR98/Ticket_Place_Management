@@ -33,6 +33,7 @@ interface Event extends RaRecord {
   title: string;
   description: string;
   date: string;
+  time: string;
   location: string;
   organizer: string;
   category: string;
@@ -41,7 +42,7 @@ interface Event extends RaRecord {
 
 export const eventDataProvider: DataProvider = {
   // Dans votre EventProvider.ts
-  getList: async function <RecordType extends RaRecord = any>(
+  getList: async function <RecordType extends RaRecord = Event>(
     resource: string,
     params: GetListParams & QueryFunctionContext
   ): Promise<GetListResult<RecordType>> {
@@ -68,6 +69,7 @@ export const eventDataProvider: DataProvider = {
       // json is from the API response database
 
       const total = Number(headers.get("X-Total-Count"));
+      const pageNumber = Math.ceil(total / perPage);
 
       const mappedData = json.map((event: Event) => ({
         id: event.id,
@@ -84,8 +86,8 @@ export const eventDataProvider: DataProvider = {
         data: mappedData.slice((page - 1) * perPage, page * perPage), // Slice the data for pagination
         total,
         pageInfo: {
-          hasNextPage: page * perPage < total,
-          hasPreviousPage: page > 1,
+          hasNextPage: page < pageNumber,
+          hasPreviousPage: page !== 1, //if page 1 no previous
         },
       };
       return result;
@@ -93,7 +95,7 @@ export const eventDataProvider: DataProvider = {
       throw error;
     }
   },
-  getOne: async function <RecordType extends RaRecord = any>(
+  getOne: async function <RecordType extends RaRecord = Event>(
     resource: string,
     params: GetOneParams<RecordType> & QueryFunctionContext
   ): Promise<GetOneResult<RecordType>> {
@@ -127,6 +129,48 @@ export const eventDataProvider: DataProvider = {
       throw error;
     }
   },
+  update: async function <RecordType extends RaRecord = Event>(
+    resource: string,
+    params: UpdateParams
+  ): Promise<UpdateResult<RecordType>> {
+    const { id, data } = params; // data is the updated data
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      const { json, headers } = await httpClient(
+        `${urlAPI}/${resource}/${id}/update`,
+        {
+          headers: new Headers({ Authorization: `Bearer ${token}` }),
+          method: "PUT",
+          body: JSON.stringify({ data }), //body of the request
+        }
+      );
+
+      console.log({ "sortie fetch": json });
+      //mappedData
+      const updatedData = {
+        id: id,
+        title: json.title,
+        description: json.descriptions,
+        date: new Date(json.event_datetime).toISOString().split("T")[0],
+        time: new Date(json.event_datetime).toTimeString().split(" ")[0],
+        location: json.locations,
+        organizer: json.organizer,
+      };
+
+      console.log({ "sortie result": updatedData });
+
+      const result: UpdateResult = {
+        data: updatedData,
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyParams<RecordType> & QueryFunctionContext
@@ -139,12 +183,7 @@ export const eventDataProvider: DataProvider = {
   ): Promise<GetManyReferenceResult<RecordType>> {
     throw new Error("Function not implemented.");
   },
-  update: function <RecordType extends RaRecord = any>(
-    resource: string,
-    params: UpdateParams
-  ): Promise<UpdateResult<RecordType>> {
-    throw new Error("Function not implemented.");
-  },
+
   updateMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: UpdateManyParams

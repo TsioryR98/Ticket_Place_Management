@@ -10,7 +10,7 @@ const handleError = (res, message, error) => {
 
 export const getAllUsers = async (req, res) => {
   //user JWT
-  if (req.user.role !== "user") {
+  if (req.user.role !== "admin") {
     //test only for user
     return res.status(403).json({ error: "Forbidden request" });
   }

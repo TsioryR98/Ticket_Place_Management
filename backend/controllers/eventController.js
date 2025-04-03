@@ -120,14 +120,14 @@ export const getEvent = async (req, res) => {
   }
 };
 
-/*--------UPDATE 1 event POST /api/events/save  ok ADMIN--------- */
+/*--------UPDATE 1 event POST /api/events/  ok ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
   const { eventId } = req.params;
   const { description, date, time, location } = req.body;
   const eventDatetime = `${date} ${time}`;
 
-  if (req.user.role !== "user") {
+  if (req.user.role !== "admin") {
     // only for user and change role into admin and organizer
     return res.status(403).json({ error: "Forbidden request" });
   }

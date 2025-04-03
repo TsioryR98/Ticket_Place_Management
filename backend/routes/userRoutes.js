@@ -13,13 +13,13 @@ import { authenticationToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", authenticationToken, getAllUsers);
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.delete("/:id/delete", authenticationToken, deleteUser);
-router.get("/:id", getUserById);
-router.get("/me", authenticationToken, getUser);
-router.patch("/me/settings", authenticationToken, updateUser);
-router.patch("/role/:id", authenticationToken, updateUserRole);
+router.get("/", authenticationToken, getAllUsers); //admin
+router.post("/register", registerUser); //next
+router.post("/login", loginUser); //next
+router.delete("/:id/delete", authenticationToken, deleteUser); //admin
+router.get("/:id", getUserById); //
+router.get("/me", authenticationToken, getUser); //next
+router.patch("/me/settings", authenticationToken, updateUser); //next
+router.patch("/role/:id", authenticationToken, updateUserRole); //admin
 
 export { router as usersRouter };

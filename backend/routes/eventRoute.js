@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllEvents);
-router.put("/:eventId", authenticationToken, updateEvent);
+router.put("/:id/update", authenticationToken, updateEvent); // admin
 router.get("/:eventId", getEvent);
 router.get("/:id/details", authenticationToken, getEventById);
 router.delete("/:eventId", authenticationToken, deleteEvent);

@@ -207,3 +207,52 @@ export const createEvent = async (req, res) => {
     handleError(res, "Error while creating event", error);
   }
 };
+
+/*--------get 1 event GET /api/events/:id/details ok ADMIN--------- */
+
+export const getEventById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+        e.event_id,
+        e.title,
+        e.descriptions,
+        e.event_datetime,
+        e.locations,
+        e.organizer,
+        e.category,
+        e.imagepath,
+        t.ticket_id,
+        t.types,
+        t.price,
+        t.available,
+        t.limit_per_person
+      FROM events e
+      LEFT JOIN tickets t ON e.event_id = t.event_id
+      WHERE e.event_id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "event not found" });
+    }
+
+    return res.status(200).json({
+      id: id,
+      title: result.rows[0].title,
+      description: result.rows[0].descriptions,
+      date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0],
+      time: new Date(result.rows[0].event_datetime)
+        .toTimeString()
+        .split(" ")[0],
+      location: result.rows[0].locations,
+      organizer: result.rows[0].organizer,
+      category: result.rows[0].category,
+      images: result.rows[0].imagepath,
+    });
+  } catch (error) {
+    return handleError(res, "Error while getting event", error);
+  }
+};

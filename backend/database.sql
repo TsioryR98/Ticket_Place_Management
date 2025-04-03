@@ -17,16 +17,19 @@ CREATE TABLE
 CREATE TABLE
     events (
         event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        title VARCHAR(255) NOT NULL,
-        descriptions TEXT,
-        event_datetime TIMESTAMP NOT NULL,
-        locations VARCHAR(255) NOT NULL,
-        organizer VARCHAR(255),
-        category VARCHAR(100) NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW (),
-        imagepath VARCHAR(255) DEFAULT NULL
+            title VARCHAR(255) NOT NULL,
+            descriptions TEXT,
+            event_datetime TIMESTAMP NOT NULL,
+            locations VARCHAR(255) NOT NULL,
+            organizer VARCHAR(255),
+            category VARCHAR(100) NOT NULL,
+            created_at TIMESTAMP DEFAULT NOW (),
+            imagepath VARCHAR(255) DEFAULT NULL,
+            event_status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (event_status IN ('Published', 'Draft', 'Cancelled'))
     );
-
+-- Add a new column for event status
+ALTER TABLE events
+ADD COLUMN event_status VARCHAR(50) NOT NULL DEFAULT 'Draft' CHECK (event_status IN ('Published', 'Draft', 'Cancelled'));
 CREATE TABLE
     tickets (
         ticket_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),

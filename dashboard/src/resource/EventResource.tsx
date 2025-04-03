@@ -8,7 +8,10 @@ import {
   EditButton,
   DeleteButton,
   EmailField,
+  SimpleShowLayout,
+  Show,
   DateField,
+  UrlField,
 } from "react-admin";
 
 export const EventList = () => {
@@ -26,10 +29,31 @@ export const EventList = () => {
           <TextField source="title" />
           <TextField source="description" />
           <DateField source="date" />
+          <TextField source="location" />
+          <TextField source="organizer" />
+          <TextField source="category" />
+          {/*<UrlField source="image" />{" "}}
+          {/* image as source is from  image: event.image,*/}
           <EditButton />
           <DeleteButton />
         </Datagrid>
       )}
     </List>
+  );
+};
+
+export const EventShow = () => {
+  return (
+    <Show>
+      <SimpleShowLayout>
+        <TextField source="title" />
+        <TextField source="description" />
+        <DateField source="date" />
+        <TextField source="location" />
+        <TextField source="organizer" />
+        <TextField source="category" />
+        <UrlField source="image" />
+      </SimpleShowLayout>
+    </Show>
   );
 };

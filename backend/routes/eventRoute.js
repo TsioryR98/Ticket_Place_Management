@@ -5,13 +5,15 @@ import {
   deleteEvent,
   getAllEvents,
   getEvent,
+  getEventById,
   updateEvent,
 } from "../controllers/eventController.js";
 const router = express.Router();
 
 router.get("/", getAllEvents);
-router.get("/:eventId", getEvent);
 router.put("/:eventId", authenticationToken, updateEvent);
+router.get("/:eventId", getEvent);
+router.get("/:id/details", authenticationToken, getEventById);
 router.delete("/:eventId", authenticationToken, deleteEvent);
 router.post("/", authenticationToken, createEvent);
 

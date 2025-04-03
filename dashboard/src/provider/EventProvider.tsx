@@ -28,17 +28,15 @@ import { fetchUtils } from "react-admin";
 const urlAPI = "http://localhost:4000/api";
 const httpClient = fetchUtils.fetchJson;
 
-interface Event {
+interface Event extends RaRecord {
   id: Identifier;
   title: string;
   description: string;
   date: string;
   location: string;
-  price: number;
-  availableTickets: number;
   organizer: string;
   category: string;
-  image: string;
+  imagePath: string;
 }
 
 export const eventDataProvider: DataProvider = {
@@ -67,38 +65,67 @@ export const eventDataProvider: DataProvider = {
         method: "GET",
       });
 
+      // json is from the API response database
+
       const total = Number(headers.get("X-Total-Count"));
 
-      const data = json.map((event: Event) => ({
+      const mappedData = json.map((event: Event) => ({
         id: event.id,
         title: event.title,
         description: event.description,
         date: event.date,
         location: event.location,
-        price: event.price,
-        availableTickets: event.availableTickets,
         organizer: event.organizer,
         category: event.category,
-        image: event.image,
+        image: event.images, //images is from the API response
       }));
 
-      return {
-        data,
+      const result: GetListResult = {
+        data: mappedData.slice((page - 1) * perPage, page * perPage), // Slice the data for pagination
         total,
         pageInfo: {
           hasNextPage: page * perPage < total,
           hasPreviousPage: page > 1,
         },
       };
+      return result;
     } catch (error) {
       throw error;
     }
   },
-  getOne: function <RecordType extends RaRecord = any>(
+  getOne: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetOneParams<RecordType> & QueryFunctionContext
   ): Promise<GetOneResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    const { id } = params; // Correctly destructure the id
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
+        method: "GET",
+      });
+      const mappedData = {
+        id: json.id,
+        title: json.title,
+        description: json.description,
+        date: json.date,
+        location: json.location,
+        organizer: json.organizer,
+        category: json.category,
+        image: json.imagePath, //imagePath is from the API response
+      };
+
+      const result: GetOneResult = {
+        data: mappedData,
+      };
+      return result;
+    } catch (error) {
+      throw error;
+    }
   },
   getMany: function <RecordType extends RaRecord = any>(
     resource: string,

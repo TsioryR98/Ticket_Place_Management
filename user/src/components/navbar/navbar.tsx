@@ -25,7 +25,7 @@ export default function NavBar() {
         <Link href="/" className="flex items-center">
           <h1 className="text-white text-2xl font-bold mr-2">Tapakila</h1>
           <span className="hidden sm:inline-block text-sky-200 text-xs font-light">
-            La billetterie simplifiée
+            Simplified ticketing
           </span>
         </Link>
       </div>
@@ -70,7 +70,7 @@ export default function NavBar() {
                 <div className="py-1">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm text-gray-500">
-                      Connecté en tant que
+                      Logged in as
                     </p>
                     <p className="text-sm font-medium text-gray-800">
                       {formatName(user?.name)}

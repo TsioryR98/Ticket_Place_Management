@@ -223,7 +223,7 @@ export default function ReservationList() {
             delay: 0.2,
           }}
         >
-          Mes Réservations
+          My Reservations
         </motion.h1>
         <motion.div
           className="h-1 w-24 bg-gradient-to-r from-blue-600 to-indigo-900 rounded-full mx-auto my-3"
@@ -238,10 +238,10 @@ export default function ReservationList() {
           transition={{ delay: 0.5 }}
         >
           {filter === "upcoming"
-            ? "Vos prochains événements"
+            ? "Your next events"
             : filter === "past"
-            ? "Vos événements passés"
-            : "Toutes vos réservations"}
+            ? "Your past events"
+            : "All your reservations"}
         </motion.p>
       </motion.div>
 
@@ -266,9 +266,9 @@ export default function ReservationList() {
                 : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200"
             }`}
           >
-            {f === "all" && "Toutes"}
-            {f === "upcoming" && "À venir"}
-            {f === "past" && "Passées"}
+            {f === "all" && "All"}
+            {f === "upcoming" && "Upcoming"}
+            {f === "past" && "Past"}
           </motion.button>
         ))}
       </motion.div>
@@ -309,14 +309,14 @@ export default function ReservationList() {
                 </svg>
               </motion.div>
               <h3 className="text-lg font-medium text-gray-900 mb-1">
-                Aucune réservation trouvée
+                No reservations found
               </h3>
               <p className="text-gray-500 mb-6">
                 {filter === "upcoming"
-                  ? "Vous n'avez pas de réservations à venir"
+                  ? "You have no upcoming reservations"
                   : filter === "past"
-                  ? "Aucune réservation passée"
-                  : "Vous n'avez pas encore de réservations"}
+                  ? "No past reservations"
+                  : "You don't have any reservations yet"}
               </p>
               <motion.div
                 whileHover={{ scale: 1.03 }}
@@ -326,7 +326,7 @@ export default function ReservationList() {
                   href="/"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-900 hover:from-blue-600 hover:to-blue-700 transition-all"
                 >
-                  Explorer les événements
+                  Explore events
                   <svg
                     className="ml-2 -mr-1 w-4 h-4"
                     fill="currentColor"
@@ -361,12 +361,12 @@ export default function ReservationList() {
                   <div className="flex justify-between items-center">
                     <div>
                       <h2 className="text-xl font-bold text-gray-800">
-                        Commande #{order.order_id.slice(0, 8).toUpperCase()}
+                        Reservation #{order.order_id.slice(0, 8).toUpperCase()}
                       </h2>
                       <p className="text-sm text-gray-500 mt-1">
-                        Réservé le{" "}
+                        Booked on{" "}
                         {new Date(order.created_at).toLocaleDateString(
-                          "fr-FR",
+                          "en-US",
                           {
                             day: "numeric",
                             month: "long",
@@ -453,7 +453,7 @@ export default function ReservationList() {
                                   />
                                 </svg>
                                 {new Date(item.event_date).toLocaleDateString(
-                                  "fr-FR",
+                                  "en-US",
                                   {
                                     weekday: "short",
                                     day: "numeric",
@@ -491,7 +491,7 @@ export default function ReservationList() {
                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                               />
                             </svg>
-                            Annuler ce billet
+                            Cancel this ticket
                           </motion.button>
                         )}
                       </motion.div>
@@ -501,9 +501,7 @@ export default function ReservationList() {
 
                 <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
                   <div className="flex justify-between items-center">
-                    <p className="font-semibold text-gray-700">
-                      Total de la commande
-                    </p>
+                    <p className="font-semibold text-gray-700">Order total</p>
                     <motion.p
                       className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
                       whileHover={{ scale: 1.05 }}

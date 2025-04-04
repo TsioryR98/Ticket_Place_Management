@@ -46,7 +46,7 @@ export default function SignupPage() {
         redirect: false,
         email: formData.email,
         password: formData.password,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/",
       });
 
       if (result?.error) {

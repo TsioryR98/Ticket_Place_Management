@@ -10,8 +10,6 @@ import {
   MapPin,
   User,
   Ticket,
-  ChevronRight,
-  Share2,
   X,
   AlertCircle,
 } from "lucide-react";
@@ -39,7 +37,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
     // Vérifier si des tickets sont sélectionnés
     const hasTickets = Object.values(quantities).some((q) => q > 0);
     if (!hasTickets) {
-      setReservationError("Veuillez sélectionner au moins un billet");
+      setReservationError("Please select at least one ticket");
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
       return;
@@ -186,7 +184,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                     />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Heure</p>
+                    <p className="text-sm text-gray-500 font-medium">Time</p>
                     <p className="font-semibold text-gray-800">{event.time}</p>
                   </div>
                 </div>
@@ -200,7 +198,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                     />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Lieu</p>
+                    <p className="text-sm text-gray-500 font-medium">Location</p>
                     <p className="font-semibold text-gray-800">
                       {event.location}
                     </p>
@@ -217,7 +215,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 font-medium">
-                      Organisateur
+                      Organizer
                     </p>
                     <p className="font-semibold text-gray-800">
                       {event.organizer}
@@ -232,7 +230,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
         {/* Description de l'événement */}
         <div className="mb-12 bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            À propos de cet événement
+            About this event
           </h2>
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed text-lg">
@@ -248,7 +246,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
               <Ticket size={24} strokeWidth={2} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
-              Billets disponibles
+              Available tickets
             </h2>
           </div>
 
@@ -261,13 +259,13 @@ export default function EventClientComponent({ event }: { event: Event }) {
                       Type
                     </th>
                     <th className="py-5 px-6 text-left font-semibold text-gray-700 border-b">
-                      Prix
+                      Price
                     </th>
                     <th className="py-5 px-6 text-left font-semibold text-gray-700 border-b">
-                      Disponibilité
+                      Availability
                     </th>
                     <th className="py-5 px-6 text-left font-semibold text-gray-700 border-b">
-                      Limite/personne
+                      Limit per person
                     </th>
                   </tr>
                 </thead>
@@ -289,17 +287,17 @@ export default function EventClientComponent({ event }: { event: Event }) {
                         {ticket.available > 10 ? (
                           <span className="text-green-600 font-medium flex items-center gap-2">
                             <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full"></span>
-                            {ticket.available} disponibles
+                            {ticket.available} available
                           </span>
                         ) : ticket.available > 0 ? (
                           <span className="text-orange-600 font-medium flex items-center gap-2">
                             <span className="inline-block w-2.5 h-2.5 bg-orange-500 rounded-full"></span>
-                            Plus que {ticket.available} !
+                            Only  {ticket.available} left!
                           </span>
                         ) : (
                           <span className="text-red-600 font-medium flex items-center gap-2">
                             <span className="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-                            Épuisé
+                            Sold out
                           </span>
                         )}
                       </td>
@@ -314,7 +312,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
           ) : (
             <div className="p-8 text-center bg-gray-50 rounded-xl">
               <p className="text-gray-500">
-                Aucun billet disponible pour le moment.
+                No tickets available at the moment.
               </p>
             </div>
           )}
@@ -325,7 +323,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
               className="bg-gradient-to-r from-blue-600 to-indigo-900 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:from-indigo-600 hover:to-blue-700 transition-all duration-300 hover:shadow-xl flex items-center gap-2 text-lg"
             >
               <Ticket size={20} />
-              <span>Réserver</span>
+              <span>Book now</span>
             </button>
           </div>
         </div>
@@ -337,7 +335,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto animate-in fade-in duration-300">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                Réservation de billets
+                Ticket booking
               </h3>
               <button
                 onClick={resetReservationForm}
@@ -359,7 +357,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
             {/* Liste des types de billets avec quantité */}
             <div className="space-y-4 mb-8">
               <h4 className="font-medium text-gray-700 mb-3">
-                Sélectionnez vos billets
+                Select your tickets
               </h4>
               {event.tickets.map((ticket) => (
                 <div
@@ -373,7 +371,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                       </span>
                       {ticket.available <= 10 && ticket.available > 0 && (
                         <span className="ml-2 text-xs font-medium px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">
-                          {ticket.available} restants
+                          {ticket.available} remaining
                         </span>
                       )}
                     </div>
@@ -384,7 +382,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500">
-                      Limite: {ticket.limitPerPerson} par personne
+                      Limit: {ticket.limitPerPerson} per person
                     </span>
 
                     <div className="flex items-center">
@@ -460,7 +458,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                 onClick={resetReservationForm}
                 className="flex-1 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors"
               >
-                Annuler
+                Cancel
               </button>
 
               {/* Bouton Confirmer */}
@@ -478,7 +476,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                   }}
                 >
                   <Ticket size={20} />
-                  <span>Réserver</span>
+                  <span>Book now</span>
                 </button>
               </div>
             </div>

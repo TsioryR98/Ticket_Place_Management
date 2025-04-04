@@ -7,21 +7,21 @@ This repository is an exam project for WEB3 about an application that handles ti
 ## Steps with React for the Admin Role
 
 **Admin** aim to have an administrator controls on the app.
-To ensure the **Admin** interface located in the `/admin` folder works correctly, follow the steps below to install the necessary dependencies.
+To ensure the **Admin** interface located in the `/dashboard` folder works correctly, follow the steps below to install the necessary dependencies.
 It is built with **React.js** and **Vite** for fast development.
 
-1. Navigate to the `/admin` folder:
+1. Navigate to the `/dashboard` folder:
    ```bash
-   cd admin
+   cd dashboard
    ```
-2. Install the dependencies, including the latest compatible version of Vite in `/admin`
+2. Install the dependencies, including the latest compatible version of Vite in `/dashboard`
    ```bash
    npm install vite@latest
    ```
-3. In `/admin`, run:
+3. In `/dashboard`, run:
 
 ```bash
-   npm run admindev
+   npm run dev
 ```
 
 ## Steps with Next for the User Role
@@ -44,12 +44,12 @@ It is built with Next.js for server-side rendering and better performance.
 2. In `/user` directory, run :
 
 ```bash
-   npm run userdev
+   npm run dev
 ```
 
 ## Steps with Node/Express for the Backend
 
-1. Install the dependencies, including the latest compatible version of Nodemon in `/Backend`directory to run in live server mode:
+1. Install the dependencies, including the latest compatible version of Nodemon in `/backend`directory to run in live server mode:
 
    ```bash
    npm install nodemon

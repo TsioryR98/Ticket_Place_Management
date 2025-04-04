@@ -17,15 +17,15 @@ export default async function OrderConfirmation({
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
-          <h2 className="font-bold text-red-700 text-lg">Accès refusé</h2>
+          <h2 className="font-bold text-red-700 text-lg">Access denied</h2>
           <p className="text-red-600 mt-2">
-            Vous devez être connecté pour voir cette commande
+            You must be logged in to view this order
           </p>
           <Link
             href="/auth/login"
             className="inline-flex items-center text-blue-600 hover:underline mt-4 font-medium"
           >
-            Se connecter
+            Sign in
           </Link>
         </div>
       </div>
@@ -37,7 +37,7 @@ export default async function OrderConfirmation({
     const order = await getOrderById(orderId);
 
     if (order.user_id !== session.user.id) {
-      throw new Error("Cette commande ne vous appartient pas");
+      throw new Error("This order doesn't belong to you");
     }
 
     return (
@@ -51,10 +51,10 @@ export default async function OrderConfirmation({
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Réservation confirmée
+            Booking confirmed
           </h1>
           <p className="text-gray-500">
-            Référence:{" "}
+            Reference:{" "}
             <span className="font-medium text-gray-700">#{order.order_id}</span>{" "}
             • Le {format(new Date(order.created_at), "dd/MM/yyyy à HH:mm")}
           </p>
@@ -66,7 +66,7 @@ export default async function OrderConfirmation({
           <div className="p-6 sm:p-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
               <span className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 mr-3 rounded-full"></span>
-              Détails de votre réservation
+              Your booking details
             </h2>
 
             <div className="space-y-4">
@@ -103,7 +103,7 @@ export default async function OrderConfirmation({
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
                 <span className="font-semibold text-gray-700 text-lg">
-                  Montant total
+                  Total amount
                 </span>
                 <span className="font-bold text-blue-600 text-xl">
                   {order.total_amount}€
@@ -119,14 +119,14 @@ export default async function OrderConfirmation({
               className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg border border-gray-300 transition-all hover:-translate-x-1 duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
-              Retour à l'accueil
+              Back to home
             </Link>
 
             <Link
               href="/dashboard/reservations"
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-900 hover:from-indigo-600 hover:to-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-all hover:translate-x-1 duration-200 shadow-sm hover:shadow-md"
             >
-              Voir mes réservations
+              View my reservations
               <List className="w-5 h-5" />
             </Link>
           </div>
@@ -138,15 +138,15 @@ export default async function OrderConfirmation({
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
-          <h2 className="font-bold text-red-700 text-lg">Erreur</h2>
+          <h2 className="font-bold text-red-700 text-lg">Error</h2>
           <p className="text-red-600 mt-2">
-            {error instanceof Error ? error.message : "Commande introuvable"}
+            {error instanceof Error ? error.message : "Order not found"}
           </p>
           <Link
             href="/dashboard/reservations"
             className="inline-flex items-center text-blue-600 hover:underline mt-4 font-medium"
           >
-            Retour à mes réservations
+            Back to my reservations
           </Link>
         </div>
       </div>

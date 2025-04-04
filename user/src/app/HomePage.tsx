@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Event } from "@/types/event";
 import { fetchServerEvents } from "@/lib/api";
 import EventCardHome from "@/components/event/EventCardHome";
@@ -142,11 +142,12 @@ export default function HomePage() {
         <div className="absolute inset-0 z-10 flex items-center justify-center text-center px-4">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-xl">
-              Vivez des moments{" "}
-              <span className="text-blue-300">inoubliables</span>
+              Create {" "}
+              <span className="text-blue-300">unforgettable</span> <br />
+              memories
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 drop-shadow-md">
-              Découvrez nos événements exclusifs et réservez vos places en ligne
+              Discover our exclusive events and book your tickets online
             </p>
             <Button
               size="lg"
@@ -157,7 +158,7 @@ export default function HomePage() {
                 });
               }}
             >
-              Explorer maintenant
+              Explore now
             </Button>
           </div>
         </div>

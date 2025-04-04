@@ -29,9 +29,9 @@ export default function NavBar() {
         */}
         {/*call for loginopenModal to open modal on click */}
           <Link href={"/"} className="text-black">
-              All events
+              Home
           </Link>
-          {session && <Link href={"/dashboard/reservations"}>My events</Link>}
+          <Link href={"/dashboard/reservations"}>My events</Link>
         {session ? (
           <>
             {" "}

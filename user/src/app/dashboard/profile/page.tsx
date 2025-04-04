@@ -40,7 +40,6 @@ export default function UserProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const formatName = (name?: string) => {
     return name
       ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
@@ -82,7 +81,7 @@ export default function UserProfile() {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
+
 
     try {
       const response = await fetch(
@@ -124,8 +123,6 @@ export default function UserProfile() {
       }
     } catch {
       setErrors({ general: "An error occurred. Please try again." });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

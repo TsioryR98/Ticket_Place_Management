@@ -34,7 +34,7 @@ const nameSchema = z.string().min(2, "User name must be at least 2 characters");
 export default function UserProfile() {
   const { data: session, status } = useSession();
 
-  const user = session?.user;
+  const user = session?.user as { name?: string; email?: string }
   const [newUserName, setNewUserName] = useState<string>("");
   const [newEmailAddress, setNewEmailAddress] = useState<string>("");
   const [newPassword, setNewPassword] = useState("");
@@ -80,12 +80,9 @@ export default function UserProfile() {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
-
-
     try {
       const response = await fetch(
-        "http://localhost:4000/api/users/me/settings",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me/settings`,
         {
           method: "PATCH",
           headers: {

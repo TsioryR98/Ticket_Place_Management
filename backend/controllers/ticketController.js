@@ -69,7 +69,7 @@ export const getAllEventsTicket = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "event not found" });
     }
-    res.status(200).json({ tickets: result.rows });
+    res.status(200).json(result.rows);
   } catch (error) {
     handleError(res, "Error during fecthing from database", error);
   }
@@ -94,5 +94,26 @@ export const createEventTicket = async (req, res) => {
     res.status(201).json({ ticket: result.rows[0] });
   } catch (error) {
     handleError(res, "Error creating the ticket", error);
+  }
+};
+
+/*-------- GET /api/events/:eventId/tickets/:ticketId ok --------- */
+
+export const getEventTicketById = async (req, res) => {
+  const { eventId, ticketId } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM tickets WHERE event_id = $1 AND ticket_id = $2",
+      [eventId, ticketId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Ticket not found" });
+    }
+
+    res.status(200).json({ ticket: result.rows[0] });
+  } catch (error) {
+    handleError(res, "Error fetching the ticket", error);
   }
 };

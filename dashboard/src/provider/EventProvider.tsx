@@ -80,6 +80,7 @@ export const eventDataProvider: DataProvider = {
         organizer: event.organizer,
         category: event.category,
         image: event.images, //images is from the API response
+        tickets: event.tickets, // Assuming tickets is part of the event data
       }));
 
       const result: GetListResult = {

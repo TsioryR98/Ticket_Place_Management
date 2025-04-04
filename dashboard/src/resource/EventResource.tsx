@@ -1,6 +1,8 @@
 import { useMediaQuery, Theme } from "@mui/material";
 import * as React from "react";
+import { Link } from "react-router-dom";
 import {
+  useGetMany,
   Datagrid,
   List,
   SimpleList,
@@ -25,26 +27,49 @@ import {
   ImageField,
 } from "react-admin";
 
+interface TicketSummaryFieldProps {
+  record?: any;
+  source?: string;
+  label?: string;
+}
+
+const TicketSummaryField = (props: { record?: any }) => {
+  const record = props.record || useRecordContext();
+
+  if (!record) return null;
+  const tickets = record.tickets || [];
+
+  const totalAvailable = tickets.reduce(
+    (sum, ticket) => sum + (ticket.available || 0),
+    0
+  );
+
+  return (
+    <div>
+      {totalAvailable} places disponibles
+      <br />
+      <Link to={`/tickets?eventId=${record.id}`}>Voir détails →</Link>
+    </div>
+  );
+};
+
 export const EventList = () => {
   const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
+
   return (
     <List>
       {isSmall ? (
         <SimpleList
           primaryText={(record) => record.title}
-          secondaryText={(record) => record.description}
-          tertiaryText={(record) => record.date}
+          secondaryText={(record) => <TicketSummaryField record={record} />}
         />
       ) : (
-        <Datagrid>
+        <Datagrid rowClick="show">
           <TextField source="title" />
-          <TextField source="description" />
           <DateField source="date" />
           <TextField source="location" />
-          <TextField source="organizer" />
           <TextField source="category" />
-          {/*<UrlField source="image" />{" "}}
-          {/* image as source is from  image: event.image,*/}
+          <TicketSummaryField label="Places" />
           <EditButton />
           <DeleteButton />
         </Datagrid>
@@ -99,11 +124,11 @@ export const EventEdit = () => {
         <SelectInput
           source="category"
           choices={[
-            { id: "musique", name: "Musique" },
-            { id: "jeunepublic", name: "Jeune Public" },
-            { id: "humour", name: "Humour" },
-            { id: "theatre", name: "Théâtre" },
-            { id: "classique", name: "Classique" },
+            { id: "Musique", name: "Musique" },
+            { id: "Jeune Public", name: "Jeune Public" },
+            { id: "Humour", name: "Humour" },
+            { id: "Théâtre", name: "Théâtre" },
+            { id: "Classique", name: "Classique" },
           ]}
           defaultValue={record?.category}
         />

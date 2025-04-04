@@ -1,5 +1,5 @@
 import { Admin, CustomRoutes, Resource } from "react-admin";
-import { Route } from 'react-router-dom'; // <-- Ajoutez cette importation
+import { Route } from "react-router-dom"; // <-- Ajoutez cette importation
 import { authProvider } from "./provider/AuthProvider";
 import { dataProvider } from "./provider/CombinedProvider";
 import { UserEdit, UserList, UserShow } from "./resource/UserResource";
@@ -12,6 +12,7 @@ import {
 } from "./resource/EventResource";
 import SignIn from "./components/loginPage/LoginPage";
 import { EventShowWithOrders } from "./resource/EventShowWithOrders";
+import { TicketList } from "./resource/TicketResource";
 
 export const App = () => (
   <Admin
@@ -27,11 +28,7 @@ export const App = () => (
       edit={EventEdit}
       create={EventCreate}
     />
-    <Resource
-      name="orders"
-      list={OrderList}
-      show={OrderShow}
-    />
+    <Resource name="orders" list={OrderList} show={OrderShow} />
     <CustomRoutes>
       <Route
         path="/events/:id/show-with-orders"

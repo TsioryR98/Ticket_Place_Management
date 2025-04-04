@@ -93,11 +93,10 @@ export default function UserProfile() {
             });
 
             const data = await response.json();
-            console.log(response.status)
 
             if (!response.ok) {
                 setErrors({ general: data.error || "Failed to update profile" });
-                console.log("Error updating : " )
+                toast.error("Something went wrong, Try again")
                 return;
             }
             if(response.ok) {

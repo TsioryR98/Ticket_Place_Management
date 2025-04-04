@@ -1,4 +1,7 @@
 import { Event } from "@/types/event";
+import { getServerSession } from "next-auth";
+import authOptions from "@/app/api/auth/[...nextauth]/options";
+import { getSession } from "next-auth/react";
 
 const API_BASE_URL = "http://localhost:4000/api";
 
@@ -73,10 +76,9 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
 // get order by id
 export async function getOrderById(orderId: string) {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/orders/${orderId}?userId=11111111-1111-1111-1111-111111111111`
-    );
-    if (!res.ok) throw new Error("Échec de la récupération de la commande");
+    const res = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}`);
+    if (!res) return null;
+
     return await res.json();
   } catch (error) {
     console.error("Error fetching order:", error);
@@ -85,14 +87,12 @@ export async function getOrderById(orderId: string) {
 }
 
 // get the user reservations
-export async function getUserReservations(userId: string) {
+export async function getUserReservations() {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/orders?userId=${userId}&includeEventDetails=true`
-    );
-    if (!res.ok) throw new Error("Failed to fetch reservations");
-    const orders = await res.json();
+    const res = await fetchWithAuth(`${API_BASE_URL}/orders`);
+    if (!res) return []; // Retourne un tableau vide si non authentifié
 
+    const orders = await res.json();
     return orders.map((order: any) => ({
       ...order,
       created_at: new Date(order.created_at),
@@ -111,20 +111,93 @@ export async function getUserReservations(userId: string) {
 // cancel reservation
 export async function cancelReservation(orderId: string, ticketId: string) {
   try {
-    const res = await fetch(
+    const res = await fetchWithAuth(
       `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
       {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }
     );
+    if (!res) return false; // Échec si non authentifié
 
-    if (!res.ok) throw new Error("Échec de l'annulation");
     return await res.json();
   } catch (error) {
     console.error("Error cancelling reservation:", error);
     throw error;
+  }
+}
+
+async function fetchWithAuth(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response | null> {
+  const isServer = typeof window === "undefined";
+
+  try {
+    let session;
+
+    if (isServer) {
+      session = await getServerSession(authOptions);
+    } else {
+      const sessionRes = await fetch("/api/auth/session");
+      if (!sessionRes.ok) return null;
+      session = await sessionRes.json();
+    }
+
+    if (!session?.user?.accessToken) {
+      return null; // Au lieu de throw une erreur
+    }
+
+    const headers = new Headers(options.headers);
+    headers.set("Content-Type", "application/json");
+    headers.set("Authorization", `Bearer ${session.user.accessToken}`);
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Request failed");
+    }
+
+    return response;
+  } catch (error) {
+    console.error("FetchWithAuth error:", error);
+    throw error;
+  }
+}
+
+export async function fetchServerEvents(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<{ events: Event[]; total: number }> {
+  try {
+    const url = new URL(`${API_BASE_URL}/events`);
+    if (params?.page) url.searchParams.append("page", params.page.toString());
+    if (params?.limit)
+      url.searchParams.append("perPage", params.limit.toString());
+
+    const response = await fetch(url.toString());
+    if (!response.ok) throw new Error("Failed to fetch events");
+
+    const total = parseInt(response.headers.get("X-Total-Count") || "0", 10);
+    const data = await response.json();
+
+    return {
+      events: data.map((event: any) => ({
+        ...event,
+        imagePath: event.images || "/default-event.jpg",
+      })),
+      total,
+    };
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    const fallback = require("./events.json");
+    return {
+      events: fallback.slice(0, params?.limit || 12),
+      total: fallback.length,
+    };
   }
 }

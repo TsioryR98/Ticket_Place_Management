@@ -8,11 +8,18 @@ const handleError = (res, message, error) => {
 
 // POST /api/orders - Créer une nouvelle commande
 export const createOrder = async (req, res) => {
-  //const { userId, items } = req.body; // items: [{ticketId, quantity}]
-  // Simulation d'user ID pour les tests
-  const userId = "11111111-1111-1111-1111-111111111111"; // ID du user test
+  const userId = req.user?.userId;
+  console.log("User ID from token:", req.user?.userId); // Debug
+  console.log("Request body:", req.body); // Debug
 
-  const { items } = req.body; // On ne prend plus userId du body
+  if (!req.user?.userId) {
+    return res.status(401).json({
+      code: "MISSING_AUTH",
+      error: "Authentification requise",
+    });
+  }
+
+  const { items } = req.body;
   if (!items || !Array.isArray(items)) {
     return res.status(400).json({ error: "Items must be an array" });
   }
@@ -87,7 +94,7 @@ export const createOrder = async (req, res) => {
 
 // GET /api/orders - Récupérer les commandes de l'utilisateur
 export const getUserOrders = async (req, res) => {
-  const { userId } = req.query;
+  const userId = req.user?.userId;
 
   if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
@@ -151,7 +158,7 @@ export const getUserOrders = async (req, res) => {
 // GET /api/orders/:orderId - Récupérer une commande spécifique
 export const getOrderById = async (req, res) => {
   const { orderId } = req.params;
-  const { userId } = req.query;
+  const userId = req.user?.userId;
 
   try {
     // Vérifier que l'utilisateur est propriétaire de la commande
@@ -222,7 +229,7 @@ export const updateOrderStatus = async (req, res) => {
 // cancel the reservation
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;
-  const userId = "11111111-1111-1111-1111-111111111111"; // À remplacer par l'userId de la session
+  const userId = req.user.userId; // Extrait du JWT
 
   const client = await pool.connect();
 
@@ -292,5 +299,166 @@ export const cancelOrderItem = async (req, res) => {
     handleError(res, "Erreur lors de l'annulation", error);
   } finally {
     client.release();
+  }
+};
+
+// GET /api/admin/orders - Récupérer TOUTES les commandes (pour admin)
+export const getAllOrders = async (req, res) => {
+  const { role } = req.user;
+
+  if (role !== "admin") {
+    return res.status(403).json({ error: "Forbidden: admin access required" });
+  }
+
+  try {
+    const ordersResult = await pool.query(
+      `SELECT 
+        o.*,
+        oi.order_item_id,
+        oi.ticket_id,
+        oi.quantity,
+        oi.price,
+        oi.created_at as item_created_at,
+        t.types as ticket_type,
+        e.title as event_title,
+        e.event_datetime as event_date,
+        e.locations as event_location,
+        u.user_email as user_email
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN tickets t ON oi.ticket_id = t.ticket_id
+      JOIN events e ON t.event_id = e.event_id
+      JOIN users u ON o.user_id = u.user_id
+      ORDER BY o.created_at DESC`
+    );
+
+    const ordersMap = new Map();
+    ordersResult.rows.forEach((row) => {
+      if (!ordersMap.has(row.order_id)) {
+        ordersMap.set(row.order_id, {
+          order_id: row.order_id,
+          user_id: row.user_id,
+          user_email: row.user_email,
+          total_amount: Number(row.total_amount),
+          status_order: row.status_order,
+          created_at: row.created_at,
+          items: [],
+        });
+      }
+
+      ordersMap.get(row.order_id).items.push({
+        order_item_id: row.order_item_id,
+        ticket_id: row.ticket_id,
+        quantity: row.quantity,
+        price: Number(row.price),
+        ticket_type: row.ticket_type,
+        event_title: row.event_title,
+        event_date: row.event_date,
+        event_location: row.event_location,
+        created_at: row.item_created_at,
+      });
+    });
+
+    const orders = Array.from(ordersMap.values());
+    res.status(200).json(orders);
+  } catch (error) {
+    handleError(res, "Error fetching all orders", error);
+  }
+};
+
+export const testAllOrders = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        o.*,
+        u.user_email,
+        e.title as event_title
+      FROM orders o
+      JOIN users u ON o.user_id = u.user_id
+      LEFT JOIN order_items oi ON o.order_id = oi.order_id
+      LEFT JOIN tickets t ON oi.ticket_id = t.ticket_id
+      LEFT JOIN events e ON t.event_id = e.event_id
+      GROUP BY o.order_id, u.user_email, e.title
+      ORDER BY o.created_at DESC
+    `);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    handleError(res, "Error testing orders", error);
+  }
+};
+
+export const getOrdersByEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT o.*, u.user_email 
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN tickets t ON oi.ticket_id = t.ticket_id
+      JOIN users u ON o.user_id = u.user_id
+      WHERE t.event_id = $1
+      GROUP BY o.order_id, u.user_email
+    `,
+      [eventId]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    handleError(res, "Error fetching orders by event", error);
+  }
+};
+
+// GET /api/orders/admin/:orderId - Admin access to any order
+// orderController.js
+export const getAdminOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+
+  try {
+    // Récupération de la commande
+    const orderResult = await pool.query(
+      `SELECT o.*, u.user_email 
+       FROM orders o
+       JOIN users u ON o.user_id = u.user_id
+       WHERE o.order_id = $1`,
+      [orderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Récupération des items
+    const itemsResult = await pool.query(
+      `SELECT oi.*, 
+        t.types as ticket_type,
+        e.title as event_title,
+        e.event_datetime as event_date,
+        e.locations as event_location
+       FROM order_items oi
+       JOIN tickets t ON oi.ticket_id = t.ticket_id
+       JOIN events e ON t.event_id = e.event_id
+       WHERE oi.order_id = $1`,
+      [orderId]
+    );
+
+    res.status(200).json({
+      ...orderResult.rows[0],
+      items: itemsResult.rows.map((item) => ({
+        ...item,
+        price: Number(item.price), // Conversion explicite
+      })),
+    });
+  } catch (error) {
+    console.error("Error in getAdminOrder:", error);
+    res.status(500).json({
+      message: "Error fetching order",
+      error: error.message,
+    });
   }
 };

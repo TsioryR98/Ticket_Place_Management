@@ -224,3 +224,64 @@ html {
   object-fit: cover;
   object-position: center;
 }
+
+/* Animation de fondu améliorée */
+@keyframes carousel-fade {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.embla__slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.embla__slide.is-selected {
+  animation: carousel-fade 5s ease-in-out infinite;
+}
+
+/* Désactive les transitions par défaut */
+.embla__container {
+  transition: none !important;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}

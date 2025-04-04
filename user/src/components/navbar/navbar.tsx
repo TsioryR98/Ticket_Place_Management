@@ -1,33 +1,54 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useLoginModal } from "@/context/ModalContext";
-//import session if authenticate with useSession
-import { signIn, useSession, signOut } from "next-auth/react";
+import {  useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function NavBar() {
   const { data: session } = useSession();
-  //call modalcontext of login inside nav
-  const { loginOpenModal, openModal, closeModal } = useLoginModal();
+  const { loginOpenModal, openModal } = useLoginModal();
 
   const handleLoginClick = () => {
     loginOpenModal();
   };
 
+  const user = session?.user as { name?: string; email?: string }
+  const formatName = (name?: string) => {
+    return name
+      ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+      : "N/A";
+  };
+
   return (
-    <nav className="sticky top-0 z-2 border-gray-300 flex h-[8vh] bg-gray-100 items-center px-4">
-      <div className="flex items-center gap-4 flex-1 justify-end">
-        {/** Button et user menu 
-        <button className="btn btn-sm btn-text btn-circle size-[2.125rem] md:hidden">
-          <span className="icon-[tabler--search] size-[1.375rem]">testte</span>
-        </button>
-        */}
-        {/*call for loginopenModal to open modal on click */}
+    <nav className="sticky top-0 z-[1000] bg-gradient-to-r from-sky-800 to-sky-900 shadow-md flex h-16 items-center px-6">
+      <div className="flex items-center flex-1">
+        <Link href="/" className="flex items-center">
+          <h1 className="text-white text-2xl font-bold mr-2">Tapakila</h1>
+          <span className="hidden sm:inline-block text-sky-200 text-xs font-light">
+            Simplified ticketing
+          </span>
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-6 justify-end">
+        <Link
+          href="/"
+          className="text-sky-100 hover:text-white font-medium transition-colors"
+        >
+          Home
+        </Link>
+        <Link
+          href="/dashboard/reservations"
+          className="text-sky-100 hover:text-white font-medium transition-colors"
+        >
+          My events
+        </Link>
+
         {session ? (
-          <>
-            {" "}
+          <div className="flex items-center gap-4">
             <button
               onClick={() => signOut()}
-              className="cursor-pointer bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
+              className="hidden sm:block bg-white hover:bg-sky-50 text-sky-800 font-medium py-2 px-4 rounded-md transition-colors"
               aria-haspopup="dialog"
               aria-expanded={openModal}
               aria-controls="scroll-inside-modal"
@@ -35,31 +56,38 @@ export default function NavBar() {
             >
               Sign out
             </button>
+
             <Menu as="div" className="relative inline-block text-left">
               <MenuButton>
-                <img
-                  className="avatar size-9.5 rounded-full"
-                  src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"
-                  alt="avatar 1"
-                />
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-sky-800 text-lg font-semibold text-center ring-2 ring-sky-100 hover:ring-white transition-all">
+                  {formatName(user?.name)?.slice(0, 2)}
+                </div>
               </MenuButton>
               <MenuItems
                 transition
-                className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 transition"
+                className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition overflow-hidden"
               >
                 <div className="py-1">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm text-gray-500">
+                      Logged in as
+                    </p>
+                    <p className="text-sm font-medium text-gray-800">
+                      {formatName(user?.name)}
+                    </p>
+                  </div>
                   <MenuItem>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700"
+                    <Link
+                      href="/dashboard/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50"
                     >
                       Account settings
-                    </a>
+                    </Link>
                   </MenuItem>
                   <MenuItem>
                     <a
                       href="#"
-                      className="block px-4 py-2 text-sm text-gray-700"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50"
                     >
                       Support
                     </a>
@@ -68,7 +96,8 @@ export default function NavBar() {
                     <MenuItem>
                       <button
                         type="submit"
-                        className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700"
+                        className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-sky-50"
+                        onClick={() => signOut()}
                       >
                         Sign out
                       </button>
@@ -77,20 +106,18 @@ export default function NavBar() {
                 </div>
               </MenuItems>
             </Menu>
-          </>
+          </div>
         ) : (
-          <>
-            <button
-              onClick={handleLoginClick}
-              className="cursor-pointer bg-sky-950 hover:bg-sky-900 text-white font-medium py-2 px-4 rounded-full"
-              aria-haspopup="dialog"
-              aria-expanded={openModal}
-              aria-controls="scroll-inside-modal"
-              data-overlay="#scroll-inside-modal"
-            >
-              Login
-            </button>
-          </>
+          <button
+            onClick={handleLoginClick}
+            className="bg-white hover:bg-sky-50 text-sky-800 font-medium py-2 px-6 rounded-md transition-colors"
+            aria-haspopup="dialog"
+            aria-expanded={openModal}
+            aria-controls="scroll-inside-modal"
+            data-overlay="#scroll-inside-modal"
+          >
+            Login
+          </button>
         )}
       </div>
     </nav>

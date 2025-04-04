@@ -1,14 +1,15 @@
 import * as React from "react";
 import { useLogin, useNotify } from "react-admin";
 import {
+  Box,
   Button,
   CssBaseline,
   Divider,
+  FormControl,
   Link,
   TextField,
   Typography,
   Stack,
-  FormHelperText,
   Card as MuiCard,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -20,7 +21,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
 import ForgotPassword from "../loginPage/ForgotPassword";
 
 // for sign card connection
@@ -79,6 +79,14 @@ const LoginPage: React.FC = () => {
   };
 
   const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
@@ -172,34 +180,23 @@ const LoginPage: React.FC = () => {
                 onChange={handleOnChangeEmail}
               />
             </FormControl>
-            <FormControl fullWidth error={passwordError} variant="outlined">
-              <InputLabel htmlFor="input-password">Password</InputLabel>
-              <OutlinedInput
+            <FormControl>
+              <TextField
+                error={passwordError}
+                helperText={passwordErrorMessage}
+                name="password"
+                placeholder="••••••"
+                type="password"
                 id="input-password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={handleOnChangePassword}
+                label="Password"
+                variant="outlined"
                 autoComplete="current-password"
                 required
-                label="Password"
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
+                fullWidth
+                color={passwordError ? "error" : "primary"}
+                value={password}
+                onChange={handleOnChangePassword}
               />
-              {passwordError && (
-                <FormHelperText error>{passwordErrorMessage}</FormHelperText>
-              )}
             </FormControl>
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button

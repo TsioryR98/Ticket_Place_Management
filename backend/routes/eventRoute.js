@@ -5,14 +5,16 @@ import {
   deleteEvent,
   getAllEvents,
   getEvent,
+  getEventById,
   updateEvent,
 } from "../controllers/eventController.js";
 const router = express.Router();
 
 router.get("/", getAllEvents);
+router.put("/:id/update", authenticationToken, updateEvent); // admin
 router.get("/:eventId", getEvent);
-router.put("/:eventId", authenticationToken, updateEvent);
-router.delete("/:eventId", authenticationToken, deleteEvent);
-router.post("/", authenticationToken, createEvent);
+router.get("/:id/details", authenticationToken, getEventById);
+router.delete("/:id/delete", authenticationToken, deleteEvent); // admin
+router.post("/create", authenticationToken, createEvent); // admin
 
 export { router as eventRouter };

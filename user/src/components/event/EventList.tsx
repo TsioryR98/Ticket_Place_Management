@@ -15,10 +15,10 @@ export default function EventList({ events }: { events: Event[] }) {
               <strong>Date :</strong> {event.date}
             </p>
             <p>
-              <strong>Lieu :</strong> {event.location}
+              <strong>Location :</strong> {event.location}
             </p>
             <p>
-              <strong>Billets disponibles :</strong>{" "}
+              <strong>Tickets available :</strong>{" "}
               {event.tickets.reduce((sum, ticket) => sum + ticket.available, 0)}
             </p>
           </Link>

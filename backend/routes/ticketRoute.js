@@ -5,6 +5,7 @@ import {
   updateEventTicket,
   createEventTicket,
   deleteEventTicket,
+  getEventTicketById,
 } from "../controllers/ticketController.js";
 const router = express.Router();
 
@@ -27,5 +28,8 @@ router.delete(
   authenticationToken,
   deleteEventTicket
 );
+
+// Get a specific ticket by ID
+router.get("/:eventId/tickets/:ticketId", getEventTicketById);
 
 export { router as ticketRouter };

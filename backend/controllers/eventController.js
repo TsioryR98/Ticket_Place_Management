@@ -8,20 +8,31 @@ const handleError = (res, message, error) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const [resultEvent, totalResult, resultTicket] = await Promise.all([
-      pool.query("SELECT * FROM events"),
-      pool.query("SELECT COUNT(*) FROM events"),
-      pool.query("SELECT*FROM tickets"),
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
+
+    // Get paginated events and total count
+    const [resultEvent, totalResult] = await Promise.all([
+      pool.query(
+        `SELECT * FROM events ORDER BY event_datetime LIMIT $1 OFFSET $2`,
+        [perPage, offset]
+      ),
+      pool.query(`SELECT COUNT(*) FROM events`),
     ]);
 
     const total = parseInt(totalResult.rows[0].count, 10);
-    //Add x-total-Count and getting from headers for pagination
-
     res.set("X-Total-Count", total);
 
-    //filter ticket for on event ( ticket.event_id === event.event_id
+    // Get tickets for all fetched events
+    const eventIds = resultEvent.rows.map((event) => event.event_id);
+    const resultTicket = await pool.query(
+      `SELECT * FROM tickets WHERE event_id = ANY($1::uuid[])`,
+      [eventIds]
+    );
+
+    // Transform events with their tickets
     const events = resultEvent.rows.map((event) => {
-      const eventTicket = resultTicket.rows
+      const eventTickets = resultTicket.rows
         .filter((ticket) => ticket.event_id === event.event_id)
         .map((ticket) => ({
           type: ticket.types,
@@ -34,18 +45,19 @@ export const getAllEvents = async (req, res) => {
         id: event.event_id,
         title: event.title,
         description: event.descriptions,
-        date: new Date(event.event_datetime).toISOString().split("T")[0], // Format YYYY-MM-DD
-        time: new Date(event.event_datetime).toTimeString().split(" ")[0], // Format HH:MM:SS
+        date: new Date(event.event_datetime).toISOString().split("T")[0],
+        time: new Date(event.event_datetime).toTimeString().split(" ")[0],
         location: event.locations,
         organizer: event.organizer,
         category: event.category,
         images: event.imagepath,
-        tickets: eventTicket,
+        tickets: eventTickets,
       };
     });
+
     res.status(200).json(events);
   } catch (error) {
-    handleError(res, "Error during fecthing from database", error);
+    handleError(res, "Error during fetching events from database", error);
   }
 };
 
@@ -109,27 +121,39 @@ export const getEvent = async (req, res) => {
   }
 };
 
-/*--------UPDATE 1 event POST /api/events/save  ok ADMIN--------- */
+/*--------UPDATE 1 event POST /api/events/  ok ADMIN--------- */
 
 export const updateEvent = async (req, res) => {
-  const { eventId } = req.params;
-  const { description, date, time, location } = req.body;
+  const { id } = req.params;
+  const { title, description, date, time, location, category } = req.body;
   const eventDatetime = `${date} ${time}`;
 
-  if (req.user.role !== "user") {
-    // only for user and change role into admin and organizer
+  if (req.user.role !== "admin") {
     return res.status(403).json({ error: "Forbidden request" });
   }
+
   try {
     const saveQuery = await pool.query(
-      "UPDATE events SET descriptions= $1,event_datetime= $2,locations= $3 WHERE event_id=$4 RETURNING *",
-      [description, eventDatetime, location, eventId]
+      "UPDATE events SET title=$1, descriptions=$2, event_datetime=$3, locations=$4 , category=$5 WHERE event_id=$6 RETURNING *",
+      [title, description, eventDatetime, location, category, id]
     );
 
     if (saveQuery.rows.length === 0) {
-      return res.status(401).json({ error: "this event doesn't exist" });
+      return res.status(404).json({ error: "This event doesn't exist" });
     }
-    res.status(200).json(saveQuery.rows[0]);
+
+    // Format the response to match frontend expectations
+    const updatedEvent = saveQuery.rows[0];
+    const responseData = {
+      title: updatedEvent.title,
+      descriptions: updatedEvent.descriptions,
+      event_datetime: updatedEvent.event_datetime,
+      locations: updatedEvent.locations,
+      organizer: updatedEvent.organizer,
+      category: updatedEvent.category,
+    };
+
+    res.status(200).json(responseData);
   } catch (error) {
     handleError(res, "Error during update event", error);
   }
@@ -138,16 +162,16 @@ export const updateEvent = async (req, res) => {
 /*----DELETE /api/events/:eventId -----ADMIN ok*/
 
 export const deleteEvent = async (req, res) => {
-  const { eventId } = req.params;
+  const { id } = req.params;
   const { role } = req.user;
-  if (role !== "user") {
+  if (role !== "admin") {
     // only for user and change role into admin and organizer
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     const result = await pool.query(
       "DELETE FROM events WHERE event_id=$1 RETURNING *",
-      [eventId]
+      [id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "event not found" });
@@ -160,22 +184,22 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-/*----POST /api/events -----ADMIN ok*/
+/*----POST /api/events/create -----ADMIN ok*/
 
 export const createEvent = async (req, res) => {
   const { role } = req.user;
-  const { title, description, date, time, locations, organizer, category } =
+  const { title, description, date, time, location, organizer, category } =
     req.body;
   const eventDatetime = `${date} ${time}`;
 
-  if (role !== "user") {
+  if (role !== "admin") {
     // only for user and change role into admin and organizer if exist
     return res.status(403).json({ error: "Forbidden request" });
   }
   try {
     const result = await pool.query(
       "INSERT INTO events (title, descriptions, event_datetime , locations ,organizer ,category )VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [title, description, eventDatetime, locations, organizer, category]
+      [title, description, eventDatetime, location, organizer, category]
     );
     // Input validation
     if (
@@ -183,7 +207,7 @@ export const createEvent = async (req, res) => {
       !description ||
       !date ||
       !time ||
-      !locations ||
+      !location ||
       !organizer ||
       !category
     ) {
@@ -194,5 +218,54 @@ export const createEvent = async (req, res) => {
     res.status(201).json(event);
   } catch (error) {
     handleError(res, "Error while creating event", error);
+  }
+};
+
+/*--------get 1 event GET /api/events/:id/details ok ADMIN--------- */
+
+export const getEventById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+        e.event_id,
+        e.title,
+        e.descriptions,
+        e.event_datetime,
+        e.locations,
+        e.organizer,
+        e.category,
+        e.imagepath,
+        t.ticket_id,
+        t.types,
+        t.price,
+        t.available,
+        t.limit_per_person
+      FROM events e
+      LEFT JOIN tickets t ON e.event_id = t.event_id
+      WHERE e.event_id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "event not found" });
+    }
+
+    return res.status(200).json({
+      id: id,
+      title: result.rows[0].title,
+      description: result.rows[0].descriptions,
+      date: new Date(result.rows[0].event_datetime).toISOString().split("T")[0],
+      time: new Date(result.rows[0].event_datetime)
+        .toTimeString()
+        .split(" ")[0],
+      location: result.rows[0].locations,
+      organizer: result.rows[0].organizer,
+      category: result.rows[0].category,
+      images: result.rows[0].imagepath,
+    });
+  } catch (error) {
+    return handleError(res, "Error while getting event", error);
   }
 };

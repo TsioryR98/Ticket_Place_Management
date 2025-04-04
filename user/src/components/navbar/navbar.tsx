@@ -1,18 +1,18 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useLoginModal } from "@/context/ModalContext";
-import { signIn, useSession, signOut } from "next-auth/react";
+import {  useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function NavBar() {
   const { data: session } = useSession();
-  const { loginOpenModal, openModal, closeModal } = useLoginModal();
+  const { loginOpenModal, openModal } = useLoginModal();
 
   const handleLoginClick = () => {
     loginOpenModal();
   };
 
-  const user = session?.user;
+  const user = session?.user as { name?: string; email?: string }
   const formatName = (name?: string) => {
     return name
       ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useLoginModal } from "@/context/ModalContext";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function ReservationList() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -108,15 +109,12 @@ export default function ReservationList() {
       const order = orders.find((o) => o.order_id === orderId);
       const item = order?.items.find((i) => i.ticket_id === ticketId);
 
-      if (!item || !item.event_date) {
+      if (!item?.event_date) {
         throw new Error("Billet non trouvé");
       }
 
-      const eventDate = new Date(item.event_date);
-      const currentDate = new Date();
-
-      if (eventDate < currentDate) {
-        alert("Impossible d'annuler un billet pour un événement passé");
+      if (new Date(item.event_date) < new Date()) {
+        toast.error("Impossible d'annuler un événement passé");
         return;
       }
 
@@ -128,9 +126,7 @@ export default function ReservationList() {
             order.order_id === orderId
               ? {
                   ...order,
-                  items: order.items.filter(
-                    (item) => item.ticket_id !== ticketId
-                  ),
+                  items: order.items.filter((i) => i.ticket_id !== ticketId),
                   total_amount: order.total_amount - item.price * item.quantity,
                 }
               : order
@@ -138,13 +134,16 @@ export default function ReservationList() {
           .filter((order) => order.items.length > 0)
       );
 
-      alert("Annulation effectuée avec succès");
+      toast.success("Annulation réussie !");
     } catch (error) {
-      alert(
-        "Erreur lors de l'annulation : " +
-          (error instanceof Error ? error.message : String(error))
+      console.error("Erreur d'annulation:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message.includes("Billet")
+            ? "Ce billet n'existe pas ou a déjà été annulé"
+            : error.message
+          : "Erreur lors de l'annulation"
       );
-      console.error(error);
     }
   }
 

@@ -1,4 +1,22 @@
 import pool from "../dbConfig.js";
+import { broadcastToEventClients } from "../websocket/wsServer.js";
+
+// websocket
+const checkAndNotifySoldOut = async (eventId) => {
+  const ticketsResult = await pool.query(
+    "SELECT types, available FROM tickets WHERE event_id = $1",
+    [eventId]
+  );
+
+  ticketsResult.rows.forEach((ticket) => {
+    if (ticket.available <= 0) {
+      broadcastToEventClients(eventId, {
+        ticketType: ticket.types,
+        status: "SOLD_OUT",
+      });
+    }
+  });
+};
 
 const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
@@ -114,6 +132,7 @@ export const getEvent = async (req, res) => {
           }))
         : [],
     };
+    await checkAndNotifySoldOut(eventId);
 
     res.status(200).json(event);
   } catch (error) {

@@ -1,5 +1,5 @@
-// backend/controllers/orderController.js
 import pool from "../dbConfig.js";
+import { broadcastToEventClients } from "../websocket/wsServer.js";
 
 const handleError = (res, message, error) => {
   console.error(message, error);
@@ -79,6 +79,26 @@ export const createOrder = async (req, res) => {
     );
 
     await client.query("COMMIT");
+
+    const eventAndTickets = await Promise.all(
+      items.map(async (item) => {
+        const res = await pool.query(
+          `SELECT t.event_id, t.types, t.available 
+           FROM tickets t 
+           WHERE t.ticket_id = $1`,
+          [item.ticketId]
+        );
+        return res.rows[0];
+      })
+    );
+
+    eventAndTickets.forEach((ticket) => {
+      broadcastToEventClients(ticket.event_id, {
+        ticketType: ticket.types,
+        available: ticket.available,
+        status: ticket.available <= 0 ? "SOLD_OUT" : "UPDATED",
+      });
+    });
 
     res.status(201).json({
       ...order,
@@ -161,7 +181,6 @@ export const getOrderById = async (req, res) => {
   const userId = req.user?.userId;
 
   try {
-    // Vérifier que l'utilisateur est propriétaire de la commande
     const orderResult = await pool.query(
       "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
       [orderId, userId]
@@ -175,7 +194,6 @@ export const getOrderById = async (req, res) => {
 
     const order = orderResult.rows[0];
 
-    // Récupérer les items de la commande
     const itemsResult = await pool.query(
       "SELECT oi.*, t.types as ticket_type, e.title as event_title " +
         "FROM order_items oi " +
@@ -198,9 +216,8 @@ export const getOrderById = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
-  // const { role } = req.user;
-  // Solution temporaire - bypass auth pour les tests
-  const role = "admin"; // Force le rôle admin
+
+  const role = "admin";
 
   if (role !== "admin") {
     return res.status(403).json({ error: "Forbidden: admin access required" });
@@ -229,14 +246,13 @@ export const updateOrderStatus = async (req, res) => {
 // cancel the reservation
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;
-  const userId = req.user.userId; // Extrait du JWT
+  const userId = req.user.userId;
 
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
-    // 1. Vérifier que l'item appartient bien à l'utilisateur
     const orderCheck = await client.query(
       "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
       [orderId, userId]
@@ -248,7 +264,6 @@ export const cancelOrderItem = async (req, res) => {
         .json({ error: "Commande non trouvée ou accès refusé" });
     }
 
-    // 2. Récupérer la quantité annulée et vérifier la date de l'événement
     const itemResult = await client.query(
       `SELECT oi.quantity, e.event_datetime 
        FROM order_items oi
@@ -274,29 +289,36 @@ export const cancelOrderItem = async (req, res) => {
       });
     }
 
-    // 3. Supprimer l'item de la commande
     await client.query(
       "DELETE FROM order_items WHERE order_id = $1 AND ticket_id = $2",
       [orderId, ticketId]
     );
 
-    // 4. Remettre les billets en stock
     await client.query(
       "UPDATE tickets SET available = available + $1 WHERE ticket_id = $2",
       [quantity, ticketId]
     );
 
-    // 5. Mettre à jour le montant total de la commande
     await client.query(
       "UPDATE orders SET total_amount = total_amount - ($1 * (SELECT price FROM tickets WHERE ticket_id = $2)) WHERE order_id = $3",
       [quantity, ticketId, orderId]
     );
 
     await client.query("COMMIT");
-    res.status(200).json({ message: "Annulation réussie" });
+
+    const updatedOrder = await client.query(
+      "SELECT * FROM orders WHERE order_id = $1",
+      [orderId]
+    );
+
+    res.status(200).json(updatedOrder.rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
-    handleError(res, "Erreur lors de l'annulation", error);
+    console.error("Erreur d'annulation:", error);
+    res.status(500).json({
+      error: "Erreur lors de l'annulation",
+      details: error.message,
+    });
   } finally {
     client.release();
   }
@@ -411,7 +433,6 @@ export const getOrdersByEvent = async (req, res) => {
 };
 
 // GET /api/orders/admin/:orderId - Admin access to any order
-// orderController.js
 export const getAdminOrder = async (req, res) => {
   const { orderId } = req.params;
 
@@ -420,7 +441,6 @@ export const getAdminOrder = async (req, res) => {
   }
 
   try {
-    // Récupération de la commande
     const orderResult = await pool.query(
       `SELECT o.*, u.user_email 
        FROM orders o
@@ -433,7 +453,6 @@ export const getAdminOrder = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    // Récupération des items
     const itemsResult = await pool.query(
       `SELECT oi.*, 
         t.types as ticket_type,
@@ -451,7 +470,7 @@ export const getAdminOrder = async (req, res) => {
       ...orderResult.rows[0],
       items: itemsResult.rows.map((item) => ({
         ...item,
-        price: Number(item.price), // Conversion explicite
+        price: Number(item.price),
       })),
     });
   } catch (error) {
@@ -459,6 +478,24 @@ export const getAdminOrder = async (req, res) => {
     res.status(500).json({
       message: "Error fetching order",
       error: error.message,
+    });
+  }
+};
+
+const notifyTicketUpdate = async (ticketId) => {
+  const res = await pool.query(
+    `SELECT t.event_id, t.types, t.available
+     FROM tickets t
+     WHERE t.ticket_id = $1`,
+    [ticketId]
+  );
+
+  if (res.rows.length > 0) {
+    const ticket = res.rows[0];
+    broadcastToEventClients(ticket.event_id, {
+      ticketType: ticket.types,
+      available: ticket.available,
+      status: ticket.available <= 0 ? "SOLD_OUT" : "UPDATED",
     });
   }
 };

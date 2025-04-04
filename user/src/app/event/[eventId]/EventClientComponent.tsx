@@ -13,6 +13,7 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function EventClientComponent({ event }: { event: Event }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,8 +23,89 @@ export default function EventClientComponent({ event }: { event: Event }) {
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [realTimeStock, setRealTimeStock] = useState<{ [key: string]: number }>(
+    {}
+  );
 
-  // Effet pour détecter le scroll et afficher une barre flottante
+  useEffect(() => {
+    let ws: WebSocket;
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 3000;
+
+    const connectWebSocket = () => {
+      try {
+        ws = new WebSocket("ws://localhost:4000");
+
+        ws.onopen = () => {
+          console.log("WebSocket connected");
+          retryCount = 0;
+          ws.send(
+            JSON.stringify({
+              action: "subscribe",
+              eventId: event.id,
+            })
+          );
+        };
+
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === "STOCK_UPDATE") {
+              setRealTimeStock((prev) => ({
+                ...prev,
+                [data.data.ticketType]: data.data.available,
+              }));
+
+              if (data.data.status === "SOLD_OUT") {
+                toast.error(`${data.data.ticketType} tickets sold out!`);
+              } else if (data.data.available < 5) {
+                toast(
+                  `Only ${data.data.available} ${data.data.ticketType} tickets left!`,
+                  { icon: "⚠️" }
+                );
+              }
+            }
+          } catch (parseError) {
+            console.error("Error parsing WebSocket message:", parseError);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket error event:", error);
+          toast.error("Connection issue - trying to reconnect...");
+        };
+
+        ws.onclose = (event) => {
+          console.log("WebSocket closed:", event.code, event.reason);
+          if (event.code !== 1000 && retryCount < maxRetries) {
+            retryCount++;
+            console.log(
+              `Attempting to reconnect (${retryCount}/${maxRetries})...`
+            );
+            setTimeout(connectWebSocket, retryDelay);
+          }
+        };
+      } catch (error) {
+        console.error("WebSocket initialization error:", error);
+      }
+    };
+
+    connectWebSocket();
+
+    return () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close(1000, "Component unmounted");
+      }
+    };
+  }, [event.id]);
+
+  const getTicketAvailability = (ticketType: string) => {
+    return realTimeStock[ticketType] !== undefined
+      ? realTimeStock[ticketType]
+      : event.tickets.find((t) => t.type === ticketType)?.available || 0;
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 200);
@@ -34,7 +116,6 @@ export default function EventClientComponent({ event }: { event: Event }) {
   }, []);
 
   const handleReservationSubmit = async () => {
-    // Vérifier si des tickets sont sélectionnés
     const hasTickets = Object.values(quantities).some((q) => q > 0);
     if (!hasTickets) {
       setReservationError("Please select at least one ticket");
@@ -85,7 +166,6 @@ export default function EventClientComponent({ event }: { event: Event }) {
     });
   };
 
-  // Calcul du total de la réservation
   const calculateTotal = () => {
     return event.tickets
       .reduce((total, ticket) => {
@@ -94,7 +174,6 @@ export default function EventClientComponent({ event }: { event: Event }) {
       .toFixed(2);
   };
 
-  // Calcul du nombre total de billets sélectionnés
   const totalTickets = Object.values(quantities).reduce(
     (sum, quantity) => sum + quantity,
     0
@@ -198,7 +277,9 @@ export default function EventClientComponent({ event }: { event: Event }) {
                     />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Location</p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Location
+                    </p>
                     <p className="font-semibold text-gray-800">
                       {event.location}
                     </p>
@@ -270,42 +351,47 @@ export default function EventClientComponent({ event }: { event: Event }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {event.tickets.map((ticket, index) => (
-                    <tr
-                      key={ticket.type}
-                      className={`${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } hover:bg-blue-50/30 transition-colors duration-150`}
-                    >
-                      <td className="py-5 px-6 border-b border-gray-100 font-medium">
-                        {ticket.type}
-                      </td>
-                      <td className="py-5 px-6 border-b border-gray-100 font-bold text-indigo-700">
-                        {ticket.price} €
-                      </td>
-                      <td className="py-5 px-6 border-b border-gray-100">
-                        {ticket.available > 10 ? (
-                          <span className="text-green-600 font-medium flex items-center gap-2">
-                            <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full"></span>
-                            {ticket.available} available
-                          </span>
-                        ) : ticket.available > 0 ? (
-                          <span className="text-orange-600 font-medium flex items-center gap-2">
-                            <span className="inline-block w-2.5 h-2.5 bg-orange-500 rounded-full"></span>
-                            Only  {ticket.available} left!
-                          </span>
-                        ) : (
-                          <span className="text-red-600 font-medium flex items-center gap-2">
-                            <span className="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-                            Sold out
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-5 px-6 border-b border-gray-100">
-                        {ticket.limitPerPerson}
-                      </td>
-                    </tr>
-                  ))}
+                  {event.tickets.map((ticket, index) => {
+                    // Use the real-time availability
+                    const available = getTicketAvailability(ticket.type);
+
+                    return (
+                      <tr
+                        key={ticket.type}
+                        className={`${
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        } hover:bg-blue-50/30 transition-colors duration-150`}
+                      >
+                        <td className="py-5 px-6 border-b border-gray-100 font-medium">
+                          {ticket.type}
+                        </td>
+                        <td className="py-5 px-6 border-b border-gray-100 font-bold text-indigo-700">
+                          {ticket.price} €
+                        </td>
+                        <td className="py-5 px-6 border-b border-gray-100">
+                          {available > 10 ? (
+                            <span className="text-green-600 font-medium flex items-center gap-2">
+                              <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full"></span>
+                              {available} available
+                            </span>
+                          ) : available > 0 ? (
+                            <span className="text-orange-600 font-medium flex items-center gap-2">
+                              <span className="inline-block w-2.5 h-2.5 bg-orange-500 rounded-full"></span>
+                              Only {available} left!
+                            </span>
+                          ) : (
+                            <span className="text-red-600 font-medium flex items-center gap-2">
+                              <span className="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                              Sold out
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-5 px-6 border-b border-gray-100">
+                          {ticket.limitPerPerson}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -359,87 +445,98 @@ export default function EventClientComponent({ event }: { event: Event }) {
               <h4 className="font-medium text-gray-700 mb-3">
                 Select your tickets
               </h4>
-              {event.tickets.map((ticket) => (
-                <div
-                  key={ticket.type}
-                  className="p-5 border rounded-xl bg-white hover:border-indigo-200 transition-colors hover:shadow-md"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <div>
-                      <span className="font-semibold text-gray-900">
-                        {ticket.type}
-                      </span>
-                      {ticket.available <= 10 && ticket.available > 0 && (
-                        <span className="ml-2 text-xs font-medium px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">
-                          {ticket.available} remaining
+              {event.tickets.map((ticket) => {
+                // Use the real-time availability for the selection form
+                const available = getTicketAvailability(ticket.type);
+
+                return (
+                  <div
+                    key={ticket.type}
+                    className="p-5 border rounded-xl bg-white hover:border-indigo-200 transition-colors hover:shadow-md"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <span className="font-semibold text-gray-900">
+                          {ticket.type}
                         </span>
-                      )}
+                        {available <= 10 && available > 0 && (
+                          <span className="ml-2 text-xs font-medium px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">
+                            {available} remaining
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-lg font-bold text-indigo-700">
+                        {ticket.price} €
+                      </span>
                     </div>
-                    <span className="text-lg font-bold text-indigo-700">
-                      {ticket.price} €
-                    </span>
-                  </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      Limit: {ticket.limitPerPerson} per person
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        Limit: {ticket.limitPerPerson} per person
+                      </span>
 
-                    <div className="flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentValue = quantities[ticket.type] || 0;
-                          if (currentValue > 0) {
-                            handleQuantityChange(ticket.type, currentValue - 1);
+                      <div className="flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentValue = quantities[ticket.type] || 0;
+                            if (currentValue > 0) {
+                              handleQuantityChange(
+                                ticket.type,
+                                currentValue - 1
+                              );
+                            }
+                          }}
+                          className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
+                          disabled={(quantities[ticket.type] || 0) === 0}
+                        >
+                          -
+                        </button>
+
+                        <input
+                          type="number"
+                          id={`quantity-${ticket.type}`}
+                          name={`quantity-${ticket.type}`}
+                          value={quantities[ticket.type] || 0}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (
+                              !isNaN(value) &&
+                              value >= 0 &&
+                              value <= ticket.limitPerPerson
+                            ) {
+                              handleQuantityChange(ticket.type, value);
+                            }
+                          }}
+                          min="0"
+                          max={ticket.limitPerPerson}
+                          className="w-14 h-9 text-center border-y focus:outline-none"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentValue = quantities[ticket.type] || 0;
+                            if (currentValue < ticket.limitPerPerson) {
+                              handleQuantityChange(
+                                ticket.type,
+                                currentValue + 1
+                              );
+                            }
+                          }}
+                          className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
+                          disabled={
+                            (quantities[ticket.type] || 0) ===
+                              ticket.limitPerPerson || available === 0
                           }
-                        }}
-                        className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
-                        disabled={(quantities[ticket.type] || 0) === 0}
-                      >
-                        -
-                      </button>
-
-                      <input
-                        type="number"
-                        id={`quantity-${ticket.type}`}
-                        name={`quantity-${ticket.type}`}
-                        value={quantities[ticket.type] || 0}
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value);
-                          if (
-                            !isNaN(value) &&
-                            value >= 0 &&
-                            value <= ticket.limitPerPerson
-                          ) {
-                            handleQuantityChange(ticket.type, value);
-                          }
-                        }}
-                        min="0"
-                        max={ticket.limitPerPerson}
-                        className="w-14 h-9 text-center border-y focus:outline-none"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentValue = quantities[ticket.type] || 0;
-                          if (currentValue < ticket.limitPerPerson) {
-                            handleQuantityChange(ticket.type, currentValue + 1);
-                          }
-                        }}
-                        className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
-                        disabled={
-                          (quantities[ticket.type] || 0) ===
-                            ticket.limitPerPerson || ticket.available === 0
-                        }
-                      >
-                        +
-                      </button>
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Total calculé */}

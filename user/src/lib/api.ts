@@ -110,46 +110,38 @@ export async function getUserReservations() {
 
 // cancel reservation
 export async function cancelReservation(orderId: string, ticketId: string) {
-  try {
-    const res = await fetchWithAuth(
-      `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
-      {
-        method: "DELETE",
-      }
-    );
-    if (!res) return false; // Échec si non authentifié
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
+    { method: "DELETE" }
+  );
 
-    return await res.json();
-  } catch (error) {
-    console.error("Error cancelling reservation:", error);
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Échec de l'annulation");
   }
+
+  return await response.json();
 }
 
 async function fetchWithAuth(
   url: string,
   options: RequestInit = {}
-): Promise<Response | null> {
-  const isServer = typeof window === "undefined";
-
+): Promise<Response> {
   try {
-    let session;
-
-    if (isServer) {
-      session = await getServerSession(authOptions);
-    } else {
-      const sessionRes = await fetch("/api/auth/session");
-      if (!sessionRes.ok) return null;
-      session = await sessionRes.json();
-    }
+    const session =
+      typeof window === "undefined"
+        ? await getServerSession(authOptions)
+        : await fetch("/api/auth/session").then((res) =>
+            res.ok ? res.json() : null
+          );
 
     if (!session?.user?.accessToken) {
-      return null; // Au lieu de throw une erreur
+      throw new Error("Authentification requise");
     }
 
     const headers = new Headers(options.headers);
-    headers.set("Content-Type", "application/json");
     headers.set("Authorization", `Bearer ${session.user.accessToken}`);
+    headers.set("Content-Type", "application/json");
 
     const response = await fetch(url, {
       ...options,
@@ -158,13 +150,20 @@ async function fetchWithAuth(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Request failed");
+      const errorContent = await response.text();
+      try {
+        const errorData = JSON.parse(errorContent);
+        throw new Error(
+          errorData.error || errorData.message || `Erreur ${response.status}`
+        );
+      } catch {
+        throw new Error(errorContent || `Erreur ${response.status}`);
+      }
     }
 
     return response;
   } catch (error) {
-    console.error("FetchWithAuth error:", error);
+    console.error("Erreur API:", error);
     throw error;
   }
 }

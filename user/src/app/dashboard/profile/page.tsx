@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/sheet"
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
-import {getSession, useSession} from "next-auth/react";
 import { z } from "zod"
+import {useSession} from "next-auth/react";
+import {toast} from "sonner"
 
 const emailSchema = z.string().email("Invalid email format");
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters long").
@@ -26,7 +27,7 @@ const passwordSchema = z.string().min(8, "Password must be at least 8 characters
 const nameSchema = z.string().min(2, "User name must be at least 2 characters");
 
 export default function UserProfile() {
-    const {data: session, status, update} = useSession();
+    const {data: session, status} = useSession();
 
     const user = session?.user;
     const [newUserName, setNewUserName] = useState<string>("");
@@ -35,7 +36,6 @@ export default function UserProfile() {
     const [oldPassword, setOldPassword] = useState("");
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const formatName = (name ?: string) => {
         return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : "N/A";
     }
@@ -49,7 +49,7 @@ export default function UserProfile() {
     };
 
     const validateForm = () => {
-        let validationErrors: { [key: string]: string } = {};
+        const validationErrors: { [key: string]: string } = {};
 
         if (newUserName && !nameSchema.safeParse(newUserName).success) {
             validationErrors.newUserName = "User name must be at least 2 characters";
@@ -78,7 +78,7 @@ export default function UserProfile() {
        setIsSubmitting(true);
 
         try {
-            const response = await fetch(" http://localhost:4000/api/users/me/settings", {
+            const response = await fetch("http://localhost:4000/api/users/me/settings", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -93,36 +93,27 @@ export default function UserProfile() {
             });
 
             const data = await response.json();
-            console.log(data);
-            console.log(response.status)
 
             if (!response.ok) {
                 setErrors({ general: data.error || "Failed to update profile" });
-                console.log("Error updating : " )
+                toast.error("Something went wrong, Try again")
                 return;
             }
             if(response.ok) {
-                await update({
-                    user: {
-                        ...session?.user,
-                        name: newUserName || session?.user?.name,
-                        email: newEmailAddress || session?.user?.email,
-                    },
-                });
+
+                toast.success("Profile was updated successfully.", {
+                    onAutoClose : () => {
+                        toast.info("Sign out and back in to see changes.")
+                    }
+                })
 
 
-                const updatedSession = await getSession();
-                console.log("Nouvelle session après mise à jour :", updatedSession?.user);
 
-
-                window.location.reload();
-                alert("Profile updated successfully!");
                 setNewUserName("");
                 setNewEmailAddress("");
                 setNewPassword("");
                 setOldPassword("");
                 setErrors({});
-                console.log("User updated successfully");
             }
         } catch  {
             setErrors({ general: "An error occurred. Please try again." });
@@ -140,7 +131,7 @@ export default function UserProfile() {
 
     if (status === "unauthenticated") {
         return <div className="text-center mt-8 space-y-4">
-            <h1 className="text-xl font-semibold text-amber-500">You need to sign up to see this page</h1>
+            <h1 className="text-xl font-semibold text-amber-500">You need to Sign In to see this page</h1>
             <Link href={"/auth/login"}>
                 <Button variant={"outline"}>
                     Sign In

@@ -11,6 +11,7 @@ import {
   Show,
   SimpleShowLayout,
   FunctionField,
+  ArrayField,
 } from "react-admin";
 
 export const OrderList = () => (
@@ -38,13 +39,30 @@ export const OrderShow = () => (
   <Show>
     <SimpleShowLayout>
       <TextField source="id" label="Order ID" />
-      <FunctionField label="User" render={(record) => record.user_id} />
+      <FunctionField
+        label="User"
+        render={(record) => record.user_email || `User ${record.user_id}`}
+      />
       <NumberField
         source="total_amount"
         options={{ style: "currency", currency: "EUR" }}
       />
       <TextField source="status_order" />
       <DateField source="created_at" showTime />
+
+      <ArrayField source="items">
+        <Datagrid>
+          <TextField source="ticket_type" />
+          <NumberField source="quantity" />
+          <NumberField
+            source="price"
+            options={{ style: "currency", currency: "EUR" }}
+          />
+          <TextField source="event_title" />
+          <DateField source="event_date" showTime />
+          <TextField source="event_location" />
+        </Datagrid>
+      </ArrayField>
     </SimpleShowLayout>
   </Show>
 );

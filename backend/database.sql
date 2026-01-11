@@ -3,7 +3,9 @@ CREATE DATABASE ticket_management;
 
 --uuid_generate_v4 () random uuid
 --ALTER TABLE events ADD COLUMN imagepath VARCHAR(255) DEFAULT NULL;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" CREATE TABLE users (
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE users (
     user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
     user_name VARCHAR(255) UNIQUE NOT NULL,
     user_email VARCHAR(255) UNIQUE NOT NULL,

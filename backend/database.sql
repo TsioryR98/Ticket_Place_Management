@@ -25,7 +25,7 @@ CREATE TABLE events (
     created_at TIMESTAMP DEFAULT NOW (),
     imagepath VARCHAR(255) DEFAULT NULL,
     event_status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (
-        event_status IN ('Published', 'Draft', 'Cancelled')
+        event_status IN ('published', 'draft', 'cancelled')
     )
 );
 

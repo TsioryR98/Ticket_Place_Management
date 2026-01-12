@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 4000;
 const corsOptions = {
   origin: ["http://localhost:5173", "http://localhost:3000"],
   credentials: true,
-  origin: process.env.URL || "*",
+  //origin: process.env.URL || "*",
   exposedHeaders: ["X-Total-Count"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 };
@@ -37,6 +37,10 @@ app.use("/api/events", ticketRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);
+});
+
+app.get("/", (req, res) => {
+  res.status(200).send(`appServer is running on http://localhost:${PORT}`);
 });
 
 initWebSocket(server);

@@ -23,7 +23,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(json());
+app.use(express.json());
 app.use(cookieParser());
 
 //route for user

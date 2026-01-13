@@ -84,7 +84,7 @@ export const loginUser = async (req, res) => {
     if (!correctPassword) {
       return res.status(401).json({ error: "incorrect password" });
     }
-    //JWT token for routes and add in cookies refresh tokens
+    //JWT token for routes a
 
     let tokens = jwTokenAuth(users.rows[0]);
 
@@ -96,8 +96,13 @@ export const loginUser = async (req, res) => {
     });
 
     return res.json({
-      tokens,
-      user: users.rows[0],
+      accessToken: tokens.accessToken,
+      user: {
+        user_id: users.rows[0].user_id,
+        user_name: users.rows[0].user_name,
+        user_email: users.rows[0].user_email,
+        role: users.rows[0].role,
+      },
     });
   } catch (error) {
     return handleError(res, "Error during connection", error);

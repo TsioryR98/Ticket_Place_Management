@@ -40,6 +40,18 @@ export const googleAuth = async (req, res) => {
       user,
       tokens,
     });
+
+    /** test 
+     *     return res.json({
+      accessToken: tokens.accessToken,
+      user: {
+        user_id: user.rows[0].user_id,
+        user_name: user.rows[0].user_name,
+        user_email: user.rows[0].user_email,
+        role: user.rows[0].role,
+      },
+    });
+     */
   } catch (error) {
     return handleError(res, "Error during Google authentication", error);
   }

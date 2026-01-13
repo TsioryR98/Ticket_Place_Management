@@ -8,7 +8,7 @@ const handleError = (res, message, error) => {
 
 export const googleAuth = async (req, res) => {
   try {
-    const { email, username, googleId } = req.body;
+    const { email, name, googleId } = req.body;
     const res = await pool.query("SELECT * FROM users WHERE user_email=$1", [
       email,
     ]);
@@ -26,7 +26,7 @@ export const googleAuth = async (req, res) => {
       //insert into DB
       const newUser = await pool.query(
         "INSERT INTO users (user_name, user_email, google_id) VALUES($1, $2, $3) RETURNING *",
-        [profile.displayName, email, googleId]
+        [name, email, googleId]
       );
       user = newUser.rows[0];
     }

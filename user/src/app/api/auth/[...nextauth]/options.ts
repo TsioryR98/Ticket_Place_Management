@@ -37,6 +37,7 @@ const option: NextAuthOptions = {
                 email: credentials?.email,
                 password: credentials?.password,
               }),
+              credentials: "include",
             }
           );
 
@@ -73,7 +74,6 @@ const option: NextAuthOptions = {
           email: user.email,
           role: user.role,
           accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
         };
       }
       return token;
@@ -88,9 +88,8 @@ const option: NextAuthOptions = {
           name: token.name,
           email: token.email,
           role: token.role,
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
         },
+        accessToken: token.accessToken,
       };
     },
   },

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useLoginModal } from "@/context/ModalContext";
 
 export default function SignupPage() {
-  const { loginOpenModal, openModal, closeModal } = useLoginModal();
+  const { loginOpenModal } = useLoginModal();
 
   const handleLoginClick = () => {
     loginOpenModal();

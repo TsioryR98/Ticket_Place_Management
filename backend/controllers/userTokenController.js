@@ -1,10 +1,12 @@
-import { jwTokenAuth } from "../utils/jwt_auth.js";
+/* eslint-disable no-undef */
 import jwt from "jsonwebtoken";
+import ms from "ms";
 
 /*------POST api/users/refresh SIGN tokens instead of User----------- */
 
 export const refreshTokenAccess = (req, res) => {
-  const refreshToken = req.cookies.refresh_token; // const refreshToken = req.cookies['refreshToken']; from the cookies named refresh_token HTTPS ONLY
+  const refreshToken = req.cookies.refresh_token;
+  // const refreshToken = req.cookies['refreshToken']; from the cookies named refresh_token HTTPS ONLY
   if (!refreshToken) {
     return res.status(401).json({
       message: "Access Denied. No refresh token provided.",
@@ -15,7 +17,7 @@ export const refreshTokenAccess = (req, res) => {
       refreshToken,
       process.env.JWT_REFRESH_SECRET
     );
-    const accesToken = jwt.sign(
+    const accessToken = jwt.sign(
       {
         userId: decodedUserRefreshed.userId,
         role: decodedUserRefreshed.role,
@@ -25,11 +27,10 @@ export const refreshTokenAccess = (req, res) => {
         expiresIn: process.env.JWT_EXPIRES_IN,
       }
     );
+    const expiresAt = Date.now() + ms(process.env.JWT_EXPIRES_IN);
 
-    const expiresIn = 3600;
-
-    return res.status(200).json({ accesToken, expiresIn });
+    return res.status(200).json({ accessToken, expiresIn: expiresAt });
   } catch (error) {
-    return res.status(400).json({ message, error: error?.message || error });
+    return res.status(400).json({ error: error?.message || error });
   }
 };

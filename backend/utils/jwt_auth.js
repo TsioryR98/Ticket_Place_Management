@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import ms from "ms";
 
 dotenv.config();
 function jwTokenAuth({ user_id, user_email, role }) {
@@ -10,6 +12,9 @@ function jwTokenAuth({ user_id, user_email, role }) {
       email: user_email,
       role: role,
     };
+
+    const expiresAt = Date.now() + ms(process.env.JWT_EXPIRES_IN);
+
     //access token and time
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
@@ -19,9 +24,8 @@ function jwTokenAuth({ user_id, user_email, role }) {
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
     });
-    const expiresIn = 3600;
 
-    return { accessToken, refreshToken, expiresIn };
+    return { accessToken, refreshToken, expiresAt };
   } catch (error) {
     throw new Error(error?.message || error);
   }

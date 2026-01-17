@@ -46,14 +46,19 @@ const option: NextAuthOptions = {
           if (!res.ok) {
             throw new Error(data.error || "Login failed");
           }
-
+          console.log({
+            id: data.user.user_id,
+            name: data.user.user_name,
+            email: data.user.user_email,
+            role: data.user.role,
+            accessToken: data.token,
+          });
           return {
             id: data.user.user_id,
             name: data.user.user_name,
             email: data.user.user_email,
             role: data.user.role,
-            accessToken: data.tokens.accessToken,
-            refreshToken: data.tokens.refreshToken,
+            accessToken: data.tokens,
           };
         } catch (error) {
           console.error("Auth error:", error);

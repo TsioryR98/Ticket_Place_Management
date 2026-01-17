@@ -89,14 +89,14 @@ export const loginUser = async (req, res) => {
     let tokens = jwTokenAuth(users.rows[0]);
 
     res.cookie("refresh_token", tokens.refreshToken, {
-      httpOnly: true, //just server but not client
+      httpOnly: true,
       secure: true, //only with https request
       sameSite: "strict",
       maxAge: 10 * 60 * 1000, //milliseconds
     });
 
     return res.json({
-      accessToken: tokens.accessToken,
+      token: tokens.accessToken,
       user: {
         user_id: users.rows[0].user_id,
         user_name: users.rows[0].user_name,

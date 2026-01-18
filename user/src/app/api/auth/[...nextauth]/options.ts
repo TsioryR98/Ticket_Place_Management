@@ -10,8 +10,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      }
+        body: JSON.stringify({ refreshToken: token.refreshToken })}
     );
     if (!res.ok) throw new Error("Refresh failed");
     const refreshedToken = await res.json();
@@ -80,6 +79,7 @@ const option: NextAuthOptions = {
             email: data.user.user_email,
             role: data.user.role,
             accessToken: data.token,
+            refreshToken: data.refreshToken, //for development purpose
             expiresAt: data.expiresAt,
           };
         } catch (error) {
@@ -101,10 +101,11 @@ const option: NextAuthOptions = {
           email: user.email ?? undefined,
           role: user.role,
           accessToken: user.accessToken,
+          refreshToken: user.refreshToken,//for development purpose
           expiresAt: user.expiresAt,
         };
       }
-      if (token.expiresAt && Date.now() < token.expiresAt) {
+      if (token.expiresAt && Date.now() > token.expiresAt) {
         return token;
       }
       return await refreshAccessToken(token);
@@ -118,14 +119,16 @@ const option: NextAuthOptions = {
           id: token.id,
           name: token.name ?? null,
           email: token.email ?? null,
+          image: session.user.image ?? null,
           role: token.role,
-        },
-        accessToken: token.accessToken,
+          accessToken: token.accessToken,
+        }
       };
     },
   },
   // if we need defaut route for login or logout
   session: { strategy: "jwt" },
+  
 };
 
 export default option;

@@ -19,6 +19,7 @@ declare module 'next-auth' {
     email?: string | null;
     role: string;
     accessToken: string;
+    refreshToken: string; //for development purpose
     expiresAt: number;
   }
 }
@@ -29,6 +30,7 @@ declare module 'next-auth/jwt' {
     email?: string | undefined;
     role?: string;
     accessToken?: string;
+    refreshToken?: string; //for development purpose
     expiresAt?: number;
     error?: string;
   }

@@ -80,13 +80,14 @@ export const loginUser = async (req, res) => {
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: true, //only with https request
-      sameSite: 'strict',
+      secure: false, //only with https request with true and strict sameSite
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, //milliseconds
     });
 
     return res.json({
       token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       expiresAt: tokens.expiresAt,
       user: {
         user_id: users.rows[0].user_id,

@@ -5,6 +5,7 @@ import { usersRouter } from './routes/userRoutes.js';
 import { eventRouter } from './routes/eventRoute.js';
 import { ticketRouter } from './routes/ticketRoute.js';
 import { orderRouter } from './routes/orderRoutes.js';
+import { usersTokenRouter } from './routes/userTokenRoute.js';
 import { initWebSocket } from './websocket/wsServer.js';
 
 const app = express();
@@ -30,7 +31,7 @@ app.use('/api/orders', orderRouter);
 //route for ticket
 app.use('/api/events', ticketRouter);
 //route for token refresh
-app.use('/api/users/refresh', usersRouter);
+app.use('/api/users', usersTokenRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

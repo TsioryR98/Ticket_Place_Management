@@ -1,11 +1,11 @@
-import { RaRecord, Identifier } from "react-admin";
+import { RaRecord, Identifier } from 'react-admin';
 
 export interface Order extends RaRecord {
   id: Identifier;
   user_id: Identifier;
   user_email?: string;
   total_amount: number;
-  status_order: "pending" | "completed" | "cancelled";
+  status_order: 'pending' | 'completed' | 'cancelled';
   created_at: string;
   items: {
     order_item_id: Identifier;

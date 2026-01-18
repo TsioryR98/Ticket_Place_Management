@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
@@ -85,74 +85,74 @@
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-Regular.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-SemiBold.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-Medium.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-ExtraBold.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-ExtraBold.ttf') format('truetype');
   font-weight: 800;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-Bold.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: url("Montserrat/Montserrat-Black.ttf") format("truetype");
+  font-family: 'Montserrat';
+  src: url('Montserrat/Montserrat-Black.ttf') format('truetype');
   font-weight: 900;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-SemiBold.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-Medium.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-ExtraBold.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-ExtraBold.ttf') format('truetype');
   font-weight: 800;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-Bold.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 
 @font-face {
-  font-family: "Poppins";
-  src: url("../styles/Poppins/Poppins-Black.ttf") format("truetype");
+  font-family: 'Poppins';
+  src: url('../styles/Poppins/Poppins-Black.ttf') format('truetype');
   font-weight: 900;
 }
 
@@ -162,7 +162,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 p,
@@ -170,7 +170,7 @@ span,
 a,
 li,
 button {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 .dark {

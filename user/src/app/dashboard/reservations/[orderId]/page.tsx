@@ -1,16 +1,12 @@
-import { getOrderById } from "@/lib/api";
-import { OrderItem } from "@/types/order";
-import { format } from "date-fns";
-import { getServerSession } from "next-auth";
-import Link from "next/link";
-import authOptions from "@/app/api/auth/[...nextauth]/options";
-import { CheckCircle, ArrowLeft, List, Ticket } from "lucide-react";
+import { getOrderById } from '@/lib/api';
+import { OrderItem } from '@/types/order';
+import { format } from 'date-fns';
+import { getServerSession } from 'next-auth';
+import Link from 'next/link';
+import authOptions from '@/app/api/auth/[...nextauth]/options';
+import { CheckCircle, ArrowLeft, List, Ticket } from 'lucide-react';
 
-export default async function OrderConfirmation({
-  params,
-}: {
-  params: { orderId: string };
-}) {
+export default async function OrderConfirmation({ params }: { params: { orderId: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.accessToken) {
@@ -18,9 +14,7 @@ export default async function OrderConfirmation({
       <div className="max-w-3xl mx-auto p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
           <h2 className="font-bold text-red-700 text-lg">Access denied</h2>
-          <p className="text-red-600 mt-2">
-            You must be logged in to view this order
-          </p>
+          <p className="text-red-600 mt-2">You must be logged in to view this order</p>
           <Link
             href="/auth/login"
             className="inline-flex items-center text-blue-600 hover:underline mt-4 font-medium"
@@ -45,18 +39,12 @@ export default async function OrderConfirmation({
         {/* Header avec confirmation - Ajout d'une animation subtle */}
         <div className="text-center mb-8 animate-in fade-in duration-300">
           <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
-            <CheckCircle
-              className="w-10 h-10 text-green-600"
-              strokeWidth={1.8}
-            />
+            <CheckCircle className="w-10 h-10 text-green-600" strokeWidth={1.8} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Booking confirmed
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking confirmed</h1>
           <p className="text-gray-500">
-            Reference:{" "}
-            <span className="font-medium text-gray-700">#{order.order_id}</span>{" "}
-            • Le {format(new Date(order.created_at), "dd/MM/yyyy à HH:mm")}
+            Reference: <span className="font-medium text-gray-700">#{order.order_id}</span> • Le{' '}
+            {format(new Date(order.created_at), 'dd/MM/yyyy à HH:mm')}
           </p>
         </div>
 
@@ -85,9 +73,7 @@ export default async function OrderConfirmation({
                           {item.quantity}x {item.ticket_type}
                         </h3>
                         {item.event_title && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {item.event_title}
-                          </p>
+                          <p className="text-sm text-gray-500 mt-1">{item.event_title}</p>
                         )}
                       </div>
                     </div>
@@ -102,12 +88,8 @@ export default async function OrderConfirmation({
             {/* Total - Meilleure mise en valeur */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
-                <span className="font-semibold text-gray-700 text-lg">
-                  Total amount
-                </span>
-                <span className="font-bold text-blue-600 text-xl">
-                  {order.total_amount}€
-                </span>
+                <span className="font-semibold text-gray-700 text-lg">Total amount</span>
+                <span className="font-bold text-blue-600 text-xl">{order.total_amount}€</span>
               </div>
             </div>
           </div>
@@ -134,13 +116,13 @@ export default async function OrderConfirmation({
       </div>
     );
   } catch (error) {
-    console.error("Erreur:", error);
+    console.error('Erreur:', error);
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
           <h2 className="font-bold text-red-700 text-lg">Error</h2>
           <p className="text-red-600 mt-2">
-            {error instanceof Error ? error.message : "Order not found"}
+            {error instanceof Error ? error.message : 'Order not found'}
           </p>
           <Link
             href="/dashboard/reservations"

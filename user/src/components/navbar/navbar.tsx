@@ -1,8 +1,8 @@
-"use client";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useLoginModal } from "@/context/ModalContext";
-import {  useSession, signOut } from "next-auth/react";
-import Link from "next/link";
+'use client';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { useLoginModal } from '@/context/ModalContext';
+import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function NavBar() {
   const { data: session } = useSession();
@@ -12,11 +12,9 @@ export default function NavBar() {
     loginOpenModal();
   };
 
-  const user = session?.user as { name?: string; email?: string }
+  const user = session?.user as { name?: string; email?: string };
   const formatName = (name?: string) => {
-    return name
-      ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
-      : "N/A";
+    return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : 'N/A';
   };
 
   return (
@@ -31,10 +29,7 @@ export default function NavBar() {
       </div>
 
       <div className="flex items-center gap-6 justify-end">
-        <Link
-          href="/"
-          className="text-sky-100 hover:text-white font-medium transition-colors"
-        >
+        <Link href="/" className="text-sky-100 hover:text-white font-medium transition-colors">
           Home
         </Link>
         <Link
@@ -69,12 +64,8 @@ export default function NavBar() {
               >
                 <div className="py-1">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm text-gray-500">
-                      Logged in as
-                    </p>
-                    <p className="text-sm font-medium text-gray-800">
-                      {formatName(user?.name)}
-                    </p>
+                    <p className="text-sm text-gray-500">Logged in as</p>
+                    <p className="text-sm font-medium text-gray-800">{formatName(user?.name)}</p>
                   </div>
                   <MenuItem>
                     <Link
@@ -85,10 +76,7 @@ export default function NavBar() {
                     </Link>
                   </MenuItem>
                   <MenuItem>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50"
-                    >
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50">
                       Support
                     </a>
                   </MenuItem>

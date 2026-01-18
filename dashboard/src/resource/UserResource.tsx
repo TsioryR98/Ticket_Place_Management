@@ -1,5 +1,5 @@
-import { useMediaQuery, Theme } from "@mui/material";
-import * as React from "react";
+import { useMediaQuery, Theme } from '@mui/material';
+import * as React from 'react';
 import {
   Datagrid,
   List,
@@ -17,10 +17,10 @@ import {
   EmailField,
   DateField,
   SimpleShowLayout,
-} from "react-admin";
+} from 'react-admin';
 
 export const UserList = () => {
-  const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
+  const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   return (
     <List>
       {isSmall ? (
@@ -63,8 +63,8 @@ export const UserEdit = () => {
         <SelectInput
           source="role"
           choices={[
-            { id: "user", name: "user" },
-            { id: "admin", name: "admin" },
+            { id: 'user', name: 'user' },
+            { id: 'admin', name: 'admin' },
           ]}
         />
       </SimpleForm>

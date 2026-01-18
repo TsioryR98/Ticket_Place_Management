@@ -1,9 +1,9 @@
-"use client";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useLoginModal } from "@/context/ModalContext";
+'use client';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useLoginModal } from '@/context/ModalContext';
 
 export default function SignupPage() {
   const { loginOpenModal } = useLoginModal();
@@ -13,11 +13,11 @@ export default function SignupPage() {
   };
 
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: '',
+    email: '',
+    password: '',
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -27,26 +27,23 @@ export default function SignupPage() {
 
     try {
       // 1. Enregistrement
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Registration failed");
+        throw new Error(errorData.error || 'Registration failed');
       }
 
       // 2. Connexion automatique
-      const result = await signIn("credentials", {
+      const result = await signIn('credentials', {
         redirect: false,
         email: formData.email,
         password: formData.password,
-        callbackUrl: "/",
+        callbackUrl: '/',
       });
 
       if (result?.error) {
@@ -57,7 +54,7 @@ export default function SignupPage() {
         router.push(result.url);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -128,9 +125,7 @@ export default function SignupPage() {
                 required
                 className="pl-10 block w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm"
                 value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 placeholder="johndoe"
               />
             </div>
@@ -162,9 +157,7 @@ export default function SignupPage() {
                 required
                 className="pl-10 block w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="john.doe@example.com"
               />
             </div>
@@ -199,9 +192,7 @@ export default function SignupPage() {
                 required
                 className="pl-10 block w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="••••••••"
               />
             </div>
@@ -237,7 +228,7 @@ export default function SignupPage() {
                 Creating Account...
               </>
             ) : (
-              "Create Account"
+              'Create Account'
             )}
           </button>
         </form>
@@ -252,7 +243,7 @@ export default function SignupPage() {
           <button
             type="button"
             className="w-full flex justify-center items-center py-3 px-4 border border-indigo-200 rounded-xl shadow-sm text-base font-medium text-indigo-700 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 mb-4 transform hover:-translate-y-0.5"
-            onClick={() => signIn("google")}
+            onClick={() => signIn('google')}
           >
             <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
               <path
@@ -276,7 +267,7 @@ export default function SignupPage() {
           </button>
 
           <p className="text-indigo-500 mt-4 text-sm">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link
               href="#"
               className="font-medium text-indigo-700 hover:text-indigo-900 transition"

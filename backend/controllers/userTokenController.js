@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-import jwt from "jsonwebtoken";
-import ms from "ms";
+import jwt from 'jsonwebtoken';
+import ms from 'ms';
 
 /*------POST api/users/refresh SIGN tokens instead of User----------- */
 
@@ -9,14 +9,11 @@ export const refreshTokenAccess = (req, res) => {
   // const refreshToken = req.cookies['refreshToken']; from the cookies named refresh_token HTTPS ONLY
   if (!refreshToken) {
     return res.status(401).json({
-      message: "Access Denied. No refresh token provided.",
+      message: 'Access Denied. No refresh token provided.',
     });
   }
   try {
-    const decodedUserRefreshed = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET
-    );
+    const decodedUserRefreshed = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const accessToken = jwt.sign(
       {
         userId: decodedUserRefreshed.userId,
@@ -25,7 +22,7 @@ export const refreshTokenAccess = (req, res) => {
       process.env.JWT_ACCESS_SECRET,
       {
         expiresIn: process.env.JWT_EXPIRES_IN,
-      }
+      },
     );
     const expiresAt = Math.floor(Date.now() + ms(process.env.JWT_EXPIRES_IN));
 

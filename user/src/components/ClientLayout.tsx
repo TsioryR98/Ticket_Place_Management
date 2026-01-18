@@ -2,17 +2,13 @@
 NOTE:
 CSR only , if you have server components , redirect it into "@/app/Layout"
 */
-"use client";
-import { SessionProvider } from "next-auth/react";
-import { LoginModalContext } from "@/context/ModalContext";
-import NavBar from "@/components/navbar/navbar";
-import LoginModal from "@/components/login/LoginModal";
+'use client';
+import { SessionProvider } from 'next-auth/react';
+import { LoginModalContext } from '@/context/ModalContext';
+import NavBar from '@/components/navbar/navbar';
+import LoginModal from '@/components/login/LoginModal';
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <LoginModalContext>
       <SessionProvider>

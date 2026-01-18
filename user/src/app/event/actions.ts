@@ -1,19 +1,19 @@
-"use server";
+'use server';
 
-import { getServerSession } from "next-auth";
-import authOptions from "@/app/api/auth/[...nextauth]/options";
+import { getServerSession } from 'next-auth';
+import authOptions from '@/app/api/auth/[...nextauth]/options';
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = 'http://localhost:4000/api';
 
 export async function reserveTicket(
   eventId: string,
-  reservations: { ticketType: string; quantity: number }[]
+  reservations: { ticketType: string; quantity: number }[],
 ) {
   try {
     // 1. Récupérer la session
     const session = await getServerSession(authOptions);
     if (!session?.user.accessToken) {
-      throw new Error("Vous devez être connecté pour réserver");
+      throw new Error('Vous devez être connecté pour réserver');
     }
 
     // 2. Récupérer l'événement
@@ -23,8 +23,7 @@ export async function reserveTicket(
       },
     });
 
-    if (!eventRes.ok)
-      throw new Error("Échec de la récupération de l'événement");
+    if (!eventRes.ok) throw new Error("Échec de la récupération de l'événement");
     const event = await eventRes.json();
 
     // 3. Préparer les items de commande
@@ -36,14 +35,14 @@ export async function reserveTicket(
           ticketId: ticket.ticket_id,
           quantity: Math.max(1, quantity),
         };
-      })
+      }),
     );
 
     // 4. Envoyer la commande avec authentification
     const res = await fetch(`${API_BASE_URL}/orders`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${session.user.accessToken}`,
       },
       body: JSON.stringify({ items: orderItems }),
@@ -51,20 +50,20 @@ export async function reserveTicket(
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.error || "Échec de la création de commande");
+      throw new Error(errorData.error || 'Échec de la création de commande');
     }
 
     const orderData = await res.json();
     return {
       success: true,
       orderId: orderData.order_id,
-      message: "Réservation confirmée!",
+      message: 'Réservation confirmée!',
     };
   } catch (error) {
-    console.error("Erreur de réservation:", error);
+    console.error('Erreur de réservation:', error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Erreur inconnue",
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
     };
   }
 }

@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface PaginationProps {
   currentPage: number;
@@ -11,7 +11,7 @@ interface PaginationProps {
 export default function Pagination({
   currentPage,
   totalPages,
-  baseUrl = "/",
+  baseUrl = '/',
   searchParams = {},
 }: PaginationProps) {
   const router = useRouter();
@@ -20,12 +20,12 @@ export default function Pagination({
     const params = new URLSearchParams();
 
     Object.entries(searchParams).forEach(([key, value]) => {
-      if (value && key !== "page") {
+      if (value && key !== 'page') {
         params.set(key, value);
       }
     });
 
-    params.set("page", pageNum.toString());
+    params.set('page', pageNum.toString());
     const url = `${baseUrl}?${params.toString()}#events`;
     router.push(url);
   };
@@ -68,7 +68,7 @@ export default function Pagination({
           <button
             onClick={() => handleNavigation(1)}
             className={`px-4 py-2 border rounded-md ${
-              1 === currentPage ? "bg-blue-500 text-white" : "hover:bg-gray-100"
+              1 === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
             }`}
           >
             1
@@ -83,9 +83,7 @@ export default function Pagination({
           key={pageNum}
           onClick={() => handleNavigation(pageNum)}
           className={`px-4 py-2 border rounded-md ${
-            pageNum === currentPage
-              ? "bg-blue-500 text-white"
-              : "hover:bg-gray-100"
+            pageNum === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
           }`}
         >
           {pageNum}
@@ -95,15 +93,11 @@ export default function Pagination({
       {/* Dernière page */}
       {!pageNumbers.includes(totalPages) && totalPages > 1 && (
         <>
-          {!pageNumbers.includes(totalPages - 1) && (
-            <span className="px-2">...</span>
-          )}
+          {!pageNumbers.includes(totalPages - 1) && <span className="px-2">...</span>}
           <button
             onClick={() => handleNavigation(totalPages)}
             className={`px-4 py-2 border rounded-md ${
-              totalPages === currentPage
-                ? "bg-blue-500 text-white"
-                : "hover:bg-gray-100"
+              totalPages === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
             }`}
           >
             {totalPages}

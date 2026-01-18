@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   List,
   Datagrid,
@@ -12,18 +12,13 @@ import {
   required,
   ReferenceInput,
   SelectInput,
-} from "react-admin";
+} from 'react-admin';
 
 export const TicketList = (props) => (
   <List
     {...props}
     filters={[
-      <ReferenceInput
-        key="event-filter"
-        source="eventId"
-        reference="events"
-        label="Événement"
-      >
+      <ReferenceInput key="event-filter" source="eventId" reference="events" label="Événement">
         <SelectInput optionText="title" />
       </ReferenceInput>,
     ]}
@@ -42,16 +37,8 @@ export const ticketEdit = (props) => (
     <SimpleForm>
       <TextInput source="types" label="Type" validate={required()} />
       <NumberInput source="price" label="Prix" validate={required()} />
-      <NumberInput
-        source="available"
-        label="Disponibles"
-        validate={required()}
-      />
-      <NumberInput
-        source="limit_per_person"
-        label="Limite/personne"
-        validate={required()}
-      />
+      <NumberInput source="available" label="Disponibles" validate={required()} />
+      <NumberInput source="limit_per_person" label="Limite/personne" validate={required()} />
     </SimpleForm>
   </Edit>
 );
@@ -64,16 +51,8 @@ export const ticketCreate = (props) => (
       </ReferenceInput>
       <TextInput source="types" label="Type" validate={required()} />
       <NumberInput source="price" label="Prix" validate={required()} />
-      <NumberInput
-        source="available"
-        label="Disponibles"
-        validate={required()}
-      />
-      <NumberInput
-        source="limit_per_person"
-        label="Limite/personne"
-        validate={required()}
-      />
+      <NumberInput source="available" label="Disponibles" validate={required()} />
+      <NumberInput source="limit_per_person" label="Limite/personne" validate={required()} />
     </SimpleForm>
   </Create>
 );

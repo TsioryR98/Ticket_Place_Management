@@ -8,10 +8,10 @@ import {
   RaRecord,
   UpdateParams,
   UpdateResult,
-} from "react-admin";
-import { fetchUtils } from "react-admin";
+} from 'react-admin';
+import { fetchUtils } from 'react-admin';
 
-const urlAPI = "http://localhost:4000/api";
+const urlAPI = 'http://localhost:4000/api';
 const httpClient = fetchUtils.fetchJson;
 
 interface Order extends RaRecord {
@@ -19,7 +19,7 @@ interface Order extends RaRecord {
   user_id: Identifier;
   user_email?: string;
   total_amount: number;
-  status_order: "pending" | "completed" | "cancelled";
+  status_order: 'pending' | 'completed' | 'cancelled';
   created_at: string;
   items: {
     order_item_id: Identifier;
@@ -37,21 +37,19 @@ export const orderDataProvider: DataProvider = {
   getList: async (resource, params) => {
     try {
       const { eventId } = params.filter || {};
-      const url = eventId
-        ? `${urlAPI}/orders/event/${eventId}`
-        : `${urlAPI}/orders/test/orders`;
-      const token = localStorage.getItem("token");
+      const url = eventId ? `${urlAPI}/orders/event/${eventId}` : `${urlAPI}/orders/test/orders`;
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json } = await httpClient(url, {
         headers: new Headers({
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         }),
-        method: "GET",
+        method: 'GET',
       });
 
       const mappedData = json.map((order: any) => ({
@@ -68,22 +66,22 @@ export const orderDataProvider: DataProvider = {
         total: mappedData.length,
       };
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error('Error fetching orders:', error);
       throw error;
     }
   },
 
   getOne: async (resource, params) => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Authentication required");
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
 
     try {
       const { json } = await httpClient(`${urlAPI}/orders/admin/${params.id}`, {
         headers: new Headers({
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         }),
-        method: "GET",
+        method: 'GET',
       });
 
       return {
@@ -107,34 +105,32 @@ export const orderDataProvider: DataProvider = {
             })) || [],
         },
       };
-    } catch (error: any) {
-      console.error("Order fetch error:", {
+    } catch (error) {
+      console.error('Order fetch error:', {
         url: `${urlAPI}/orders/admin/${params.id}`,
         error: error.message,
         status: error.status,
         body: error.body,
       });
       throw new Error(
-        error.status === 403
-          ? "Admin access required"
-          : "Could not load order details"
+        error.status === 403 ? 'Admin access required' : 'Could not load order details',
       );
     }
   },
 
   update: async (resource, params) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json } = await httpClient(`${urlAPI}/orders/${params.id}`, {
         headers: new Headers({
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         }),
-        method: "PUT",
+        method: 'PUT',
         body: JSON.stringify({ status: params.data.status_order }),
       });
 

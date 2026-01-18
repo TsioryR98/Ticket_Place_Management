@@ -22,9 +22,9 @@ import {
   UpdateManyParams,
   UpdateManyResult,
   email,
-} from "react-admin";
+} from 'react-admin';
 
-import { fetchUtils } from "react-admin";
+import { fetchUtils } from 'react-admin';
 
 interface User extends RaRecord {
   id: Identifier; // Add the required 'id' property
@@ -34,14 +34,14 @@ interface User extends RaRecord {
   created_at: string;
 }
 
-const urlAPI = "http://localhost:4000/api";
+const urlAPI = 'http://localhost:4000/api';
 const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
-  getList: async function <RecordType extends RaRecord = User>(
+  getList: async function<RecordType extends RaRecord = User>(
     resource: string,
-    params: GetListParams & QueryFunctionContext
+    params: GetListParams & QueryFunctionContext,
   ): Promise<GetListResult<RecordType>> {
     try {
       const { page = 1, perPage = 6 } = params.pagination || {}; // 6 éléments par page
@@ -53,18 +53,18 @@ export const userDataProvider: DataProvider = {
 
       // get data with HTTPS and URL
       const url = `${urlAPI}/${resource}?${fetchUtils.queryParameters(query)}`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
       const { json, headers } = await httpClient(url, {
         headers: new Headers({ Authorization: `Bearer ${token}` }),
-        method: "GET",
+        method: 'GET',
       });
 
       //get X total count from header and cast Number
-      const total = Number(headers.get("X-Total-Count"));
+      const total = Number(headers.get('X-Total-Count'));
       const pageNumber = Math.ceil(total / perPage);
 
       const resultDataAdmin = json.map((item: any) => ({
@@ -92,19 +92,19 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  getOne: async function <RecordType extends RaRecord = User>(
+  getOne: async function<RecordType extends RaRecord = User>(
     resource: string,
-    params: GetOneParams<RecordType> & QueryFunctionContext
+    params: GetOneParams<RecordType> & QueryFunctionContext,
   ): Promise<GetOneResult<RecordType>> {
     const { id } = params; // Correctly destructure the id
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
-        method: "GET",
+        method: 'GET',
       });
 
       //already mapped in server express
@@ -126,24 +126,21 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  update: async function <RecordType extends RaRecord = User>(
+  update: async function<RecordType extends RaRecord = User>(
     resource: string,
-    params: UpdateParams
+    params: UpdateParams,
   ): Promise<UpdateResult<RecordType>> {
     const { id, data } = params; // data is the updated data
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
-      const { json, headers } = await httpClient(
-        `${urlAPI}/${resource}/role/${id}`,
-        {
-          headers: new Headers({ Authorization: `Bearer ${token}` }),
-          method: "PATCH",
-          body: JSON.stringify({ role: data.role }), //body of the request
-        }
-      );
+      const { json, headers } = await httpClient(`${urlAPI}/${resource}/role/${id}`, {
+        headers: new Headers({ Authorization: `Bearer ${token}` }),
+        method: 'PATCH',
+        body: JSON.stringify({ role: data.role }), //body of the request
+      });
       const updatedData = {
         id: json.id,
         username: json.username,
@@ -161,19 +158,19 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  delete: async function <RecordType extends RaRecord = User>(
+  delete: async function<RecordType extends RaRecord = User>(
     resource: string,
-    params: DeleteParams<RecordType>
+    params: DeleteParams<RecordType>,
   ): Promise<DeleteResult<RecordType>> {
     const { id } = params; // Correctly destructure the id
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       await httpClient(`${urlAPI}/${resource}/${id}/delete`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: new Headers({ Authorization: `Bearer ${token}` }),
       });
 
@@ -187,37 +184,34 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  create: function <
-    RecordType extends Omit<RaRecord, "id"> = any,
+  create: function<
+    RecordType extends Omit<RaRecord, 'id'> = any,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier }
-  >(
-    resource: string,
-    params: CreateParams
-  ): Promise<CreateResult<ResultRecordType>> {
-    throw new Error("Function not implemented.");
+  >(resource: string, params: CreateParams): Promise<CreateResult<ResultRecordType>> {
+    throw new Error('Function not implemented.');
   },
-  getMany: function <RecordType extends RaRecord = any>(
+  getMany: function<RecordType extends RaRecord = any>(
     resource: string,
-    params: GetManyParams<RecordType> & QueryFunctionContext
+    params: GetManyParams<RecordType> & QueryFunctionContext,
   ): Promise<GetManyResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    throw new Error('Function not implemented.');
   },
-  getManyReference: function <RecordType extends RaRecord = any>(
+  getManyReference: function<RecordType extends RaRecord = any>(
     resource: string,
-    params: GetManyReferenceParams & QueryFunctionContext
+    params: GetManyReferenceParams & QueryFunctionContext,
   ): Promise<GetManyReferenceResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    throw new Error('Function not implemented.');
   },
-  updateMany: function <RecordType extends RaRecord = any>(
+  updateMany: function<RecordType extends RaRecord = any>(
     resource: string,
-    params: UpdateManyParams
+    params: UpdateManyParams,
   ): Promise<UpdateManyResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    throw new Error('Function not implemented.');
   },
-  deleteMany: function <RecordType extends RaRecord = any>(
+  deleteMany: function<RecordType extends RaRecord = any>(
     resource: string,
-    params: DeleteManyParams<RecordType>
+    params: DeleteManyParams<RecordType>,
   ): Promise<DeleteManyResult<RecordType>> {
-    throw new Error("Function not implemented.");
+    throw new Error('Function not implemented.');
   },
 };

@@ -1,5 +1,5 @@
-import * as React from "react";
-import { useLogin, useNotify } from "react-admin";
+import * as React from 'react';
+import { useLogin, useNotify } from 'react-admin';
 import {
   Button,
   CssBaseline,
@@ -10,69 +10,67 @@ import {
   Stack,
   FormHelperText,
   Card as MuiCard,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import ForgotPassword from "../loginPage/ForgotPassword";
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ForgotPassword from '../loginPage/ForgotPassword';
 
 // for sign card connection
 const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
+  display: 'flex',
+  flexDirection: 'column',
+  alignSelf: 'center',
+  width: '100%',
   padding: theme.spacing(4),
   gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
+  margin: 'auto',
+  [theme.breakpoints.up('sm')]: {
+    maxWidth: '450px',
   },
-  backgroundColor: "#002157",
+  backgroundColor: '#002157',
   boxShadow:
-    "hsla(225, 100.00%, 83.90%, 0.05) 0px 5px 15px 0px, hsla(222, 97.00%, 73.90%, 0.05) 0px 15px 35px -5px",
+    'hsla(225, 100.00%, 83.90%, 0.05) 0px 5px 15px 0px, hsla(222, 97.00%, 73.90%, 0.05) 0px 15px 35px -5px',
 }));
 
 // login container
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: "100vh",
-  minHeight: "100%",
+  height: '100vh',
+  minHeight: '100%',
   padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
+  [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
-  "&::before": {
+  '&::before': {
     content: '""',
-    display: "block",
-    position: "absolute",
+    display: 'block',
+    position: 'absolute',
     zIndex: -1,
     inset: 0,
-    backgroundImage: "url(/loginPage.jpg)",
-    backgroundSize: "cover",
-    backgroundRepeat: "no-repeat",
+    backgroundImage: 'url(/loginPage.jpg)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
   },
 }));
 
 const LoginPage: React.FC = () => {
   const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
@@ -96,7 +94,7 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    login({ email, password }).catch(() => notify("Invalid email or password"));
+    login({ email, password }).catch(() => notify('Invalid email or password'));
   };
 
   const validateInputs = () => {
@@ -104,20 +102,20 @@ const LoginPage: React.FC = () => {
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
+      setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
     } else {
       setEmailError(false);
-      setEmailErrorMessage("");
+      setEmailErrorMessage('');
     }
 
     if (!password) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      setPasswordErrorMessage('Password must be at least 6 characters long.');
       isValid = false;
     } else {
       setPasswordError(false);
-      setPasswordErrorMessage("");
+      setPasswordErrorMessage('');
     }
 
     return isValid;
@@ -131,7 +129,7 @@ const LoginPage: React.FC = () => {
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
           >
             Sign in
           </Typography>
@@ -140,9 +138,9 @@ const LoginPage: React.FC = () => {
             onSubmit={handleSubmit}
             noValidate
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: "100%",
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
               gap: 2,
             }}
           >
@@ -159,7 +157,7 @@ const LoginPage: React.FC = () => {
                 id="input-email"
                 label="Email"
                 variant="outlined"
-                color={emailError ? "error" : "primary"}
+                color={emailError ? 'error' : 'primary'}
                 value={email}
                 onChange={handleOnChangeEmail}
               />
@@ -168,7 +166,7 @@ const LoginPage: React.FC = () => {
               <InputLabel htmlFor="input-password">Password</InputLabel>
               <OutlinedInput
                 id="input-password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={handleOnChangePassword}
                 autoComplete="current-password"
@@ -177,9 +175,7 @@ const LoginPage: React.FC = () => {
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                       onClick={handleClickShowPassword}
                       onMouseDown={handleMouseDownPassword}
                       edge="end"
@@ -189,17 +185,10 @@ const LoginPage: React.FC = () => {
                   </InputAdornment>
                 }
               />
-              {passwordError && (
-                <FormHelperText error>{passwordErrorMessage}</FormHelperText>
-              )}
+              {passwordError && <FormHelperText error>{passwordErrorMessage}</FormHelperText>}
             </FormControl>
             <ForgotPassword open={open} handleClose={handleClose} />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
               Sign in
             </Button>
             <Link
@@ -207,7 +196,7 @@ const LoginPage: React.FC = () => {
               type="button"
               onClick={handleClickOpen}
               variant="body2"
-              sx={{ alignSelf: "center" }}
+              sx={{ alignSelf: 'center' }}
             >
               Forgot your password?
             </Link>

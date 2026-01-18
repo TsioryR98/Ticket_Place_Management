@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { CiFacebook } from "react-icons/ci";
-import { FaInstagram, FaWhatsapp, FaTelegramPlane } from "react-icons/fa";
+import Link from 'next/link';
+import { CiFacebook } from 'react-icons/ci';
+import { FaInstagram, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -14,7 +14,7 @@ const Footer = () => {
             </h2>
             <div className="grid grid-cols-2 gap-6">
               <Link
-                href={"#"}
+                href={'#'}
                 className="flex items-center gap-2 text-sky-100 hover:text-white transition-colors"
               >
                 <div className="bg-sky-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
@@ -23,7 +23,7 @@ const Footer = () => {
                 <span className="hidden md:inline text-sm">Facebook</span>
               </Link>
               <Link
-                href={"#"}
+                href={'#'}
                 className="flex items-center gap-2 text-sky-100 hover:text-white transition-colors"
               >
                 <div className="bg-sky-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
@@ -32,7 +32,7 @@ const Footer = () => {
                 <span className="hidden md:inline text-sm">Instagram</span>
               </Link>
               <Link
-                href={"#"}
+                href={'#'}
                 className="flex items-center gap-2 text-sky-100 hover:text-white transition-colors"
               >
                 <div className="bg-sky-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
@@ -41,7 +41,7 @@ const Footer = () => {
                 <span className="hidden md:inline text-sm">Telegram</span>
               </Link>
               <Link
-                href={"#"}
+                href={'#'}
                 className="flex items-center gap-2 text-sky-100 hover:text-white transition-colors"
               >
                 <div className="bg-sky-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
@@ -59,25 +59,25 @@ const Footer = () => {
             </h2>
             <nav className="flex flex-col space-y-3">
               <Link
-                href={"/"}
+                href={'/'}
                 className="text-sky-100 hover:text-white transition-colors flex items-center gap-1"
               >
                 <span className="text-sky-400">›</span> Home
               </Link>
               <Link
-                href={"/"}
+                href={'/'}
                 className="text-sky-100 hover:text-white transition-colors flex items-center gap-1"
               >
                 <span className="text-sky-400">›</span> All Events
               </Link>
               <Link
-                href={"/auth/login"}
+                href={'/auth/login'}
                 className="text-sky-100 hover:text-white transition-colors flex items-center gap-1"
               >
                 <span className="text-sky-400">›</span> Sign In
               </Link>
               <Link
-                href={"/auth/signup"}
+                href={'/auth/signup'}
                 className="text-sky-100 hover:text-white transition-colors flex items-center gap-1"
               >
                 <span className="text-sky-400">›</span> Sign Up
@@ -91,8 +91,7 @@ const Footer = () => {
               Tapakila
             </h2>
             <p className="text-center md:text-left text-sky-100">
-              Concerts, sports, theater. Get your tickets and create memories
-              that last a lifetime!
+              Concerts, sports, theater. Get your tickets and create memories that last a lifetime!
             </p>
             <div className="mt-4 p-4 bg-sky-700 rounded-lg shadow-md bg-opacity-50">
               <p className="text-sm font-medium">Need Help?</p>

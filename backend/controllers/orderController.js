@@ -1,5 +1,5 @@
-import pool from "../dbConfig.js";
-import { broadcastToEventClients } from "../websocket/wsServer.js";
+import pool from '../dbConfig.js';
+import { broadcastToEventClients } from '../websocket/wsServer.js';
 
 const handleError = (res, message, error) => {
   console.error(message, error);
@@ -9,51 +9,49 @@ const handleError = (res, message, error) => {
 // POST /api/orders - Créer une nouvelle commande
 export const createOrder = async (req, res) => {
   const userId = req.user?.userId;
-  console.log("User ID from token:", req.user?.userId); // Debug
-  console.log("Request body:", req.body); // Debug
+  console.log('User ID from token:', req.user?.userId); // Debug
+  console.log('Request body:', req.body); // Debug
 
   if (!req.user?.userId) {
     return res.status(401).json({
-      code: "MISSING_AUTH",
-      error: "Authentification requise",
+      code: 'MISSING_AUTH',
+      error: 'Authentification requise',
     });
   }
 
   const { items } = req.body;
   if (!items || !Array.isArray(items)) {
-    return res.status(400).json({ error: "Items must be an array" });
+    return res.status(400).json({ error: 'Items must be an array' });
   }
   if (!items || !Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: "Items are required" });
+    return res.status(400).json({ error: 'Items are required' });
   }
 
   const client = await pool.connect();
 
   try {
-    await client.query("BEGIN");
+    await client.query('BEGIN');
 
     // 1. Calculer le montant total
     const ticketPrices = await Promise.all(
       items.map((item) =>
         client
-          .query("SELECT price FROM tickets WHERE ticket_id = $1", [
-            item.ticketId,
-          ])
+          .query('SELECT price FROM tickets WHERE ticket_id = $1', [item.ticketId])
           .then((result) => {
             if (result.rows.length === 0) {
               throw new Error(`Ticket ${item.ticketId} not found`);
             }
             return Number(result.rows[0].price) * item.quantity;
-          })
-      )
+          }),
+      ),
     );
 
     const totalAmount = ticketPrices.reduce((sum, price) => sum + price, 0);
 
     // 2. Créer la commande
     const orderResult = await client.query(
-      "INSERT INTO orders (user_id, total_amount, status_order) VALUES ($1, $2, $3) RETURNING *",
-      [userId, totalAmount, "pending"]
+      'INSERT INTO orders (user_id, total_amount, status_order) VALUES ($1, $2, $3) RETURNING *',
+      [userId, totalAmount, 'pending'],
     );
     const order = orderResult.rows[0];
 
@@ -61,24 +59,24 @@ export const createOrder = async (req, res) => {
     const orderItems = await Promise.all(
       items.map((item) =>
         client.query(
-          "INSERT INTO order_items (order_id, ticket_id, quantity, price) " +
-            "VALUES ($1, $2, $3, (SELECT price FROM tickets WHERE ticket_id = $2)) RETURNING *",
-          [order.order_id, item.ticketId, item.quantity]
-        )
-      )
+          'INSERT INTO order_items (order_id, ticket_id, quantity, price) ' +
+            'VALUES ($1, $2, $3, (SELECT price FROM tickets WHERE ticket_id = $2)) RETURNING *',
+          [order.order_id, item.ticketId, item.quantity],
+        ),
+      ),
     );
 
     // 4. Mettre à jour la disponibilité des billets
     await Promise.all(
       items.map((item) =>
-        client.query(
-          "UPDATE tickets SET available = available - $1 WHERE ticket_id = $2",
-          [item.quantity, item.ticketId]
-        )
-      )
+        client.query('UPDATE tickets SET available = available - $1 WHERE ticket_id = $2', [
+          item.quantity,
+          item.ticketId,
+        ]),
+      ),
     );
 
-    await client.query("COMMIT");
+    await client.query('COMMIT');
 
     const eventAndTickets = await Promise.all(
       items.map(async (item) => {
@@ -86,17 +84,17 @@ export const createOrder = async (req, res) => {
           `SELECT t.event_id, t.types, t.available 
            FROM tickets t 
            WHERE t.ticket_id = $1`,
-          [item.ticketId]
+          [item.ticketId],
         );
         return res.rows[0];
-      })
+      }),
     );
 
     eventAndTickets.forEach((ticket) => {
       broadcastToEventClients(ticket.event_id, {
         ticketType: ticket.types,
         available: ticket.available,
-        status: ticket.available <= 0 ? "SOLD_OUT" : "UPDATED",
+        status: ticket.available <= 0 ? 'SOLD_OUT' : 'UPDATED',
       });
     });
 
@@ -105,8 +103,8 @@ export const createOrder = async (req, res) => {
       items: orderItems.map((item) => item.rows[0]),
     });
   } catch (error) {
-    await client.query("ROLLBACK");
-    handleError(res, "Error creating order", error);
+    await client.query('ROLLBACK');
+    handleError(res, 'Error creating order', error);
   } finally {
     client.release();
   }
@@ -117,7 +115,7 @@ export const getUserOrders = async (req, res) => {
   const userId = req.user?.userId;
 
   if (!userId) {
-    return res.status(400).json({ error: "User ID is required" });
+    return res.status(400).json({ error: 'User ID is required' });
   }
 
   try {
@@ -139,7 +137,7 @@ export const getUserOrders = async (req, res) => {
       JOIN events e ON t.event_id = e.event_id
       WHERE o.user_id = $1
       ORDER BY e.event_datetime ASC`,
-      [userId]
+      [userId],
     );
 
     const ordersMap = new Map();
@@ -171,7 +169,7 @@ export const getUserOrders = async (req, res) => {
     const orders = Array.from(ordersMap.values());
     res.status(200).json(orders);
   } catch (error) {
-    handleError(res, "Error fetching orders", error);
+    handleError(res, 'Error fetching orders', error);
   }
 };
 
@@ -182,25 +180,23 @@ export const getOrderById = async (req, res) => {
 
   try {
     const orderResult = await pool.query(
-      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
-      [orderId, userId]
+      'SELECT * FROM orders WHERE order_id = $1 AND user_id = $2',
+      [orderId, userId],
     );
 
     if (orderResult.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Order not found or access denied" });
+      return res.status(404).json({ error: 'Order not found or access denied' });
     }
 
     const order = orderResult.rows[0];
 
     const itemsResult = await pool.query(
-      "SELECT oi.*, t.types as ticket_type, e.title as event_title " +
-        "FROM order_items oi " +
-        "JOIN tickets t ON oi.ticket_id = t.ticket_id " +
-        "JOIN events e ON t.event_id = e.event_id " +
-        "WHERE oi.order_id = $1",
-      [orderId]
+      'SELECT oi.*, t.types as ticket_type, e.title as event_title ' +
+        'FROM order_items oi ' +
+        'JOIN tickets t ON oi.ticket_id = t.ticket_id ' +
+        'JOIN events e ON t.event_id = e.event_id ' +
+        'WHERE oi.order_id = $1',
+      [orderId],
     );
 
     res.status(200).json({
@@ -208,7 +204,7 @@ export const getOrderById = async (req, res) => {
       items: itemsResult.rows,
     });
   } catch (error) {
-    handleError(res, "Error fetching order", error);
+    handleError(res, 'Error fetching order', error);
   }
 };
 
@@ -217,29 +213,29 @@ export const updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 
-  const role = "admin";
+  const role = 'admin';
 
-  if (role !== "admin") {
-    return res.status(403).json({ error: "Forbidden: admin access required" });
+  if (role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: admin access required' });
   }
 
-  if (!["pending", "completed", "cancelled"].includes(status)) {
-    return res.status(400).json({ error: "Invalid status" });
+  if (!['pending', 'completed', 'cancelled'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
   }
 
   try {
     const result = await pool.query(
-      "UPDATE orders SET status_order = $1 WHERE order_id = $2 RETURNING *",
-      [status, orderId]
+      'UPDATE orders SET status_order = $1 WHERE order_id = $2 RETURNING *',
+      [status, orderId],
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Order not found" });
+      return res.status(404).json({ error: 'Order not found' });
     }
 
     res.status(200).json(result.rows[0]);
   } catch (error) {
-    handleError(res, "Error updating order status", error);
+    handleError(res, 'Error updating order status', error);
   }
 };
 
@@ -251,17 +247,15 @@ export const cancelOrderItem = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    await client.query("BEGIN");
+    await client.query('BEGIN');
 
     const orderCheck = await client.query(
-      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
-      [orderId, userId]
+      'SELECT * FROM orders WHERE order_id = $1 AND user_id = $2',
+      [orderId, userId],
     );
 
     if (orderCheck.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Commande non trouvée ou accès refusé" });
+      return res.status(404).json({ error: 'Commande non trouvée ou accès refusé' });
     }
 
     const itemResult = await client.query(
@@ -270,13 +264,11 @@ export const cancelOrderItem = async (req, res) => {
        JOIN tickets t ON oi.ticket_id = t.ticket_id
        JOIN events e ON t.event_id = e.event_id
        WHERE oi.order_id = $1 AND oi.ticket_id = $2`,
-      [orderId, ticketId]
+      [orderId, ticketId],
     );
 
     if (itemResult.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Billet non trouvé dans la commande" });
+      return res.status(404).json({ error: 'Billet non trouvé dans la commande' });
     }
 
     const { quantity, event_datetime } = itemResult.rows[0];
@@ -289,31 +281,28 @@ export const cancelOrderItem = async (req, res) => {
       });
     }
 
-    await client.query(
-      "DELETE FROM order_items WHERE order_id = $1 AND ticket_id = $2",
-      [orderId, ticketId]
-    );
+    await client.query('DELETE FROM order_items WHERE order_id = $1 AND ticket_id = $2', [
+      orderId,
+      ticketId,
+    ]);
+
+    await client.query('UPDATE tickets SET available = available + $1 WHERE ticket_id = $2', [
+      quantity,
+      ticketId,
+    ]);
 
     await client.query(
-      "UPDATE tickets SET available = available + $1 WHERE ticket_id = $2",
-      [quantity, ticketId]
+      'UPDATE orders SET total_amount = total_amount - ($1 * (SELECT price FROM tickets WHERE ticket_id = $2)) WHERE order_id = $3',
+      [quantity, ticketId, orderId],
     );
 
-    await client.query(
-      "UPDATE orders SET total_amount = total_amount - ($1 * (SELECT price FROM tickets WHERE ticket_id = $2)) WHERE order_id = $3",
-      [quantity, ticketId, orderId]
-    );
+    await client.query('COMMIT');
 
-    await client.query("COMMIT");
-
-    const updatedOrder = await client.query(
-      "SELECT * FROM orders WHERE order_id = $1",
-      [orderId]
-    );
+    const updatedOrder = await client.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
 
     res.status(200).json(updatedOrder.rows[0]);
   } catch (error) {
-    await client.query("ROLLBACK");
+    await client.query('ROLLBACK');
     console.error("Erreur d'annulation:", error);
     res.status(500).json({
       error: "Erreur lors de l'annulation",
@@ -328,8 +317,8 @@ export const cancelOrderItem = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   const { role } = req.user;
 
-  if (role !== "admin") {
-    return res.status(403).json({ error: "Forbidden: admin access required" });
+  if (role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: admin access required' });
   }
 
   try {
@@ -351,7 +340,7 @@ export const getAllOrders = async (req, res) => {
       JOIN tickets t ON oi.ticket_id = t.ticket_id
       JOIN events e ON t.event_id = e.event_id
       JOIN users u ON o.user_id = u.user_id
-      ORDER BY o.created_at DESC`
+      ORDER BY o.created_at DESC`,
     );
 
     const ordersMap = new Map();
@@ -384,7 +373,7 @@ export const getAllOrders = async (req, res) => {
     const orders = Array.from(ordersMap.values());
     res.status(200).json(orders);
   } catch (error) {
-    handleError(res, "Error fetching all orders", error);
+    handleError(res, 'Error fetching all orders', error);
   }
 };
 
@@ -405,7 +394,7 @@ export const testAllOrders = async (req, res) => {
     `);
     res.status(200).json(result.rows);
   } catch (error) {
-    handleError(res, "Error testing orders", error);
+    handleError(res, 'Error testing orders', error);
   }
 };
 
@@ -423,12 +412,12 @@ export const getOrdersByEvent = async (req, res) => {
       WHERE t.event_id = $1
       GROUP BY o.order_id, u.user_email
     `,
-      [eventId]
+      [eventId],
     );
 
     res.status(200).json(result.rows);
   } catch (error) {
-    handleError(res, "Error fetching orders by event", error);
+    handleError(res, 'Error fetching orders by event', error);
   }
 };
 
@@ -436,8 +425,8 @@ export const getOrdersByEvent = async (req, res) => {
 export const getAdminOrder = async (req, res) => {
   const { orderId } = req.params;
 
-  if (req.user?.role !== "admin") {
-    return res.status(403).json({ error: "Admin access required" });
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
   }
 
   try {
@@ -446,11 +435,11 @@ export const getAdminOrder = async (req, res) => {
        FROM orders o
        JOIN users u ON o.user_id = u.user_id
        WHERE o.order_id = $1`,
-      [orderId]
+      [orderId],
     );
 
     if (orderResult.rows.length === 0) {
-      return res.status(404).json({ error: "Order not found" });
+      return res.status(404).json({ error: 'Order not found' });
     }
 
     const itemsResult = await pool.query(
@@ -463,7 +452,7 @@ export const getAdminOrder = async (req, res) => {
        JOIN tickets t ON oi.ticket_id = t.ticket_id
        JOIN events e ON t.event_id = e.event_id
        WHERE oi.order_id = $1`,
-      [orderId]
+      [orderId],
     );
 
     res.status(200).json({
@@ -474,9 +463,9 @@ export const getAdminOrder = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error("Error in getAdminOrder:", error);
+    console.error('Error in getAdminOrder:', error);
     res.status(500).json({
-      message: "Error fetching order",
+      message: 'Error fetching order',
       error: error.message,
     });
   }
@@ -487,7 +476,7 @@ const notifyTicketUpdate = async (ticketId) => {
     `SELECT t.event_id, t.types, t.available
      FROM tickets t
      WHERE t.ticket_id = $1`,
-    [ticketId]
+    [ticketId],
   );
 
   if (res.rows.length > 0) {
@@ -495,7 +484,7 @@ const notifyTicketUpdate = async (ticketId) => {
     broadcastToEventClients(ticket.event_id, {
       ticketType: ticket.types,
       available: ticket.available,
-      status: ticket.available <= 0 ? "SOLD_OUT" : "UPDATED",
+      status: ticket.available <= 0 ? 'SOLD_OUT' : 'UPDATED',
     });
   }
 };

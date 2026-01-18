@@ -1,13 +1,9 @@
-import { notFound } from "next/navigation";
-import { Event } from "@/types/event";
-import EventClientComponent from "./EventClientComponent";
-import { fetchEventById } from "@/lib/api";
+import { notFound } from 'next/navigation';
+import { Event } from '@/types/event';
+import EventClientComponent from './EventClientComponent';
+import { fetchEventById } from '@/lib/api';
 
-export default async function EventPage({
-  params,
-}: {
-  params: { eventId: string };
-}) {
+export default async function EventPage({ params }: { params: { eventId: string } }) {
   const { eventId } = await params;
 
   try {
@@ -19,7 +15,7 @@ export default async function EventPage({
 
     return <EventClientComponent event={event} />;
   } catch (error) {
-    console.error("Error fetching event:", error);
+    console.error('Error fetching event:', error);
     return notFound();
   }
 }

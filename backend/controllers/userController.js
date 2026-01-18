@@ -1,6 +1,6 @@
-import pool from "../dbConfig.js";
-import bcrypt from "bcryptjs";
-import { jwTokenAuth } from "../utils/jwt_auth.js";
+import pool from '../dbConfig.js';
+import bcrypt from 'bcryptjs';
+import { jwTokenAuth } from '../utils/jwt_auth.js';
 
 const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
@@ -11,9 +11,9 @@ const handleError = (res, message, error) => {
 export const getAllUsers = async (req, res) => {
   //user JWT
 
-  if (req.user.role !== "admin") {
+  if (req.user.role !== 'admin') {
     //test only for user
-    return res.status(403).json({ error: "Forbidden request" });
+    return res.status(403).json({ error: 'Forbidden request' });
   }
   try {
     //Get Paged Users List  //Get Total of all Users
@@ -21,16 +21,13 @@ export const getAllUsers = async (req, res) => {
     const offset = (page - 1) * perPage;
 
     const [userQuery, totalResult] = await Promise.all([
-      pool.query("SELECT * FROM users ORDER BY created_at LIMIT $1 OFFSET $2", [
-        perPage,
-        offset,
-      ]),
-      pool.query("SELECT COUNT(*) FROM users"),
+      pool.query('SELECT * FROM users ORDER BY created_at LIMIT $1 OFFSET $2', [perPage, offset]),
+      pool.query('SELECT COUNT(*) FROM users'),
     ]);
     const total = parseInt(totalResult.rows[0].count, 10);
 
     //Add x-total-Count
-    res.set("X-Total-Count", total);
+    res.set('X-Total-Count', total);
 
     const users = userQuery.rows.map((user) => ({
       ...user,
@@ -38,7 +35,7 @@ export const getAllUsers = async (req, res) => {
     }));
     return res.status(200).json(users);
   } catch (error) {
-    return handleError(res, "Error during fecthing from database", error);
+    return handleError(res, 'Error during fecthing from database', error);
   }
 };
 
@@ -50,13 +47,13 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const newUser = await pool.query(
-      "INSERT INTO users (user_name, user_email, user_passwords) VALUES($1, $2, $3) RETURNING *",
-      [username, email, hashedPassword]
+      'INSERT INTO users (user_name, user_email, user_passwords) VALUES($1, $2, $3) RETURNING *',
+      [username, email, hashedPassword],
     );
 
     return res.status(201).json({ user: newUser.rows[0] });
   } catch (error) {
-    return handleError(res, "Error during insert into database:", error);
+    return handleError(res, 'Error during insert into database:', error);
   }
 };
 
@@ -67,31 +64,24 @@ export const loginUser = async (req, res) => {
     //check connection with email or username
     const { email, password } = req.body;
 
-    const users = await pool.query("SELECT * FROM users WHERE user_email=$1", [
-      email,
-    ]);
+    const users = await pool.query('SELECT * FROM users WHERE user_email=$1', [email]);
     if (users.rows.length === 0) {
-      return res
-        .status(401)
-        .json({ error: "this email doesn't have any account" });
+      return res.status(401).json({ error: "this email doesn't have any account" });
     }
 
     //check password
-    const correctPassword = await bcrypt.compare(
-      password,
-      users.rows[0].user_passwords
-    );
+    const correctPassword = await bcrypt.compare(password, users.rows[0].user_passwords);
     if (!correctPassword) {
-      return res.status(401).json({ error: "incorrect password" });
+      return res.status(401).json({ error: 'incorrect password' });
     }
     //JWT token for routes a
 
     let tokens = jwTokenAuth(users.rows[0]);
 
-    res.cookie("refresh_token", tokens.refreshToken, {
+    res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: true, //only with https request
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, //milliseconds
     });
 
@@ -106,7 +96,7 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    return handleError(res, "Error during connection", error);
+    return handleError(res, 'Error during connection', error);
   }
 };
 
@@ -115,24 +105,21 @@ export const loginUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
-  if (role !== "admin") {
-    return res.status(403).json({ error: "Forbidden request" });
+  if (role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden request' });
   }
 
   try {
-    const userExists = await pool.query(
-      "SELECT * FROM users WHERE user_id = $1",
-      [id]
-    );
+    const userExists = await pool.query('SELECT * FROM users WHERE user_id = $1', [id]);
     if (userExists.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [id]);
+    await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [id]);
 
-    return res.status(200).json({ message: "User deleted successfully" });
+    return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    return handleError(res, "Error while deleting user", error);
+    return handleError(res, 'Error while deleting user', error);
   }
 };
 
@@ -141,17 +128,15 @@ export const deleteUser = async (req, res) => {
 export const getUser = async (req, res) => {
   const userId = req.user?.userId; //jwt key
   try {
-    const result = await pool.query("SELECT * FROM users WHERE user_id =$1", [
-      userId,
-    ]);
+    const result = await pool.query('SELECT * FROM users WHERE user_id =$1', [userId]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: 'User not found' });
     }
     const user = result.rows[0];
 
     return res.status(200).json(user);
   } catch (error) {
-    return handleError(res, "Error while getting user", error);
+    return handleError(res, 'Error while getting user', error);
   }
 };
 
@@ -163,7 +148,7 @@ export const updateUser = async (req, res) => {
   try {
     //Check if there is no info sent
     if (!username && !email && !password) {
-      return res.status(400).json({ error: "No updates provided" });
+      return res.status(400).json({ error: 'No updates provided' });
     }
     //params for request
     const updateFields = [];
@@ -184,24 +169,18 @@ export const updateUser = async (req, res) => {
 
     if (password) {
       if (!oldPassword) {
-        return res
-          .status(400)
-          .json({ error: "Old password is required to update password" });
+        return res.status(400).json({ error: 'Old password is required to update password' });
       }
 
       // Check current password
-      const userQuery = await pool.query(
-        "SELECT user_passwords FROM users WHERE user_id = $1",
-        [userId]
-      );
+      const userQuery = await pool.query('SELECT user_passwords FROM users WHERE user_id = $1', [
+        userId,
+      ]);
       const user = userQuery.rows[0];
-      const passwordMatch = await bcrypt.compare(
-        oldPassword,
-        user.user_passwords
-      );
+      const passwordMatch = await bcrypt.compare(oldPassword, user.user_passwords);
 
       if (!passwordMatch) {
-        return res.status(401).json({ error: "Incorrect old password" });
+        return res.status(401).json({ error: 'Incorrect old password' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -214,7 +193,7 @@ export const updateUser = async (req, res) => {
 
     const queryText = `
       UPDATE users 
-      SET ${updateFields.join(", ")} 
+      SET ${updateFields.join(', ')} 
       WHERE user_id = $${paramIndex} 
       RETURNING *
     `;
@@ -222,14 +201,14 @@ export const updateUser = async (req, res) => {
     const query = await pool.query(queryText, queryParams);
 
     if (query.rows.length === 0) {
-      return res.status(404).json({ error: "User not found " });
+      return res.status(404).json({ error: 'User not found ' });
     }
 
     const user = query.rows[0];
     delete user.user_passwords;
 
     return res.status(200).json({
-      message: "update successfully",
+      message: 'update successfully',
       user: {
         user_id: user.user_id,
         user_name: user.user_name,
@@ -237,7 +216,7 @@ export const updateUser = async (req, res) => {
       },
     });
   } catch (error) {
-    return handleError(res, "Error during update", error);
+    return handleError(res, 'Error during update', error);
   }
 };
 
@@ -248,29 +227,24 @@ export const updateUserRole = async (req, res) => {
   const { role } = req.body; // New role from the request body
   const { role: currentUserRole } = req.user; // Current user's role from JWT
 
-  if (currentUserRole !== "user") {
-    return res.status(403).json({ error: "Forbidden request" });
+  if (currentUserRole !== 'user') {
+    return res.status(403).json({ error: 'Forbidden request' });
   }
 
   try {
-    const userExists = await pool.query(
-      "SELECT * FROM users WHERE user_id = $1",
-      [id]
-    );
+    const userExists = await pool.query('SELECT * FROM users WHERE user_id = $1', [id]);
     if (userExists.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    const query = await pool.query(
-      "UPDATE users SET role = $1 WHERE user_id = $2 RETURNING *",
-      [role, id]
-    );
+    const query = await pool.query('UPDATE users SET role = $1 WHERE user_id = $2 RETURNING *', [
+      role,
+      id,
+    ]);
 
-    return res
-      .status(200)
-      .json({ message: "User role updated successfully", user: query.rows[0] });
+    return res.status(200).json({ message: 'User role updated successfully', user: query.rows[0] });
   } catch (error) {
-    return handleError(res, "Error while updating user role", error);
+    return handleError(res, 'Error while updating user role', error);
   }
 };
 
@@ -278,11 +252,9 @@ export const updateUserRole = async (req, res) => {
 export const getUserById = async (req, res) => {
   const { id } = req.params; // User ID from the route parameter
   try {
-    const result = await pool.query("SELECT * FROM users WHERE user_id =$1", [
-      id,
-    ]);
+    const result = await pool.query('SELECT * FROM users WHERE user_id =$1', [id]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: 'User not found' });
     }
     const user = result.rows[0];
 
@@ -295,6 +267,6 @@ export const getUserById = async (req, res) => {
       created_at: user.created_at,
     });
   } catch (error) {
-    return handleError(res, "Error while getting user", error);
+    return handleError(res, 'Error while getting user', error);
   }
 };

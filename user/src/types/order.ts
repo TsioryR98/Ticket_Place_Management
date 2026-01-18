@@ -16,7 +16,7 @@ export type Order = {
   order_id: string;
   user_id: string;
   total_amount: number;
-  status_order: "pending" | "confirmed" | "cancelled";
+  status_order: 'pending' | 'confirmed' | 'cancelled';
   created_at: string;
   items: OrderItem[];
   event_date?: Date;

@@ -1,19 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Event } from "@/types/event";
-import { reserveTicket } from "@/app/event/actions";
-import Image from "next/image";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  User,
-  Ticket,
-  X,
-  AlertCircle,
-} from "lucide-react";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { Event } from '@/types/event';
+import { reserveTicket } from '@/app/event/actions';
+import Image from 'next/image';
+import { Calendar, Clock, MapPin, User, Ticket, X, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function EventClientComponent({ event }: { event: Event }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,9 +15,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [realTimeStock, setRealTimeStock] = useState<{ [key: string]: number }>(
-    {}
-  );
+  const [realTimeStock, setRealTimeStock] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     let ws: WebSocket;
@@ -35,59 +25,56 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
     const connectWebSocket = () => {
       try {
-        ws = new WebSocket("ws://localhost:4000");
+        ws = new WebSocket('ws://localhost:4000');
 
         ws.onopen = () => {
-          console.log("WebSocket connected");
+          console.log('WebSocket connected');
           retryCount = 0;
           ws.send(
             JSON.stringify({
-              action: "subscribe",
+              action: 'subscribe',
               eventId: event.id,
-            })
+            }),
           );
         };
 
         ws.onmessage = (e) => {
           try {
             const data = JSON.parse(e.data);
-            if (data.type === "STOCK_UPDATE") {
+            if (data.type === 'STOCK_UPDATE') {
               setRealTimeStock((prev) => ({
                 ...prev,
                 [data.data.ticketType]: data.data.available,
               }));
 
-              if (data.data.status === "SOLD_OUT") {
+              if (data.data.status === 'SOLD_OUT') {
                 toast.error(`${data.data.ticketType} tickets sold out!`);
               } else if (data.data.available < 5) {
-                toast(
-                  `Only ${data.data.available} ${data.data.ticketType} tickets left!`,
-                  { icon: "⚠️" }
-                );
+                toast(`Only ${data.data.available} ${data.data.ticketType} tickets left!`, {
+                  icon: '⚠️',
+                });
               }
             }
           } catch (parseError) {
-            console.error("Error parsing WebSocket message:", parseError);
+            console.error('Error parsing WebSocket message:', parseError);
           }
         };
 
         ws.onerror = (error) => {
-          console.error("WebSocket error event:", error);
-          toast.error("Connection issue - trying to reconnect...");
+          console.error('WebSocket error event:', error);
+          toast.error('Connection issue - trying to reconnect...');
         };
 
         ws.onclose = (event) => {
-          console.log("WebSocket closed:", event.code, event.reason);
+          console.log('WebSocket closed:', event.code, event.reason);
           if (event.code !== 1000 && retryCount < maxRetries) {
             retryCount++;
-            console.log(
-              `Attempting to reconnect (${retryCount}/${maxRetries})...`
-            );
+            console.log(`Attempting to reconnect (${retryCount}/${maxRetries})...`);
             setTimeout(connectWebSocket, retryDelay);
           }
         };
       } catch (error) {
-        console.error("WebSocket initialization error:", error);
+        console.error('WebSocket initialization error:', error);
       }
     };
 
@@ -95,7 +82,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
     return () => {
       if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close(1000, "Component unmounted");
+        ws.close(1000, 'Component unmounted');
       }
     };
   }, [event.id]);
@@ -111,14 +98,14 @@ export default function EventClientComponent({ event }: { event: Event }) {
       setScrolled(window.scrollY > 200);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleReservationSubmit = async () => {
     const hasTickets = Object.values(quantities).some((q) => q > 0);
     if (!hasTickets) {
-      setReservationError("Please select at least one ticket");
+      setReservationError('Please select at least one ticket');
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
       return;
@@ -158,11 +145,11 @@ export default function EventClientComponent({ event }: { event: Event }) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
   };
 
@@ -174,32 +161,27 @@ export default function EventClientComponent({ event }: { event: Event }) {
       .toFixed(2);
   };
 
-  const totalTickets = Object.values(quantities).reduce(
-    (sum, quantity) => sum + quantity,
-    0
-  );
+  const totalTickets = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
 
   return (
     <>
       {/* Barre flottante qui apparaît au scroll */}
       <div
         className={`fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm shadow-lg transform transition-transform duration-300 ${
-          scrolled ? "translate-y-0" : "-translate-y-full"
+          scrolled ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 relative rounded-md overflow-hidden">
               <Image
-                src={event.imagePath || "/api/placeholder/100/100"}
+                src={event.imagePath || '/api/placeholder/100/100'}
                 alt={event.title}
                 fill
                 className="object-cover"
               />
             </div>
-            <h3 className="font-bold text-gray-900 truncate max-w-md">
-              {event.title}
-            </h3>
+            <h3 className="font-bold text-gray-900 truncate max-w-md">{event.title}</h3>
           </div>
           <button
             onClick={() => setShowReservationForm(true)}
@@ -216,7 +198,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
           {/* Image de l'événement */}
           <div className="w-full lg:w-3/5 relative h-[550px] overflow-hidden rounded-2xl shadow-2xl group">
             <Image
-              src={event.imagePath || "/api/placeholder/800/600"}
+              src={event.imagePath || '/api/placeholder/800/600'}
               alt={event.title}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -226,41 +208,29 @@ export default function EventClientComponent({ event }: { event: Event }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
             <div className="absolute top-6 right-6 flex gap-3"></div>
             <div className="absolute bottom-6 left-6 border-2 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-lg">
-              {event.category || "Événement"}
+              {event.category || 'Événement'}
             </div>
           </div>
 
           {/* Détails de l'événement avec nouveaux logos */}
           <div className="w-full lg:w-2/5 flex flex-col">
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
-              <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                {event.title}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">{event.title}</h1>
 
               <div className="space-y-6">
                 <div className="flex items-center gap-5">
                   <div className="p-3 bg-yellow-50 rounded-full text-green-600">
-                    <Calendar
-                      size={24}
-                      strokeWidth={2}
-                      className="text-slate-500"
-                    />
+                    <Calendar size={24} strokeWidth={2} className="text-slate-500" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 font-medium">Date</p>
-                    <p className="font-semibold text-gray-800">
-                      {formatDate(event.date)}
-                    </p>
+                    <p className="font-semibold text-gray-800">{formatDate(event.date)}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-5">
                   <div className="p-3 bg-yellow-50 rounded-full text-purple-600">
-                    <Clock
-                      size={24}
-                      strokeWidth={2}
-                      className="text-slate-500"
-                    />
+                    <Clock size={24} strokeWidth={2} className="text-slate-500" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 font-medium">Time</p>
@@ -270,37 +240,21 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
                 <div className="flex items-center gap-5">
                   <div className="p-3 bg-yellow-50 rounded-full text-red-600">
-                    <MapPin
-                      size={24}
-                      strokeWidth={2}
-                      className="text-slate-500"
-                    />
+                    <MapPin size={24} strokeWidth={2} className="text-slate-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">
-                      Location
-                    </p>
-                    <p className="font-semibold text-gray-800">
-                      {event.location}
-                    </p>
+                    <p className="text-sm text-gray-500 font-medium">Location</p>
+                    <p className="font-semibold text-gray-800">{event.location}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-5">
                   <div className="p-3 bg-yellow-50 rounded-full text-blue-600">
-                    <User
-                      size={24}
-                      strokeWidth={2}
-                      className="text-slate-500"
-                    />
+                    <User size={24} strokeWidth={2} className="text-slate-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">
-                      Organizer
-                    </p>
-                    <p className="font-semibold text-gray-800">
-                      {event.organizer}
-                    </p>
+                    <p className="text-sm text-gray-500 font-medium">Organizer</p>
+                    <p className="font-semibold text-gray-800">{event.organizer}</p>
                   </div>
                 </div>
               </div>
@@ -310,13 +264,9 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
         {/* Description de l'événement */}
         <div className="mb-12 bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            About this event
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">About this event</h2>
           <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed text-lg">
-              {event.description}
-            </p>
+            <p className="text-gray-700 leading-relaxed text-lg">{event.description}</p>
           </div>
         </div>
 
@@ -326,9 +276,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
             <div className="p-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full text-indigo-600">
               <Ticket size={24} strokeWidth={2} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Available tickets
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Available tickets</h2>
           </div>
 
           {event.tickets && event.tickets.length > 0 ? (
@@ -359,7 +307,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                       <tr
                         key={ticket.type}
                         className={`${
-                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         } hover:bg-blue-50/30 transition-colors duration-150`}
                       >
                         <td className="py-5 px-6 border-b border-gray-100 font-medium">
@@ -397,9 +345,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
             </div>
           ) : (
             <div className="p-8 text-center bg-gray-50 rounded-xl">
-              <p className="text-gray-500">
-                No tickets available at the moment.
-              </p>
+              <p className="text-gray-500">No tickets available at the moment.</p>
             </div>
           )}
 
@@ -420,9 +366,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto animate-in fade-in duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">
-                Ticket booking
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900">Ticket booking</h3>
               <button
                 onClick={resetReservationForm}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -442,9 +386,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
 
             {/* Liste des types de billets avec quantité */}
             <div className="space-y-4 mb-8">
-              <h4 className="font-medium text-gray-700 mb-3">
-                Select your tickets
-              </h4>
+              <h4 className="font-medium text-gray-700 mb-3">Select your tickets</h4>
               {event.tickets.map((ticket) => {
                 // Use the real-time availability for the selection form
                 const available = getTicketAvailability(ticket.type);
@@ -456,18 +398,14 @@ export default function EventClientComponent({ event }: { event: Event }) {
                   >
                     <div className="flex justify-between items-center mb-3">
                       <div>
-                        <span className="font-semibold text-gray-900">
-                          {ticket.type}
-                        </span>
+                        <span className="font-semibold text-gray-900">{ticket.type}</span>
                         {available <= 10 && available > 0 && (
                           <span className="ml-2 text-xs font-medium px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">
                             {available} remaining
                           </span>
                         )}
                       </div>
-                      <span className="text-lg font-bold text-indigo-700">
-                        {ticket.price} €
-                      </span>
+                      <span className="text-lg font-bold text-indigo-700">{ticket.price} €</span>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -481,10 +419,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                           onClick={() => {
                             const currentValue = quantities[ticket.type] || 0;
                             if (currentValue > 0) {
-                              handleQuantityChange(
-                                ticket.type,
-                                currentValue - 1
-                              );
+                              handleQuantityChange(ticket.type, currentValue - 1);
                             }
                           }}
                           className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
@@ -500,11 +435,7 @@ export default function EventClientComponent({ event }: { event: Event }) {
                           value={quantities[ticket.type] || 0}
                           onChange={(e) => {
                             const value = parseInt(e.target.value);
-                            if (
-                              !isNaN(value) &&
-                              value >= 0 &&
-                              value <= ticket.limitPerPerson
-                            ) {
+                            if (!isNaN(value) && value >= 0 && value <= ticket.limitPerPerson) {
                               handleQuantityChange(ticket.type, value);
                             }
                           }}
@@ -518,16 +449,13 @@ export default function EventClientComponent({ event }: { event: Event }) {
                           onClick={() => {
                             const currentValue = quantities[ticket.type] || 0;
                             if (currentValue < ticket.limitPerPerson) {
-                              handleQuantityChange(
-                                ticket.type,
-                                currentValue + 1
-                              );
+                              handleQuantityChange(ticket.type, currentValue + 1);
                             }
                           }}
                           className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
                           disabled={
-                            (quantities[ticket.type] || 0) ===
-                              ticket.limitPerPerson || available === 0
+                            (quantities[ticket.type] || 0) === ticket.limitPerPerson ||
+                            available === 0
                           }
                         >
                           +
@@ -564,12 +492,10 @@ export default function EventClientComponent({ event }: { event: Event }) {
                   type="button"
                   onClick={handleReservationSubmit}
                   className={`flex items-center justify-center gap-2 flex-1 bg-gradient-to-r from-blue-600 to-indigo-900 hover:from-indigo-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 ${
-                    totalTickets === 0
-                      ? "cursor-not-allowed"
-                      : "hover:shadow-lg"
+                    totalTickets === 0 ? 'cursor-not-allowed' : 'hover:shadow-lg'
                   }`}
                   style={{
-                    cursor: totalTickets === 0 ? "not-allowed" : "pointer",
+                    cursor: totalTickets === 0 ? 'not-allowed' : 'pointer',
                   }}
                 >
                   <Ticket size={20} />

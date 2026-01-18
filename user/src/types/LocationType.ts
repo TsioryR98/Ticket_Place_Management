@@ -1,6 +1,6 @@
 type LocationType = {
-    value : string,
-    label : string,
-}
+  value: string;
+  label: string;
+};
 
 export default LocationType;

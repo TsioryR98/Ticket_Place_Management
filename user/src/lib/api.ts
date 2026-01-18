@@ -1,15 +1,15 @@
-import { Event } from "@/types/event";
-import { getServerSession } from "next-auth";
-import authOptions from "@/app/api/auth/[...nextauth]/options";
-import { getSession } from "next-auth/react";
+import { Event } from '@/types/event';
+import { getServerSession } from 'next-auth';
+import authOptions from '@/app/api/auth/[...nextauth]/options';
+import { getSession } from 'next-auth/react';
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = 'http://localhost:4000/api';
 
 // fetch all events
 export async function fetchEvents(): Promise<Event[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/events`);
-    if (!response.ok) throw new Error("Failed to fetch events");
+    if (!response.ok) throw new Error('Failed to fetch events');
 
     const data = await response.json();
 
@@ -18,7 +18,7 @@ export async function fetchEvents(): Promise<Event[]> {
       imagePath: event.images,
     }));
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error('Error fetching events:', error);
     throw error;
   }
 }
@@ -28,12 +28,12 @@ export async function fetchEventById(eventId: string) {
   try {
     const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch event");
+      throw new Error('Failed to fetch event');
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching event:", error);
+    console.error('Error fetching event:', error);
     throw error;
   }
 }
@@ -42,20 +42,18 @@ export async function fetchEventById(eventId: string) {
 export async function fetchEventWithTickets(eventId: string): Promise<Event> {
   try {
     const eventResponse = await fetch(`${API_BASE_URL}/events/${eventId}`);
-    if (!eventResponse.ok) throw new Error("Failed to fetch event");
+    if (!eventResponse.ok) throw new Error('Failed to fetch event');
     const event = await eventResponse.json();
 
-    const ticketsResponse = await fetch(
-      `${API_BASE_URL}/events/${eventId}/tickets`
-    );
-    if (!ticketsResponse.ok) throw new Error("Failed to fetch tickets");
+    const ticketsResponse = await fetch(`${API_BASE_URL}/events/${eventId}/tickets`);
+    if (!ticketsResponse.ok) throw new Error('Failed to fetch tickets');
     const tickets = await ticketsResponse.json();
 
     return {
       id: event.event_id,
       title: event.title,
       description: event.descriptions,
-      date: new Date(event.event_datetime).toISOString().split("T")[0],
+      date: new Date(event.event_datetime).toISOString().split('T')[0],
       time: new Date(event.event_datetime).toLocaleTimeString(),
       location: event.locations,
       organizer: event.organizer,
@@ -68,7 +66,7 @@ export async function fetchEventWithTickets(eventId: string): Promise<Event> {
       })),
     };
   } catch (error) {
-    console.error("Error fetching event with tickets:", error);
+    console.error('Error fetching event with tickets:', error);
     throw error;
   }
 }
@@ -81,7 +79,7 @@ export async function getOrderById(orderId: string) {
 
     return await res.json();
   } catch (error) {
-    console.error("Error fetching order:", error);
+    console.error('Error fetching order:', error);
     throw error;
   }
 }
@@ -103,17 +101,16 @@ export async function getUserReservations() {
       })),
     }));
   } catch (error) {
-    console.error("Error fetching reservations:", error);
+    console.error('Error fetching reservations:', error);
     throw error;
   }
 }
 
 // cancel reservation
 export async function cancelReservation(orderId: string, ticketId: string) {
-  const response = await fetchWithAuth(
-    `${API_BASE_URL}/orders/${orderId}/items/${ticketId}`,
-    { method: "DELETE" }
-  );
+  const response = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}/items/${ticketId}`, {
+    method: 'DELETE',
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -123,39 +120,32 @@ export async function cancelReservation(orderId: string, ticketId: string) {
   return await response.json();
 }
 
-async function fetchWithAuth(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
+async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
   try {
     const session =
-      typeof window === "undefined"
+      typeof window === 'undefined'
         ? await getServerSession(authOptions)
-        : await fetch("/api/auth/session").then((res) =>
-            res.ok ? res.json() : null
-          );
+        : await fetch('/api/auth/session').then((res) => (res.ok ? res.json() : null));
 
     if (!session?.user?.accessToken) {
-      throw new Error("Authentification requise");
+      throw new Error('Authentification requise');
     }
 
     const headers = new Headers(options.headers);
-    headers.set("Authorization", `Bearer ${session.user.accessToken}`);
-    headers.set("Content-Type", "application/json");
+    headers.set('Authorization', `Bearer ${session.user.accessToken}`);
+    headers.set('Content-Type', 'application/json');
 
     const response = await fetch(url, {
       ...options,
       headers,
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       const errorContent = await response.text();
       try {
         const errorData = JSON.parse(errorContent);
-        throw new Error(
-          errorData.error || errorData.message || `Erreur ${response.status}`
-        );
+        throw new Error(errorData.error || errorData.message || `Erreur ${response.status}`);
       } catch {
         throw new Error(errorContent || `Erreur ${response.status}`);
       }
@@ -163,7 +153,7 @@ async function fetchWithAuth(
 
     return response;
   } catch (error) {
-    console.error("Erreur API:", error);
+    console.error('Erreur API:', error);
     throw error;
   }
 }
@@ -174,26 +164,25 @@ export async function fetchServerEvents(params?: {
 }): Promise<{ events: Event[]; total: number }> {
   try {
     const url = new URL(`${API_BASE_URL}/events`);
-    if (params?.page) url.searchParams.append("page", params.page.toString());
-    if (params?.limit)
-      url.searchParams.append("perPage", params.limit.toString());
+    if (params?.page) url.searchParams.append('page', params.page.toString());
+    if (params?.limit) url.searchParams.append('perPage', params.limit.toString());
 
     const response = await fetch(url.toString());
-    if (!response.ok) throw new Error("Failed to fetch events");
+    if (!response.ok) throw new Error('Failed to fetch events');
 
-    const total = parseInt(response.headers.get("X-Total-Count") || "0", 10);
+    const total = parseInt(response.headers.get('X-Total-Count') || '0', 10);
     const data = await response.json();
 
     return {
       events: data.map((event: any) => ({
         ...event,
-        imagePath: event.images || "/default-event.jpg",
+        imagePath: event.images || '/default-event.jpg',
       })),
       total,
     };
   } catch (error) {
-    console.error("Error fetching events:", error);
-    const fallback = require("./events.json");
+    console.error('Error fetching events:', error);
+    const fallback = require('./events.json');
     return {
       events: fallback.slice(0, params?.limit || 12),
       total: fallback.length,

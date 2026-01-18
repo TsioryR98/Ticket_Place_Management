@@ -1,6 +1,6 @@
-import { useMediaQuery, Theme } from "@mui/material";
-import * as React from "react";
-import { Link } from "react-router-dom";
+import { useMediaQuery, Theme } from '@mui/material';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
 import {
   useGetMany,
   Datagrid,
@@ -25,7 +25,7 @@ import {
   SelectInput,
   ImageInput,
   ImageField,
-} from "react-admin";
+} from 'react-admin';
 
 interface TicketSummaryFieldProps {
   record?: any;
@@ -39,10 +39,7 @@ const TicketSummaryField = (props: { record?: any }) => {
   if (!record) return null;
   const tickets = record.tickets || [];
 
-  const totalAvailable = tickets.reduce(
-    (sum, ticket) => sum + (ticket.available || 0),
-    0
-  );
+  const totalAvailable = tickets.reduce((sum, ticket) => sum + (ticket.available || 0), 0);
 
   return (
     <div>
@@ -54,7 +51,7 @@ const TicketSummaryField = (props: { record?: any }) => {
 };
 
 export const EventList = () => {
-  const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
+  const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
 
   return (
     <List>
@@ -99,7 +96,7 @@ export const EventEdit = () => {
   const record = useRecordContext(); //
   const transform = (data: any) => ({
     ...data,
-    time: data.time.includes(":") ? data.time.substring(0, 5) : data.time,
+    time: data.time.includes(':') ? data.time.substring(0, 5) : data.time,
   });
 
   return (
@@ -109,33 +106,28 @@ export const EventEdit = () => {
         <TextInput source="description" multiline fullWidth />
         <DateInput
           source="date"
-          defaultValue={new Date().toISOString().split("T")[0]} //datein database
+          defaultValue={new Date().toISOString().split('T')[0]} //datein database
         />
         <TimeInput source="time" defaultValue="12:00" />
         <TextInput source="location" fullWidth />
         <TextInput source="organizer" fullWidth />
         {/*default categorie */}
-        <TextInput
-          source="category"
-          label="Actual category"
-          disabled
-          fullWidth
-        />{" "}
+        <TextInput source="category" label="Actual category" disabled fullWidth />{' '}
         <SelectInput
           source="category"
           choices={[
-            { id: "Musique", name: "Musique" },
-            { id: "Jeune Public", name: "Jeune Public" },
-            { id: "Humour", name: "Humour" },
-            { id: "Théâtre", name: "Théâtre" },
-            { id: "Classique", name: "Classique" },
+            { id: 'Musique', name: 'Musique' },
+            { id: 'Jeune Public', name: 'Jeune Public' },
+            { id: 'Humour', name: 'Humour' },
+            { id: 'Théâtre', name: 'Théâtre' },
+            { id: 'Classique', name: 'Classique' },
           ]}
           defaultValue={record?.category}
         />
         <ImageField
           source="imagePath"
           title="Current Image"
-          sx={{ "& img": { maxWidth: 400, maxHeight: 400 } }}
+          sx={{ '& img': { maxWidth: 400, maxHeight: 400 } }}
         />
         <ImageInput source="newImage" label="Replace Image">
           <ImageField source="src" title="New Image Preview" />
@@ -153,7 +145,7 @@ export const EventCreate = () => {
         <TextInput source="description" multiline fullWidth />
         <DateInput
           source="date"
-          defaultValue={new Date().toISOString().split("T")[0]} // Default to today's date
+          defaultValue={new Date().toISOString().split('T')[0]} // Default to today's date
         />
         <TimeInput source="time" defaultValue="12:00" />
         <TextInput source="location" fullWidth />
@@ -161,11 +153,11 @@ export const EventCreate = () => {
         <SelectInput
           source="category"
           choices={[
-            { id: "musique", name: "Musique" },
-            { id: "jeunepublic", name: "Jeune Public" },
-            { id: "humour", name: "Humour" },
-            { id: "theatre", name: "Théâtre" },
-            { id: "classique", name: "Classique" },
+            { id: 'musique', name: 'Musique' },
+            { id: 'jeunepublic', name: 'Jeune Public' },
+            { id: 'humour', name: 'Humour' },
+            { id: 'theatre', name: 'Théâtre' },
+            { id: 'classique', name: 'Classique' },
           ]}
         />
         {/*    <ImageInput source="image" label="Upload Image">

@@ -1,0 +1,10 @@
+.next
+dist
+build
+node_modules
+public
+package-lock.json
+.env
+.env.local
+.vscode
+user/next.config.ts

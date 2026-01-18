@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import ms from "ms";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import ms from 'ms';
 
 dotenv.config();
 function jwTokenAuth({ user_id, user_email, role }) {

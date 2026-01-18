@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { signIn } from "next-auth/react";
-import React, { useState } from "react";
-import { useLoginModal } from "@/context/ModalContext";
-import { useForm, SubmitHandler } from "react-hook-form";
-import Link from "next/link";
+import { signIn } from 'next-auth/react';
+import React, { useState } from 'react';
+import { useLoginModal } from '@/context/ModalContext';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import Link from 'next/link';
 
 type Inputs = {
   email: string;
@@ -23,16 +23,16 @@ const LoginModal = () => {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const result = await signIn("credentials", {
+    const result = await signIn('credentials', {
       redirect: false,
       email: data.email,
       password: data.password,
     });
 
     if (result?.error) {
-      alert("Email ou mot de passe incorrect.");
+      alert('Email ou mot de passe incorrect.');
     } else {
-      alert("Connexion réussie");
+      alert('Connexion réussie');
       closeModal();
     }
   };
@@ -46,11 +46,11 @@ const LoginModal = () => {
         <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
         <div
           className="absolute bottom-1/3 left-1/3 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-          style={{ animationDelay: "1s" }}
+          style={{ animationDelay: '1s' }}
         ></div>
         <div
           className="absolute top-2/3 left-1/4 w-56 h-56 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-          style={{ animationDelay: "2s" }}
+          style={{ animationDelay: '2s' }}
         ></div>
       </div>
 
@@ -103,11 +103,11 @@ const LoginModal = () => {
                 </div>
                 <input
                   id="email"
-                  {...register("email", {
-                    required: "Email is required",
+                  {...register('email', {
+                    required: 'Email is required',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: 'Invalid email address',
                     },
                   })}
                   className="pl-10 w-full border border-blue-200 p-3 rounded-xl bg-white/70 backdrop-blur-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
@@ -115,9 +115,7 @@ const LoginModal = () => {
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1 animate-pulse">
-                  {errors.email.message}
-                </p>
+                <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.email.message}</p>
               )}
             </div>
 
@@ -144,10 +142,10 @@ const LoginModal = () => {
                   </svg>
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
-                  {...register("password", {
-                    required: "Password is required",
+                  {...register('password', {
+                    required: 'Password is required',
                   })}
                   className="pl-10 w-full border border-blue-200 p-3 rounded-xl bg-white/70 backdrop-blur-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   placeholder="••••••••"
@@ -188,9 +186,7 @@ const LoginModal = () => {
                 </div>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1 animate-pulse">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.password.message}</p>
               )}
             </div>
 
@@ -202,10 +198,7 @@ const LoginModal = () => {
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-blue-700"
-                >
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-blue-700">
                   Remember me
                 </label>
               </div>
@@ -250,12 +243,12 @@ const LoginModal = () => {
                   Signing in...
                 </>
               ) : (
-                "Sign in"
+                'Sign in'
               )}
             </button>
 
             <p className="text-sm text-blue-600 text-center">
-              Don't have an account yet?{" "}
+              Don't have an account yet?{' '}
               <Link
                 href="/auth/signup"
                 className="font-medium text-blue-700 hover:text-blue-800 hover:underline transition"
@@ -267,9 +260,7 @@ const LoginModal = () => {
 
             <div className="flex items-center my-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
-              <span className="px-4 text-blue-500 text-sm font-medium">
-                or continue with
-              </span>
+              <span className="px-4 text-blue-500 text-sm font-medium">or continue with</span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
             </div>
 
@@ -277,7 +268,7 @@ const LoginModal = () => {
             <button
               type="button"
               className="w-full flex justify-center items-center border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition transform hover:-translate-y-0.5"
-              onClick={() => signIn("google")}
+              onClick={() => signIn('google')}
             >
               <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
                 <path

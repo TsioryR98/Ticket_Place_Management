@@ -1,16 +1,12 @@
-"use client";
+'use client';
 
-import { format } from "date-fns";
-import { CalendarIcon, Check, ChevronsUpDown, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useState, useEffect } from "react";
+import { format } from 'date-fns';
+import { CalendarIcon, Check, ChevronsUpDown, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
+import { Calendar } from '../ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useState, useEffect } from 'react';
 import {
   Command,
   CommandEmpty,
@@ -18,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Select,
   SelectContent,
@@ -27,11 +23,11 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import LocationType from "@/types/LocationType";
-import DateRangeType from "@/types/DateRangeType";
-import { useRouter, useSearchParams } from "next/navigation";
-import { SearchIcon } from "lucide-react";
+} from '@/components/ui/select';
+import LocationType from '@/types/LocationType';
+import DateRangeType from '@/types/DateRangeType';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SearchIcon } from 'lucide-react';
 
 interface FilterBarProps {
   selectedDateRange: DateRangeType;
@@ -51,20 +47,18 @@ const FilterBar = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<string | undefined>(
-    selectedLocation || ""
-  );
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [value, setValue] = useState<string | undefined>(selectedLocation || '');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
-    setValue(selectedLocation || "");
+    setValue(selectedLocation || '');
   }, [selectedLocation]);
 
   const scrollToEvents = () => {
     setTimeout(() => {
-      const eventsSection = document.getElementById("events");
+      const eventsSection = document.getElementById('events');
       if (eventsSection) {
-        eventsSection.scrollIntoView({ behavior: "smooth" });
+        eventsSection.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100); // Petit délai pour s'assurer que le DOM est mis à jour
   };
@@ -98,13 +92,13 @@ const FilterBar = ({
     };
 
     updateSearchParams({
-      start: newRange.start ? format(newRange.start, "yyyy-MM-dd") : null,
-      end: newRange.end ? format(newRange.end, "yyyy-MM-dd") : null,
+      start: newRange.start ? format(newRange.start, 'yyyy-MM-dd') : null,
+      end: newRange.end ? format(newRange.end, 'yyyy-MM-dd') : null,
     });
   };
 
   const handleLocationChange = (currentValue: string) => {
-    const newValue = currentValue === value ? "" : currentValue;
+    const newValue = currentValue === value ? '' : currentValue;
     updateSearchParams({
       location: newValue || null,
     });
@@ -112,14 +106,14 @@ const FilterBar = ({
 
   const handleCategoryChange = (value: string) => {
     updateSearchParams({
-      category: value === "all" ? null : value,
+      category: value === 'all' ? null : value,
     });
   };
 
   const resetFilters = () => {
-    setSearchQuery("");
-    setValue("");
-    router.replace("/", { scroll: false });
+    setSearchQuery('');
+    setValue('');
+    router.replace('/', { scroll: false });
     setTimeout(scrollToEvents, 100);
   };
 
@@ -142,18 +136,17 @@ const FilterBar = ({
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant={"outline"}
+            variant={'outline'}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
-              !selectedDateRange.start && "text-muted-foreground"
+              'w-[300px] justify-start text-left font-normal',
+              !selectedDateRange.start && 'text-muted-foreground',
             )}
           >
             <CalendarIcon />
-            {selectedDateRange.start !== null &&
-            selectedDateRange.end !== null ? (
+            {selectedDateRange.start !== null && selectedDateRange.end !== null ? (
               <>
-                {format(selectedDateRange.start, "LLL dd, y")} -{" "}
-                {format(selectedDateRange.end, "LLL dd, y")}
+                {format(selectedDateRange.start, 'LLL dd, y')} -{' '}
+                {format(selectedDateRange.end, 'LLL dd, y')}
               </>
             ) : (
               <span>Select a date range</span>
@@ -202,16 +195,12 @@ const FilterBar = ({
               <CommandEmpty>No location found.</CommandEmpty>
               <CommandGroup>
                 {locations.map((location, index: number) => (
-                  <CommandItem
-                    key={index}
-                    value={location.value}
-                    onSelect={handleLocationChange}
-                  >
+                  <CommandItem key={index} value={location.value} onSelect={handleLocationChange}>
                     {location.label}
                     <Check
                       className={cn(
-                        "ml-auto",
-                        value === location.value ? "opacity-100" : "opacity-0"
+                        'ml-auto',
+                        value === location.value ? 'opacity-100' : 'opacity-0',
                       )}
                     />
                   </CommandItem>
@@ -223,10 +212,7 @@ const FilterBar = ({
       </Popover>
 
       {/* Sélecteur de catégorie */}
-      <Select
-        onValueChange={handleCategoryChange}
-        value={selectedCategory || "all"}
-      >
+      <Select onValueChange={handleCategoryChange} value={selectedCategory || 'all'}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
@@ -244,11 +230,7 @@ const FilterBar = ({
       </Select>
 
       {/* Bouton de réinitialisation */}
-      <Button
-        variant="destructive"
-        onClick={resetFilters}
-        className="ml-auto cursor-pointer"
-      >
+      <Button variant="destructive" onClick={resetFilters} className="ml-auto cursor-pointer">
         Reset Filters <X className="ml-2 w-4 h-4" />
       </Button>
     </div>

@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { cancelReservation, getUserReservations } from "@/lib/api";
-import { Order } from "@/types/order";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { useLoginModal } from "@/context/ModalContext";
-import { motion, AnimatePresence } from "framer-motion";
-import toast from "react-hot-toast";
+import { useEffect, useState } from 'react';
+import { cancelReservation, getUserReservations } from '@/lib/api';
+import { Order } from '@/types/order';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useLoginModal } from '@/context/ModalContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 export default function ReservationList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
   const { loginOpenModal } = useLoginModal();
 
   const handleLoginClick = () => {
@@ -28,20 +28,20 @@ export default function ReservationList() {
         const data = await getUserReservations();
         setOrders(data || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur de chargement");
+        setError(err instanceof Error ? err.message : 'Erreur de chargement');
       } finally {
         setLoading(false);
       }
     };
 
-    if (session.status === "authenticated") {
+    if (session.status === 'authenticated') {
       fetchOrders();
     } else {
       setOrders([]);
     }
   }, [session.status]);
 
-  if (session.status === "unauthenticated") {
+  if (session.status === 'unauthenticated') {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -56,15 +56,13 @@ export default function ReservationList() {
           >
             🎟️
           </motion.div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Accès à vos réservations
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Accès à vos réservations</h2>
           <p className="text-gray-600">Connectez-vous pour gérer vos billets</p>
         </div>
         <motion.button
           whileHover={{
             scale: 1.03,
-            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.25)",
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)',
           }}
           whileTap={{ scale: 0.98 }}
           onClick={handleLoginClick}
@@ -85,32 +83,27 @@ export default function ReservationList() {
   const filteredOrders = orders
     .filter((order) => {
       const hasUpcomingEvents = order.items.some(
-        (item) => item.event_date && isEventUpcoming(item.event_date)
+        (item) => item.event_date && isEventUpcoming(item.event_date),
       );
-      if (filter === "upcoming") return hasUpcomingEvents;
-      if (filter === "past") return !hasUpcomingEvents;
+      if (filter === 'upcoming') return hasUpcomingEvents;
+      if (filter === 'past') return !hasUpcomingEvents;
       return true;
     })
     .sort((a, b) => {
-      const aDate = a.items[0]?.event_date
-        ? new Date(a.items[0].event_date).getTime()
-        : 0;
-      const bDate = b.items[0]?.event_date
-        ? new Date(b.items[0].event_date).getTime()
-        : 0;
+      const aDate = a.items[0]?.event_date ? new Date(a.items[0].event_date).getTime() : 0;
+      const bDate = b.items[0]?.event_date ? new Date(b.items[0].event_date).getTime() : 0;
       return aDate - bDate;
     });
 
   async function handleCancel(orderId: string, ticketId: string) {
-    if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?"))
-      return;
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) return;
 
     try {
       const order = orders.find((o) => o.order_id === orderId);
       const item = order?.items.find((i) => i.ticket_id === ticketId);
 
       if (!item?.event_date) {
-        throw new Error("Billet non trouvé");
+        throw new Error('Billet non trouvé');
       }
 
       if (new Date(item.event_date) < new Date()) {
@@ -129,20 +122,20 @@ export default function ReservationList() {
                   items: order.items.filter((i) => i.ticket_id !== ticketId),
                   total_amount: order.total_amount - item.price * item.quantity,
                 }
-              : order
+              : order,
           )
-          .filter((order) => order.items.length > 0)
+          .filter((order) => order.items.length > 0),
       );
 
-      toast.success("Annulation réussie !");
+      toast.success('Annulation réussie !');
     } catch (error) {
       console.error("Erreur d'annulation:", error);
       toast.error(
         error instanceof Error
-          ? error.message.includes("Billet")
+          ? error.message.includes('Billet')
             ? "Ce billet n'existe pas ou a déjà été annulé"
             : error.message
-          : "Erreur lors de l'annulation"
+          : "Erreur lors de l'annulation",
       );
     }
   }
@@ -152,12 +145,10 @@ export default function ReservationList() {
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"
         />
-        <p className="text-gray-600 font-medium">
-          Chargement de vos réservations...
-        </p>
+        <p className="text-gray-600 font-medium">Chargement de vos réservations...</p>
       </div>
     );
   }
@@ -180,9 +171,7 @@ export default function ReservationList() {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">
-              Erreur de chargement
-            </h3>
+            <h3 className="text-sm font-medium text-red-800">Erreur de chargement</h3>
             <p className="text-sm text-red-700 mt-1">{error}</p>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -206,7 +195,7 @@ export default function ReservationList() {
           opacity: 1,
           y: 0,
           transition: {
-            type: "spring",
+            type: 'spring',
             stiffness: 300,
             damping: 20,
           },
@@ -218,7 +207,7 @@ export default function ReservationList() {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            type: "spring",
+            type: 'spring',
             damping: 12,
             delay: 0.2,
           }}
@@ -228,7 +217,7 @@ export default function ReservationList() {
         <motion.div
           className="h-1 w-24 bg-gradient-to-r from-blue-600 to-indigo-900 rounded-full mx-auto my-3"
           initial={{ width: 0 }}
-          animate={{ width: "6rem" }}
+          animate={{ width: '6rem' }}
           transition={{ delay: 0.4, duration: 0.6 }}
         />
         <motion.p
@@ -237,11 +226,11 @@ export default function ReservationList() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          {filter === "upcoming"
-            ? "Your next events"
-            : filter === "past"
-            ? "Your past events"
-            : "All your reservations"}
+          {filter === 'upcoming'
+            ? 'Your next events'
+            : filter === 'past'
+            ? 'Your past events'
+            : 'All your reservations'}
         </motion.p>
       </motion.div>
 
@@ -251,7 +240,7 @@ export default function ReservationList() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        {["all", "upcoming", "past"].map((f, index) => (
+        {['all', 'upcoming', 'past'].map((f, index) => (
           <motion.button
             key={f}
             whileHover={{ scale: 1.05, y: -2 }}
@@ -262,13 +251,13 @@ export default function ReservationList() {
             onClick={() => setFilter(f as any)}
             className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
               filter === f
-                ? "bg-gradient-to-r from-blue-600 to-indigo-900 text-white shadow-lg"
-                : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200"
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-900 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200'
             }`}
           >
-            {f === "all" && "All"}
-            {f === "upcoming" && "Upcoming"}
-            {f === "past" && "Past"}
+            {f === 'all' && 'All'}
+            {f === 'upcoming' && 'Upcoming'}
+            {f === 'past' && 'Past'}
           </motion.button>
         ))}
       </motion.div>
@@ -291,7 +280,7 @@ export default function ReservationList() {
                 transition={{
                   duration: 4,
                   repeat: Infinity,
-                  repeatType: "reverse",
+                  repeatType: 'reverse',
                 }}
               >
                 <svg
@@ -308,30 +297,21 @@ export default function ReservationList() {
                   />
                 </svg>
               </motion.div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                No reservations found
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No reservations found</h3>
               <p className="text-gray-500 mb-6">
-                {filter === "upcoming"
-                  ? "You have no upcoming reservations"
-                  : filter === "past"
-                  ? "No past reservations"
+                {filter === 'upcoming'
+                  ? 'You have no upcoming reservations'
+                  : filter === 'past'
+                  ? 'No past reservations'
                   : "You don't have any reservations yet"}
               </p>
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link
                   href="/"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-900 hover:from-blue-600 hover:to-blue-700 transition-all"
                 >
                   Explore events
-                  <svg
-                    className="ml-2 -mr-1 w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
+                  <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
@@ -351,7 +331,7 @@ export default function ReservationList() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -2 }}
                 transition={{
-                  type: "spring",
+                  type: 'spring',
                   stiffness: 300,
                   delay: 0.1 * orderIndex,
                 }}
@@ -364,15 +344,12 @@ export default function ReservationList() {
                         Reservation #{order.order_id.slice(0, 8).toUpperCase()}
                       </h2>
                       <p className="text-sm text-gray-500 mt-1">
-                        Booked on{" "}
-                        {new Date(order.created_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          }
-                        )}
+                        Booked on{' '}
+                        {new Date(order.created_at).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
                       </p>
                     </div>
                   </div>
@@ -380,9 +357,7 @@ export default function ReservationList() {
 
                 <div className="divide-y divide-gray-100">
                   {order.items.map((item, index) => {
-                    const eventDate = item.event_date
-                      ? new Date(item.event_date)
-                      : null;
+                    const eventDate = item.event_date ? new Date(item.event_date) : null;
                     const isUpcoming = eventDate && eventDate >= new Date();
 
                     return (
@@ -423,8 +398,7 @@ export default function ReservationList() {
                                   {item.event_title}
                                 </h3>
                                 <p className="text-gray-600">
-                                  {item.quantity}x {item.ticket_type} •{" "}
-                                  {item.price}€
+                                  {item.quantity}x {item.ticket_type} • {item.price}€
                                 </p>
                                 <p className="font-bold text-gray-900 mt-1">
                                   {(item.price * item.quantity).toFixed(2)}€
@@ -452,14 +426,11 @@ export default function ReservationList() {
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                   />
                                 </svg>
-                                {new Date(item.event_date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    weekday: "short",
-                                    day: "numeric",
-                                    month: "short",
-                                  }
-                                )}
+                                {new Date(item.event_date).toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  day: 'numeric',
+                                  month: 'short',
+                                })}
                               </motion.div>
                             </div>
                           )}
@@ -469,7 +440,7 @@ export default function ReservationList() {
                           <motion.button
                             whileHover={{
                               scale: 1.02,
-                              backgroundColor: "#FEE2E2",
+                              backgroundColor: '#FEE2E2',
                             }}
                             whileTap={{ scale: 0.98 }}
                             onClick={(e) => {
@@ -505,7 +476,7 @@ export default function ReservationList() {
                     <motion.p
                       className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
                       whileHover={{ scale: 1.05 }}
-                      transition={{ type: "spring", stiffness: 500 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
                     >
                       {order.total_amount.toFixed(2)}€
                     </motion.p>

@@ -1,6 +1,6 @@
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
-import Image from "next/image";
+import { Card } from '@/components/ui/card';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const EventCardHome = ({
   title,
@@ -71,25 +71,18 @@ const EventCardHome = ({
                         strokeWidth="2"
                         className="transition-all duration-300 group-hover:stroke-[2.5px] group-hover:text-primary-300"
                       >
-                        <rect
-                          x="3"
-                          y="4"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        ></rect>
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                       </svg>
                     </div>
                     <p className="text-sm group-hover:text-primary-100 transition-colors duration-300">
-                      {new Date(date).toLocaleDateString("fr-FR", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
+                      {new Date(date).toLocaleDateString('fr-FR', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
                       })}
-                      {" • "}
+                      {' • '}
                       {time}
                     </p>
                   </div>

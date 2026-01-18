@@ -1,6 +1,6 @@
-import pool from "../dbConfig";
+import pool from '../dbConfig';
 
-import { jwTokenAuth } from "../utils/jwt_auth";
+import { jwTokenAuth } from '../utils/jwt_auth';
 
 const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
@@ -9,24 +9,22 @@ const handleError = (res, message, error) => {
 export const googleAuth = async (req, res) => {
   try {
     const { email, name, googleId } = req.body;
-    const res = await pool.query("SELECT * FROM users WHERE user_email=$1", [
-      email,
-    ]);
+    const res = await pool.query('SELECT * FROM users WHERE user_email=$1', [email]);
     let user = res.rows[0];
     if (user) {
       //updating DB
       if (!user.google_id) {
         const updatedUser = await pool.query(
-          "UPDATE users SET google_id=$1 WHERE user_id=$2 RETURNING *",
-          [googleId, user.user_id]
+          'UPDATE users SET google_id=$1 WHERE user_id=$2 RETURNING *',
+          [googleId, user.user_id],
         );
         user = updatedUser.rows[0];
       }
     } else {
       //insert into DB
       const newUser = await pool.query(
-        "INSERT INTO users (user_name, user_email, google_id) VALUES($1, $2, $3) RETURNING *",
-        [name, email, googleId]
+        'INSERT INTO users (user_name, user_email, google_id) VALUES($1, $2, $3) RETURNING *',
+        [name, email, googleId],
       );
       user = newUser.rows[0];
     }
@@ -53,6 +51,6 @@ export const googleAuth = async (req, res) => {
     });
      */
   } catch (error) {
-    return handleError(res, "Error during Google authentication", error);
+    return handleError(res, 'Error during Google authentication', error);
   }
 };

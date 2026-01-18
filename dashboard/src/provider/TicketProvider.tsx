@@ -13,10 +13,10 @@ import {
   UpdateResult,
   DeleteParams,
   DeleteResult,
-} from "react-admin";
-import { fetchUtils } from "react-admin";
+} from 'react-admin';
+import { fetchUtils } from 'react-admin';
 
-const urlAPI = "http://localhost:4000/api";
+const urlAPI = 'http://localhost:4000/api';
 const httpClient = fetchUtils.fetchJson;
 
 interface Ticket extends RaRecord {
@@ -33,21 +33,21 @@ interface Ticket extends RaRecord {
 }
 
 export const ticketDataProvider: DataProvider = {
-  getList: async function <RecordType extends RaRecord = Ticket>(
+  getList: async function<RecordType extends RaRecord = Ticket>(
     resource: string,
-    params: GetListParams
+    params: GetListParams,
   ): Promise<GetListResult<RecordType>> {
     try {
       const { eventId } = params.filter;
       if (!eventId) {
-        throw new Error("eventId is required to fetch tickets");
+        throw new Error('eventId is required to fetch tickets');
       }
 
       const url = `${urlAPI}/events/${eventId}/tickets`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json } = await httpClient(url, {
@@ -63,17 +63,17 @@ export const ticketDataProvider: DataProvider = {
     }
   },
 
-  getOne: async function <RecordType extends RaRecord = Ticket>(
+  getOne: async function<RecordType extends RaRecord = Ticket>(
     resource: string,
-    params: GetOneParams
+    params: GetOneParams,
   ): Promise<GetOneResult<RecordType>> {
     try {
-      const [eventId, ticketId] = params.id.toString().split("_");
+      const [eventId, ticketId] = params.id.toString().split('_');
       const url = `${urlAPI}/events/${eventId}/tickets/${ticketId}`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json: response } = await httpClient(url, {
@@ -91,32 +91,29 @@ export const ticketDataProvider: DataProvider = {
     }
   },
 
-  create: async function <
-    RecordType extends Omit<RaRecord, "id"> = Ticket,
+  create: async function<
+    RecordType extends Omit<RaRecord, 'id'> = Ticket,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier }
-  >(
-    resource: string,
-    params: CreateParams<RecordType>
-  ): Promise<CreateResult<ResultRecordType>> {
+  >(resource: string, params: CreateParams<RecordType>): Promise<CreateResult<ResultRecordType>> {
     try {
       const { eventId } = params.data;
       if (!eventId) {
-        throw new Error("eventId is required to create a ticket");
+        throw new Error('eventId is required to create a ticket');
       }
 
       const url = `${urlAPI}/events/${eventId}/tickets`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json: response } = await httpClient(url, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(params.data),
         headers: new Headers({
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         }),
       });
 
@@ -131,25 +128,25 @@ export const ticketDataProvider: DataProvider = {
     }
   },
 
-  update: async function <RecordType extends RaRecord = Ticket>(
+  update: async function<RecordType extends RaRecord = Ticket>(
     resource: string,
-    params: UpdateParams<RecordType>
+    params: UpdateParams<RecordType>,
   ): Promise<UpdateResult<RecordType>> {
     try {
-      const [eventId, ticketId] = params.id.toString().split("_");
+      const [eventId, ticketId] = params.id.toString().split('_');
       const url = `${urlAPI}/events/${eventId}/tickets/${ticketId}`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       const { json: response } = await httpClient(url, {
-        method: "PUT",
+        method: 'PUT',
         body: JSON.stringify(params.data),
         headers: new Headers({
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         }),
       });
 
@@ -164,21 +161,21 @@ export const ticketDataProvider: DataProvider = {
     }
   },
 
-  delete: async function <RecordType extends RaRecord = Ticket>(
+  delete: async function<RecordType extends RaRecord = Ticket>(
     resource: string,
-    params: DeleteParams<RecordType>
+    params: DeleteParams<RecordType>,
   ): Promise<DeleteResult<RecordType>> {
     try {
-      const [eventId, ticketId] = params.id.toString().split("_");
+      const [eventId, ticketId] = params.id.toString().split('_');
       const url = `${urlAPI}/events/${eventId}/tickets/${ticketId}`;
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        throw new Error("No token found in localStorage");
+        throw new Error('No token found in localStorage');
       }
 
       await httpClient(url, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: new Headers({ Authorization: `Bearer ${token}` }),
       });
 
@@ -191,18 +188,16 @@ export const ticketDataProvider: DataProvider = {
   },
 
   // Méthodes non implémentées
-  getMany: function <RecordType extends RaRecord = any>(): Promise<any> {
-    throw new Error("Function not implemented.");
+  getMany: function<RecordType extends RaRecord = any>(): Promise<any> {
+    throw new Error('Function not implemented.');
   },
-  getManyReference: function <
-    RecordType extends RaRecord = any
-  >(): Promise<any> {
-    throw new Error("Function not implemented.");
+  getManyReference: function<RecordType extends RaRecord = any>(): Promise<any> {
+    throw new Error('Function not implemented.');
   },
-  updateMany: function <RecordType extends RaRecord = any>(): Promise<any> {
-    throw new Error("Function not implemented.");
+  updateMany: function<RecordType extends RaRecord = any>(): Promise<any> {
+    throw new Error('Function not implemented.');
   },
-  deleteMany: function <RecordType extends RaRecord = any>(): Promise<any> {
-    throw new Error("Function not implemented.");
+  deleteMany: function<RecordType extends RaRecord = any>(): Promise<any> {
+    throw new Error('Function not implemented.');
   },
 };

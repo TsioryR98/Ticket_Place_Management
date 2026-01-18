@@ -1,4 +1,4 @@
-import { Identifier } from "react-admin";
+import { Identifier } from 'react-admin';
 
 export interface Event {
   id: Identifier;

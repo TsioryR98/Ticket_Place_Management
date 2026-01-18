@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Event } from "@/types/event";
-import Link from "next/link";
+import { Event } from '@/types/event';
+import Link from 'next/link';
 
 export default function EventList({ events }: { events: Event[] }) {
   return (
@@ -18,7 +18,7 @@ export default function EventList({ events }: { events: Event[] }) {
               <strong>Location :</strong> {event.location}
             </p>
             <p>
-              <strong>Tickets available :</strong>{" "}
+              <strong>Tickets available :</strong>{' '}
               {event.tickets.reduce((sum, ticket) => sum + ticket.available, 0)}
             </p>
           </Link>

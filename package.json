@@ -12,5 +12,8 @@
   "dependencies": {
     "express-router": "^0.0.1",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
   }
 }

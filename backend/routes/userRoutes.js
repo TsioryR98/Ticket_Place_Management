@@ -8,7 +8,6 @@ import {
   getUserById,
   updateUserRole,
 } from "../controllers/userController.js";
-import { refreshTokenAccess } from "../controllers/userTokenController.js";
 import express from "express";
 import { authenticationToken } from "../middleware/authMiddleware.js";
 
@@ -22,7 +21,5 @@ router.get("/:id", getUserById); //
 router.get("/me", authenticationToken, getUser); //next
 router.patch("/me/settings", authenticationToken, updateUser); //next
 router.patch("/role/:id", authenticationToken, updateUserRole); //admin
-
-router.post("/refresh", refreshTokenAccess); //next
 
 export { router as usersRouter };

@@ -1,16 +1,11 @@
-import express, { json } from "express";
+import express from "express";
 import cors from "cors";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import cookieParser from "cookie-parser";
 import { usersRouter } from "./routes/userRoutes.js";
 import { eventRouter } from "./routes/eventRoute.js";
 import { ticketRouter } from "./routes/ticketRoute.js";
 import { orderRouter } from "./routes/orderRoutes.js";
 import { initWebSocket } from "./websocket/wsServer.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -34,6 +29,8 @@ app.use("/api/events", eventRouter);
 app.use("/api/orders", orderRouter);
 //route for ticket
 app.use("/api/events", ticketRouter);
+//route for token refresh
+app.use("/api/users/refresh", usersRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

@@ -92,11 +92,12 @@ export const loginUser = async (req, res) => {
       httpOnly: true,
       secure: true, //only with https request
       sameSite: "strict",
-      maxAge: 10 * 60 * 1000, //milliseconds
+      maxAge: 7 * 24 * 60 * 60 * 1000, //milliseconds
     });
 
     return res.json({
       token: tokens.accessToken,
+      expiresAt: tokens.expiresAt,
       user: {
         user_id: users.rows[0].user_id,
         user_name: users.rows[0].user_name,

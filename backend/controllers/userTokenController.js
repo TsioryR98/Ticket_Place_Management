@@ -27,9 +27,9 @@ export const refreshTokenAccess = (req, res) => {
         expiresIn: process.env.JWT_EXPIRES_IN,
       }
     );
-    const expiresAt = Date.now() + ms(process.env.JWT_EXPIRES_IN);
+    const expiresAt = Math.floor(Date.now() + ms(process.env.JWT_EXPIRES_IN));
 
-    return res.status(200).json({ accessToken, expiresIn: expiresAt });
+    return res.status(200).json({ accessToken, expiresAt: expiresAt });
   } catch (error) {
     return res.status(400).json({ error: error?.message || error });
   }

@@ -1,6 +1,33 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { JWT } from "next-auth/jwt";
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/refresh`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
+    if (!res.ok) throw new Error("Refresh failed");
+    const refreshedToken = await res.json();
+    return {
+      ...token,
+      accessToken: refreshedToken.accessToken,
+      expiresAt: refreshedToken.expiresAt,
+    };
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 const option: NextAuthOptions = {
   providers: [
@@ -40,25 +67,20 @@ const option: NextAuthOptions = {
               credentials: "include",
             }
           );
+          if (!res.ok) throw new Error("access failed");
 
           const data = await res.json();
 
           if (!res.ok) {
             throw new Error(data.error || "Login failed");
           }
-          console.log({
-            id: data.user.user_id,
-            name: data.user.user_name,
-            email: data.user.user_email,
-            role: data.user.role,
-            accessToken: data.token,
-          });
           return {
             id: data.user.user_id,
             name: data.user.user_name,
             email: data.user.user_email,
             role: data.user.role,
-            accessToken: data.tokens,
+            accessToken: data.token,
+            expiresAt: data.expiresAt,
           };
         } catch (error) {
           console.error("Auth error:", error);
@@ -70,18 +92,22 @@ const option: NextAuthOptions = {
 
   //callbacks
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }): Promise<JWT> {
       if (user) {
         return {
           ...token,
           id: user.id,
-          name: user.name,
-          email: user.email,
+          name: user.name ?? undefined,
+          email: user.email ?? undefined,
           role: user.role,
           accessToken: user.accessToken,
+          expiresAt: user.expiresAt,
         };
       }
-      return token;
+      if (token.expiresAt && Date.now() < token.expiresAt) {
+        return token;
+      }
+      return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
@@ -90,8 +116,8 @@ const option: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
-          name: token.name,
-          email: token.email,
+          name: token.name ?? null,
+          email: token.email ?? null,
           role: token.role,
         },
         accessToken: token.accessToken,

@@ -23,7 +23,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     console.error("Error refreshing access token:", error);
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: "RefreshAccessTokenInvalid",
     };
   }
 }
@@ -105,13 +105,22 @@ const option: NextAuthOptions = {
           expiresAt: user.expiresAt,
         };
       }
-      if (token.expiresAt && Date.now() > token.expiresAt) {
+      if (token.error === 'RefreshAccessTokenInvalid' ) {
+        return {} //broken token after refresh failure
+      }
+      if (token.expiresAt && Date.now() < token.expiresAt) {
         return token;
       }
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
+      if (!token?.accessToken) {
+        return {
+          ...session,
+          user: undefined
+        }
+      };
       return {
         ...session,
         user: {
@@ -128,7 +137,6 @@ const option: NextAuthOptions = {
   },
   // if we need defaut route for login or logout
   session: { strategy: "jwt" },
-  
 };
 
 export default option;

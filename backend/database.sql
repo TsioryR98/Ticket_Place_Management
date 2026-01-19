@@ -14,6 +14,17 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT NOW ()
 );
 
+CREATE TABLE user_providers (
+    provider_id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    provider_name VARCHAR(50) NOT NULL, --'google', 'facebook'
+    provider_account_id VARCHAR(255) NOT NULL, -- id from provider
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(provider_name, provider_account_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE events (
     event_id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
     title VARCHAR(255) NOT NULL,

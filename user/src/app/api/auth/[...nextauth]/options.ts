@@ -1,4 +1,4 @@
-import type { NextAuthOptions } from "next-auth";
+import type { Session,NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
@@ -23,7 +23,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     console.error("Error refreshing access token:", error);
     return {
       ...token,
-      error: "RefreshAccessTokenInvalid",
+      error: "RefreshAccessTokenError",
     };
   }
 }
@@ -105,7 +105,7 @@ const option: NextAuthOptions = {
           expiresAt: user.expiresAt,
         };
       }
-      if (token.error === 'RefreshAccessTokenInvalid' ) {
+      if (token.error === 'RefreshAccessTokenError' ) {
         return {} //broken token after refresh failure
       }
       if (token.expiresAt && Date.now() < token.expiresAt) {
@@ -114,22 +114,22 @@ const option: NextAuthOptions = {
       return await refreshAccessToken(token);
     },
 
-    async session({ session, token }) {
+    async session({ session, token }) : Promise <Session> {
       if (!token?.accessToken) {
         return {
           ...session,
-          user: undefined
+          user: null
         }
       };
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
+          id: token.id ?? null,
           name: token.name ?? null,
           email: token.email ?? null,
-          image: session.user.image ?? null,
-          role: token.role,
+          image: session.user?.image ?? null,
+          role: token.role ?? null,
           accessToken: token.accessToken,
         }
       };

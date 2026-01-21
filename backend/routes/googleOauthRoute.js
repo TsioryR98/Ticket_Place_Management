@@ -1,8 +1,8 @@
 import express from 'express';
-import googleAuth from '../google/googleSyncOauth';
+import googleOauth from '../google/googleSyncOauth.js';
 
 const router = express.Router();
 
-router.post('/auth/google', googleAuth);
+router.post('/auth/google', googleOauth);
 
 export { router as googleOauthRouter };

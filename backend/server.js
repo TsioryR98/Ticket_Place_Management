@@ -7,6 +7,7 @@ import { ticketRouter } from './routes/ticketRoute.js';
 import { orderRouter } from './routes/orderRoutes.js';
 import { usersTokenRouter } from './routes/userTokenRoute.js';
 import { initWebSocket } from './websocket/wsServer.js';
+import { googleOauthRouter } from './routes/googleOauthRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -32,6 +33,8 @@ app.use('/api/orders', orderRouter);
 app.use('/api/events', ticketRouter);
 //route for token refresh
 app.use('/api/users', usersTokenRouter);
+//route google oauth
+app.use('/api/users', googleOauthRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

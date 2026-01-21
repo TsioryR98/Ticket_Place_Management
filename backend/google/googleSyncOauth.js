@@ -1,11 +1,11 @@
-import pool from '../dbConfig';
-import { jwTokenAuth } from '../utils/jwt_auth';
+import pool from '../dbConfig.js';
+import { jwTokenAuth } from '../utils/jwt_auth.js';
 
 const handleError = (res, message, error) => {
   res.status(500).json({ message, error: error?.message || error });
 };
 
-export const googleAuth = async (req, res) => {
+const googleOauth = async (req, res) => {
   try {
     const { email, name, googleId } = req.body;
 
@@ -27,8 +27,8 @@ export const googleAuth = async (req, res) => {
         );
       } else {
         const newUserRes = await pool.query(
-          'INSERT INTO users (user_name, user_email, role) VALUES ($1, $2, $3) RETURNING *',
-          [name, email, 'user'],
+          'INSERT INTO users (user_name, user_email, role, user_passwords) VALUES ($1, $2, $3, $4) RETURNING *',
+          [name, email, 'user', 'OAUTH_GOOGLE_ACCOUNT'],
         );
         user = newUserRes.rows[0];
 
@@ -45,18 +45,22 @@ export const googleAuth = async (req, res) => {
       role: user.role,
     });
 
-    /** test * return res.json(
-     * { accessToken: tokens.accessToken,
-     *  user: {
-     * user_id: user.rows[0].user_id,
-     * user_name: user.rows[0].user_name,
-     *  user_email: user.rows[0].user_email,
-     * role: user.rows[0].role, },
-     * }); */
-
-    return res.json({ user, tokens });
+    return res.json({
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresAt: tokens.expiresAt,
+      },
+      user: {
+        user_id: user.user_id,
+        user_name: user.user_name,
+        user_email: user.user_email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     return handleError(res, 'Error during Google authentication', error);
   }
 };
-export default googleAuth;
+
+export default googleOauth;

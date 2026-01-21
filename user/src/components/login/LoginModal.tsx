@@ -14,6 +14,7 @@ type Inputs = {
 const LoginModal = () => {
   const { closeModal, openModal } = useLoginModal();
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   //REACT HOOK FORM
   const {
@@ -37,6 +38,11 @@ const LoginModal = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    await signIn('google');
+    setIsGoogleLoading(false);
+  };
   if (!openModal) return null;
 
   return (
@@ -267,28 +273,57 @@ const LoginModal = () => {
             {/* Google Login Button */}
             <button
               type="button"
-              className="w-full flex justify-center items-center border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition transform hover:-translate-y-0.5"
-              onClick={() => signIn('google')}
+              disabled={isGoogleLoading}
+              className="w-full flex justify-center items-center border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition transform hover:-translate-y-0.5 disabled:opacity-70"
+              onClick={handleGoogleSignIn}
             >
-              <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
-                <path
-                  fill="#FBBC05"
-                  d="M9.8,24c0-1.5,0.3-2.9,0.7-4.4L2.6,13.6c-1.5,3.1-2.4,6.6-2.4,10.4s0.9,7.3,2.4,10.4l7.9-6C10.1,26.9,9.8,25.5,9.8,24z"
-                ></path>
-                <path
-                  fill="#EB4335"
-                  d="M23.7,10.1c3.3,0,6.3,1.2,8.7,3.1l6.8-6.8C35,2.8,29.7,0.5,23.7,0.5C14.4,0.5,6.4,5.8,2.6,13.6l7.9,6C12.4,14.1,17.5,10.1,23.7,10.1z"
-                ></path>
-                <path
-                  fill="#34A853"
-                  d="M23.7,37.9c-6.2,0-11.3-4-13.2-9.5l-7.9,6c3.8,7.8,11.8,13.1,21.1,13.1c5.7,0,11.2-2,15.3-5.9l-7.5-6C29.4,37.1,26.7,37.9,23.7,37.9z"
-                ></path>
-                <path
-                  fill="#4285F4"
-                  d="M46.1,24c0-1.4-0.2-2.9-0.5-4.3H23.7v8.8h12.6c-0.6,2.9-2.4,5.3-4.9,6.8l7.5,6c4.3-4,6.9-10,6.9-16.3z"
-                ></path>
-              </svg>
-              Continue with Google
+              {isGoogleLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Connecting by Google...
+                </>
+              ) : (
+                <>
+                  <svg className="h-5 w-5 mr-3" viewBox="0 0 48 48">
+                    <path
+                      fill="#FBBC05"
+                      d="M9.8,24c0-1.5,0.3-2.9,0.7-4.4L2.6,13.6c-1.5,3.1-2.4,6.6-2.4,10.4s0.9,7.3,2.4,10.4l7.9-6C10.1,26.9,9.8,25.5,9.8,24z"
+                    ></path>
+                    <path
+                      fill="#EB4335"
+                      d="M23.7,10.1c3.3,0,6.3,1.2,8.7,3.1l6.8-6.8C35,2.8,29.7,0.5,23.7,0.5C14.4,0.5,6.4,5.8,2.6,13.6l7.9,6C12.4,14.1,17.5,10.1,23.7,10.1z"
+                    ></path>
+                    <path
+                      fill="#34A853"
+                      d="M23.7,37.9c-6.2,0-11.3-4-13.2-9.5l-7.9,6c3.8,7.8,11.8,13.1,21.1,13.1c5.7,0,11.2-2,15.3-5.9l-7.5-6C29.4,37.1,26.7,37.9,23.7,37.9z"
+                    ></path>
+                    <path
+                      fill="#4285F4"
+                      d="M46.1,24c0-1.4-0.2-2.9-0.5-4.3H23.7v8.8h12.6c-0.6,2.9-2.4,5.3-4.9,6.8l7.5,6c4.3-4,6.9-10,6.9-16.3z"
+                    ></path>
+                  </svg>
+                  Continue with Google
+                </>
+              )}
             </button>
           </form>
         </div>

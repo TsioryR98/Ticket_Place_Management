@@ -1,7 +1,7 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import React, { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
 import { useLoginModal } from '@/context/ModalContext';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ type Inputs = {
 };
 
 const LoginModal = () => {
+  const { data: session } = useSession();
   const { closeModal, openModal } = useLoginModal();
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -21,7 +22,22 @@ const LoginModal = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<Inputs>();
+
+  useEffect(() => {
+    if (session) {
+      closeModal();
+      setIsGoogleLoading(false);
+    }
+  }, [session, closeModal]);
+
+  useEffect(() => {
+    if (openModal) {
+      reset();
+      setShowPassword(false);
+    }
+  }, [openModal, reset]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const result = await signIn('credentials', {
@@ -41,8 +57,8 @@ const LoginModal = () => {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     await signIn('google');
-    setIsGoogleLoading(false);
   };
+
   if (!openModal) return null;
 
   return (

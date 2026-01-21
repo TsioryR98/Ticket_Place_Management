@@ -248,7 +248,7 @@ const LoginModal = () => {
             </button>
 
             <p className="text-sm text-blue-600 text-center">
-              Don't have an account yet?{' '}
+              Don&apos;t have an account yet?{' '}
               <Link
                 href="/auth/signup"
                 className="font-medium text-blue-700 hover:text-blue-800 hover:underline transition"

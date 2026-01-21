@@ -1,18 +1,17 @@
-import type { Session,NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
+import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { NextAuthOptions } from 'next-auth';
+import { Session } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/refresh`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken: token.refreshToken })}
-    );
-    if (!res.ok) throw new Error("Refresh failed");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: token.refreshToken }),
+    });
+    if (!res.ok) throw new Error('Refresh failed');
     const refreshedToken = await res.json();
     return {
       ...token,
@@ -20,10 +19,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       expiresAt: refreshedToken.expiresAt,
     };
   } catch (error) {
-    console.error("Error refreshing access token:", error);
+    console.error('Error refreshing access token:', error);
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: 'RefreshAccessTokenError',
     };
   }
 }
@@ -38,40 +37,37 @@ const option: NextAuthOptions = {
 
     //Auht with email & Password
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
         email: {
-          label: "email",
-          type: "email",
-          placeholder: "Email",
+          label: 'email',
+          type: 'email',
+          placeholder: 'Email',
         },
         password: {
-          label: "password",
-          type: "password",
-          placeholder: "Password",
+          label: 'password',
+          type: 'password',
+          placeholder: 'Password',
         },
       },
 
       async authorize(credentials) {
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: credentials?.email,
-                password: credentials?.password,
-              }),
-              credentials: "include",
-            }
-          );
-          if (!res.ok) throw new Error("access failed");
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: credentials?.email,
+              password: credentials?.password,
+            }),
+            credentials: 'include',
+          });
+          if (!res.ok) throw new Error('access failed');
 
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.error || "Login failed");
+            throw new Error(data.error || 'Login failed');
           }
           return {
             id: data.user.user_id,
@@ -83,7 +79,7 @@ const option: NextAuthOptions = {
             expiresAt: data.expiresAt,
           };
         } catch (error) {
-          console.error("Auth error:", error);
+          console.error('Auth error:', error);
           return null;
         }
       },
@@ -92,6 +88,35 @@ const option: NextAuthOptions = {
 
   //callbacks
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== 'google') return true; // continue for non-google providers
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name,
+            googleId: account?.providerAccountId,
+          }),
+        });
+        if (!res.ok) return false;
+
+        const data = await res.json();
+
+        user.id = data.user.user_id;
+        user.role = data.user.role;
+        user.accessToken = data.tokens.accessToken;
+        user.refreshToken = data.tokens.refreshToken;
+        user.expiresAt = data.tokens.expiresAt;
+
+        return true;
+      } catch (error) {
+        console.error('Google signIn error:', error);
+        return false;
+      }
+    },
     async jwt({ token, user }): Promise<JWT> {
       if (user) {
         return {
@@ -101,26 +126,29 @@ const option: NextAuthOptions = {
           email: user.email ?? undefined,
           role: user.role,
           accessToken: user.accessToken,
-          refreshToken: user.refreshToken,//for development purpose
+          refreshToken: user.refreshToken, //for development purpose
           expiresAt: user.expiresAt,
         };
       }
-      if (token.error === 'RefreshAccessTokenError' ) {
-        return {} //broken token after refresh failure
+      if (token.error === 'RefreshAccessTokenError') {
+        return {}; //broken token after refresh failure
       }
       if (token.expiresAt && Date.now() < token.expiresAt) {
+        return token;
+      }
+      if (!token.refreshToken) {
         return token;
       }
       return await refreshAccessToken(token);
     },
 
-    async session({ session, token }) : Promise <Session> {
+    async session({ session, token }): Promise<Session> {
       if (!token?.accessToken) {
         return {
           ...session,
-          user: null
-        }
-      };
+          user: null,
+        };
+      }
       return {
         ...session,
         user: {
@@ -131,12 +159,12 @@ const option: NextAuthOptions = {
           image: session.user?.image ?? null,
           role: token.role ?? null,
           accessToken: token.accessToken,
-        }
+        },
       };
     },
   },
   // if we need defaut route for login or logout
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
 };
 
 export default option;

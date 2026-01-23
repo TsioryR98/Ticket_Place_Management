@@ -145,7 +145,6 @@ export const orderDataProvider: DataProvider = {
     }
   },
 
-  // Méthodes minimales requises (implémentez selon vos besoins)
   create: () => Promise.resolve({ data: {} as any }),
   delete: () => Promise.resolve({ data: {} as any }),
   getMany: () => Promise.resolve({ data: [] }),

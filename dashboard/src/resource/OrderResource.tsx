@@ -50,6 +50,7 @@ export const OrderShow = () => (
           <TextField source="event_title" />
           <DateField source="event_date" showTime />
           <TextField source="event_location" />
+          <TextField source="actions" />
         </Datagrid>
       </ArrayField>
     </SimpleShowLayout>

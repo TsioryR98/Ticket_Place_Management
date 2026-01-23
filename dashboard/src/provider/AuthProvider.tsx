@@ -9,9 +9,22 @@ export const authProvider: AuthProvider = {
     });
     try {
       const response = await fetch(request);
+      if (!response.ok) {
+        return Promise.reject(new Error("Invalid login"));
+      }
       if (response.ok) {
-        const { tokens } = await response.json();
-        localStorage.setItem("token", tokens.accessToken); // save token
+        const data = await response.json();
+        const token = data.accessToken;
+
+        //mapper for user data
+        const user  = {
+          ...data.user,
+          id: data.user.user_id,
+          name: data.user.user_name,
+          email: data.user.user_email,
+        }
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(user));
         return Promise.resolve();
       }
       return Promise.reject(new Error("Invalid login"));

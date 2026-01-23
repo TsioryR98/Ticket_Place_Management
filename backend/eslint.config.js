@@ -9,5 +9,9 @@ export default defineConfig([
     extends: ['js/recommended'],
     languageOptions: { globals: globals.browser },
     ignores: ['node_modules/'],
+    env: {
+      node: true,
+      es2021: true,
+    },
   },
 ]);

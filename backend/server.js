@@ -8,6 +8,9 @@ import { orderRouter } from './routes/orderRoutes.js';
 import { usersTokenRouter } from './routes/userTokenRoute.js';
 import { initWebSocket } from './websocket/wsServer.js';
 import { googleOauthRouter } from './routes/googleOauthRoute.js';
+import { orderValidatorRouter } from './routes/orderValidatorRoute.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -35,6 +38,8 @@ app.use('/api/events', ticketRouter);
 app.use('/api/users', usersTokenRouter);
 //route google oauth
 app.use('/api/users', googleOauthRouter);
+//route validate order
+app.use('/api/orders', orderValidatorRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`appServer is running on http://localhost:${PORT}`);

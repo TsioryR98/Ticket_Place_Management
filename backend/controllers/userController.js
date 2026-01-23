@@ -86,7 +86,7 @@ export const loginUser = async (req, res) => {
     });
 
     return res.json({
-      token: tokens.accessToken,
+      accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       expiresAt: tokens.expiresAt,
       user: {
@@ -228,7 +228,7 @@ export const updateUserRole = async (req, res) => {
   const { role } = req.body; // New role from the request body
   const { role: currentUserRole } = req.user; // Current user's role from JWT
 
-  if (currentUserRole !== 'user') {
+  if (currentUserRole !== 'admin') {
     return res.status(403).json({ error: 'Forbidden request' });
   }
 

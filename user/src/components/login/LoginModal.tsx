@@ -77,7 +77,7 @@ const LoginModal = () => {
       </div>
 
       <div className="modal-content bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md mx-4 animate-slideUp relative overflow-hidden">
-        <div className="absolute -z-10 inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl opacity-70"></div>
+        <div className="absolute -z-10 inset-0 bg-linear-to-r from-blue-50 to-indigo-50 rounded-2xl opacity-70"></div>
 
         <div className="modal-header flex justify-between items-center pb-6 relative">
           <h1 className="text-2xl font-bold text-blue-700">Welcome Back</h1>
@@ -238,7 +238,7 @@ const LoginModal = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-base font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 transform hover:-translate-y-0.5 disabled:opacity-70"
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-base font-medium text-white bg-linear-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 transform hover:-translate-y-0.5 disabled:opacity-70"
             >
               {isSubmitting ? (
                 <>
@@ -281,9 +281,9 @@ const LoginModal = () => {
             </p>
 
             <div className="flex items-center my-4">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
+              <div className="flex-1 h-px bg-linear-to-r from-transparent via-blue-300 to-transparent"></div>
               <span className="px-4 text-blue-500 text-sm font-medium">or continue with</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
+              <div className="flex-1 h-px bg-linear-to-r from-transparent via-blue-300 to-transparent"></div>
             </div>
 
             {/* Google Login Button */}

@@ -74,7 +74,7 @@ const option: NextAuthOptions = {
             name: data.user.user_name,
             email: data.user.user_email,
             role: data.user.role,
-            accessToken: data.token,
+            accessToken: data.accessToken,
             refreshToken: data.refreshToken, //for development purpose
             expiresAt: data.expiresAt,
           };

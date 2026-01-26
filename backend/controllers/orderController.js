@@ -237,6 +237,8 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+/**----CANCEL ORDER */
+
 export const cancelOrder = async (req, res) => {
   const { id } = req.params;
 

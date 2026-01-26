@@ -13,6 +13,7 @@ import {
   FunctionField,
   ArrayField,
 } from 'react-admin';
+import { OrderOptionToolbar } from '../components/orderOptionToolbar';
 
 export const OrderList = () => (
   <List>
@@ -31,7 +32,7 @@ export const OrderList = () => (
 );
 
 export const OrderShow = () => (
-  <Show>
+  <Show actions={<OrderOptionToolbar />}>
     <SimpleShowLayout>
       <TextField source="id" label="Order ID" />
       <FunctionField

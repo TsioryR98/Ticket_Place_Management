@@ -176,6 +176,13 @@ export const orderDataProvider: DataProvider & {
       if (!token) {
         throw new Error('No token found in localStorage');
       }
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}/cancel`, {
+        method: 'POST',
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+      return { data_cancel: json };
     } catch (error) {}
   },
 

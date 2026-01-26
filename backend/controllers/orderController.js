@@ -237,6 +237,56 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+export const cancelOrder = async (req, res) => {
+  const { id } = req.params;
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // 1. Vérifier la commande
+    const orderResult = await client.query(
+      `SELECT status_order FROM orders WHERE order_id = $1 FOR UPDATE`,
+      [id],
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Commande non trouvée' });
+    }
+
+    if (orderResult.rows[0].status_order !== 'pending') {
+      return res.status(400).json({ error: 'Commande non annulable' });
+    }
+
+    // 2. Récupérer les items
+    const itemsResult = await client.query(
+      `SELECT ticket_id, quantity FROM order_items WHERE order_id = $1`,
+      [id],
+    );
+
+    // 3. Restaurer le stock
+    for (const item of itemsResult.rows) {
+      await client.query(`UPDATE tickets SET available = available + $1 WHERE ticket_id = $2`, [
+        item.quantity,
+        item.ticket_id,
+      ]);
+    }
+
+    // 4. Annuler la commande
+    await client.query(`UPDATE orders SET status_order = 'cancelled' WHERE order_id = $1`, [id]);
+
+    await client.query('COMMIT');
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: 'Erreur lors de l’annulation' });
+  } finally {
+    client.release();
+  }
+};
+
 // cancel the reservation
 export const cancelOrderItem = async (req, res) => {
   const { orderId, ticketId } = req.params;

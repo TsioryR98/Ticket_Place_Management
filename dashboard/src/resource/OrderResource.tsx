@@ -42,14 +42,25 @@ export const OrderShow = () => (
       <TextField source="status_order" />
       <DateField source="created_at" showTime />
 
+      <hr />
+      <h3>Order Items</h3>
       <ArrayField source="items">
-        <Datagrid>
-          <TextField source="ticket_type" />
+        <Datagrid bulkActionButtons={false}>
+          <TextField source="ticket_type" label="Type" />
+          <TextField source="event_title" label="Event" />
+          <DateField source="event_date" label="Date Event" showTime />
+          <TextField source="event_location" label="Location" />
+          <TextField source="ticket_type" label="Category" />
           <NumberField source="quantity" />
-          <NumberField source="price" options={{ style: 'currency', currency: 'EUR' }} />
-          <TextField source="event_title" />
-          <DateField source="event_date" showTime />
-          <TextField source="event_location" />
+          <NumberField
+            source="price"
+            label="Unit Price"
+            options={{ style: 'currency', currency: 'EUR' }}
+          />
+          <FunctionField
+            label="subtotal"
+            render={(record: any) => `${(record.price * record.quantity).toFixed(2)} €`}
+          />
           <TextField source="actions" />
         </Datagrid>
       </ArrayField>

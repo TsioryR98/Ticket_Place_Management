@@ -33,7 +33,10 @@ interface Order extends RaRecord {
   }[];
 }
 
-export const orderDataProvider: DataProvider = {
+export const orderDataProvider: DataProvider & {
+  validate?: any;
+  cancel?: any;
+} = {
   getList: async (resource, params) => {
     try {
       const { eventId } = params.filter || {};
@@ -143,6 +146,37 @@ export const orderDataProvider: DataProvider = {
     } catch (error) {
       throw error;
     }
+  },
+
+  validate: async (resource: string, params: any) => {
+    const { id } = params;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+      const { json } = await httpClient(`${urlAPI}/${resource}/${id}/validate`, {
+        method: 'POST',
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
+      });
+      return { data_validate: json };
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  cancel: async (resource: string, params: any) => {
+    const { id } = params;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+    } catch (error) {}
   },
 
   create: () => Promise.resolve({ data: {} as any }),

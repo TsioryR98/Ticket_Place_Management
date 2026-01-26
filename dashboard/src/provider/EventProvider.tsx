@@ -110,6 +110,10 @@ export const eventDataProvider: DataProvider = {
 
       const { json } = await httpClient(`${urlAPI}/${resource}/${id}`, {
         method: 'GET',
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
       });
       const mappedData = {
         id: json.id,

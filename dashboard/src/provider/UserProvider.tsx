@@ -39,7 +39,7 @@ const httpClient = fetchUtils.fetchJson;
 
 //DATA FOR USER IN admin Page
 export const userDataProvider: DataProvider = {
-  getList: async function<RecordType extends RaRecord = User>(
+  getList: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: GetListParams & QueryFunctionContext,
   ): Promise<GetListResult<RecordType>> {
@@ -92,7 +92,7 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  getOne: async function<RecordType extends RaRecord = User>(
+  getOne: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: GetOneParams<RecordType> & QueryFunctionContext,
   ): Promise<GetOneResult<RecordType>> {
@@ -126,7 +126,7 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  update: async function<RecordType extends RaRecord = User>(
+  update: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: UpdateParams,
   ): Promise<UpdateResult<RecordType>> {
@@ -158,7 +158,7 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  delete: async function<RecordType extends RaRecord = User>(
+  delete: async function <RecordType extends RaRecord = User>(
     resource: string,
     params: DeleteParams<RecordType>,
   ): Promise<DeleteResult<RecordType>> {
@@ -184,31 +184,31 @@ export const userDataProvider: DataProvider = {
     }
   },
 
-  create: function<
+  create: function <
     RecordType extends Omit<RaRecord, 'id'> = any,
-    ResultRecordType extends RaRecord = RecordType & { id: Identifier }
+    ResultRecordType extends RaRecord = RecordType & { id: Identifier },
   >(resource: string, params: CreateParams): Promise<CreateResult<ResultRecordType>> {
     throw new Error('Function not implemented.');
   },
-  getMany: function<RecordType extends RaRecord = any>(
+  getMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyParams<RecordType> & QueryFunctionContext,
   ): Promise<GetManyResult<RecordType>> {
     throw new Error('Function not implemented.');
   },
-  getManyReference: function<RecordType extends RaRecord = any>(
+  getManyReference: function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyReferenceParams & QueryFunctionContext,
   ): Promise<GetManyReferenceResult<RecordType>> {
     throw new Error('Function not implemented.');
   },
-  updateMany: function<RecordType extends RaRecord = any>(
+  updateMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: UpdateManyParams,
   ): Promise<UpdateManyResult<RecordType>> {
     throw new Error('Function not implemented.');
   },
-  deleteMany: function<RecordType extends RaRecord = any>(
+  deleteMany: function <RecordType extends RaRecord = any>(
     resource: string,
     params: DeleteManyParams<RecordType>,
   ): Promise<DeleteManyResult<RecordType>> {

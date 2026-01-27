@@ -229,8 +229,8 @@ export default function ReservationList() {
           {filter === 'upcoming'
             ? 'Your next events'
             : filter === 'past'
-            ? 'Your past events'
-            : 'All your reservations'}
+              ? 'Your past events'
+              : 'All your reservations'}
         </motion.p>
       </motion.div>
 
@@ -302,8 +302,8 @@ export default function ReservationList() {
                 {filter === 'upcoming'
                   ? 'You have no upcoming reservations'
                   : filter === 'past'
-                  ? 'No past reservations'
-                  : "You don't have any reservations yet"}
+                    ? 'No past reservations'
+                    : "You don't have any reservations yet"}
               </p>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link

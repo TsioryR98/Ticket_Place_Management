@@ -17,7 +17,12 @@ export const CancelOrder = () => {
   };
   return (
     <>
-      <Button label="Cancel Order" onClick={() => setOpen(true)} color="warning" />
+      <Button
+        style={{ fontWeight: 'bold' }}
+        label="Cancel"
+        onClick={() => setOpen(true)}
+        color="warning"
+      />
       <Confirm
         isOpen={open}
         title="Confirm Cancellation"

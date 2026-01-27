@@ -18,7 +18,12 @@ export const ValidateButton = () => {
   return (
     <>
       {' '}
-      <Button label="Validate Order" onClick={() => setOpen(true)} color="success" />
+      <Button
+        style={{ fontWeight: 'bold' }}
+        label="Validate"
+        onClick={() => setOpen(true)}
+        color="success"
+      />
       <Confirm
         isOpen={open}
         title="Confirm Validation"

@@ -82,11 +82,11 @@ export const validateOrder = async (req, res) => {
       [order.user_id],
     );
     const user = userResult.rows[0];
-
+    //same as correct params in orderconfirmedTemplate
     let htmlContent = orderConfirmedTemplate({
-      user_name: user.user_name,
+      userName: user.user_name,
       orderId,
-      items: OrderWithQrCodes,
+      tickets: OrderWithQrCodes,
     });
 
     await sendEmail({

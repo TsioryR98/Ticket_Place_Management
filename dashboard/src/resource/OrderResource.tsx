@@ -59,10 +59,9 @@ export const OrderShow = () => (
             options={{ style: 'currency', currency: 'EUR' }}
           />
           <FunctionField
-            label="subtotal"
+            label="Subtotal"
             render={(record: any) => `${(record.price * record.quantity).toFixed(2)} €`}
           />
-          <TextField source="actions" />
         </Datagrid>
       </ArrayField>
     </SimpleShowLayout>

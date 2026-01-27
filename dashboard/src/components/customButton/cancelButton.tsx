@@ -21,7 +21,7 @@ export const CancelOrder = () => {
         style={{ fontWeight: 'bold' }}
         label="Cancel"
         onClick={() => setOpen(true)}
-        color="warning"
+        color="error"
       />
       <Confirm
         isOpen={open}
